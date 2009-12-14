@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://schemas.active-endpoints.com/catalog/2006/07/catalog.xsd">
+   <wsdlEntry classpath="wsdl/ApprovalService.wsdl"
+              location="project:/wsdl/ApprovalService.wsdl"/>
+   <wsdlEntry classpath="wsdl/AssessorService.wsdl"
+              location="project:/wsdl/AssessorService.wsdl"/>
+   <wsdlEntry classpath="wsdl/LoanService.wsdl" location="project:/wsdl/LoanService.wsdl"/>
+   <schemaEntry classpath="wsdl/Loans.xsd" location="project:/wsdl/Loans.xsd"/>
+</catalog>

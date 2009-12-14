@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BaseBPELBuildFile" default="abstract" basedir=".">
+
+    <!-- Directorio en el que se halla este fichero Ant (así funciona siempre, da igual desde donde se importe) -->
+    <dirname property="basebuild.basedir" file="${ant.file.BaseBPELBuildFile}"/>
+
+    <!-- Directorio base de takuan, simplifica las localizaciones.  -->
+    <dirname property="basebuild.takuan_basedir" file="${basebuild.basedir}/../../.."/>
+
+    <!-- Importamos todas las variables de entorno existentes -->
+    <property environment="env"/>
+
+    <!-- Ruta al JAR con la tarea Ant de autoinstrumentación -->
+    <path id="instr.classpath">
+        <pathelement location="${basebuild.takuan_basedir}/bin/instrumentador_bpel.jar"/>
+    </path>
+
+    <!-- Ruta a los guiones de análisis mediante Daikon -->
+    <property name="analyzer.path"  location="${basebuild.takuan_basedir}/src/analizadorDaikon/" />
+
+    <!-- Nombre del guión principal de análisis mediante Daikon -->
+    <property name="analyzer.name"  value="analizadorDaikon.pl" />
+
+    <!-- Opciones por defecto para el analizador de Daikon -->
+    <property name="analyzer.flags" value="--metrics --simplify --index-flattening"/>
+
+    <!-- Ruta a los process logs de Tomcat -->
+    <property name="processlog.dir" location="${env.HOME}/AeBpelEngine/process-logs/"/>
+
+    <!-- Nombre del fichero BPEL instrumentado -->
+    <property name="instrumented.bpel"  value="bpel_ins.bpel"/>
+
+    <!-- Nombre del fichero de declaraciones generado por el autoinstrumentador -->
+    <property name="instrumented.decls" value="procesoInspeccionado.decls"/>
+
+    <!-- CUERPO DEL FICHERO ANT -->
+    <target name="init">
+        <tstamp/>
+
+        <!-- Nombre de la carpeta de ficheros de salida de Daikon y el analizador -->
+        <property name="daikonout.dir" location="daikon-out-${DSTAMP}-${TSTAMP}"/>
+
+    </target>
+
+    <typedef name="bpelunit" classname="org.bpelunit.framework.ui.ant.BPELUnit">
+        <classpath>
+            <fileset dir="${env.BPELUNIT_HOME}/lib"/>
+        </classpath>
+    </typedef>
+
+    <taskdef name="instrument" 
+        classname="es.uca.webservices.bpel.InstrumentBPELProcessTask" 
+        classpathref="instr.classpath"/>
+
+    <target name="abstract">
+        <fail message="Este fichero Ant no se usa directamente, sino que ha de ser importado por otro"/>
+    </target>
+
+    <target name="test-and-analyze" depends="test,analyze"
+        description="Runs all tests and analyses the results with Daikon"/>
+
+    <target name="test" depends="build-bpr" description="Runs all tests with BPELUnit">
+        <!-- Ejecutamos BPELUnit -->
+        <bpelunit testsuite="${bptsfile}" bpelunitdir="${env.BPELUNIT_HOME}">      
+            <logging level="INFO"/>
+        </bpelunit>
+    </target>
+
+    <target name="analyze" depends="init" description="Analyses the results of the last run with Daikon">
+
+        <!-- Borramos la carpeta de análisis de Daikon (si estuviera) y la
+        creamos de nuevo -->
+        <delete dir="${daikonout.dir}"/>
+        <mkdir  dir="${daikonout.dir}"/>
+
+        <!-- Ejecutamos el motor de análisis por Daikon -->
+        <apply executable="perl" dir="${analyzer.path}" parallel="true">
+            <arg file="${analyzer.path}/${analyzer.name}"/>
+
+            <!-- Opciones -->
+            <arg line="${analyzer.flags}"/>
+
+            <!-- Retirar espacio entre guiones y descomentar si se desea
+            activar el paralelizado de parte del preprocesado -->
+            <!-- <arg line="- -ncpu 2"/>  -->
+
+            <arg value="--output-dir"/>
+            <arg file="${daikonout.dir}"/>
+
+            <!-- Fichero de declaraciones -->
+            <arg file="${instrumented.decls}"/>
+
+            <!-- Logs nuevos generados tras la ejecución anterior de
+            BPELUnit (no se permite ejecutar varias pruebas de unidad
+            concurrentemente) -->
+            <fileset dir="${processlog.dir}">
+                <include name="**/*.log"/>
+                <depend targetdir="."> 
+                    <mapper type="merge" to="${instrumented.bpel}"/>
+                </depend>
+            </fileset>
+        </apply>
+    </target>
+
+    <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
+        <instrument bpel="${main.bpel}" bpr="${bprfile}"/>
+        <move file="${basebuild.basedir}/../catalog.xml" todir="${basebuild.baseprojectdir}"/>
+        <move file="${basebuild.basedir}/../tiposReunidos.xml" todir="${basebuild.baseprojectdir}"/>
+        <move file="${basebuild.basedir}/../procesoInspeccionado.decls" todir="${basebuild.baseprojectdir}"/>
+        <move file="${basebuild.basedir}/../proceso.pdd" todir="${basebuild.baseprojectdir}"/>
+        <move file="${basebuild.basedir}/../procesoInspeccionado.bpel" todir="${basebuild.baseprojectdir}"/>
+    </target>
+
+</project>

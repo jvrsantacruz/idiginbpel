@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+   Copyright (C) 2009 Antonio García Domínguez
+
+   This file is part of the LoanApprovalDoc composition in the SPI&FM
+   WS-BPEL composition repository.
+
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+--><process xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://enterprise.netbeans.org/bpel/N6_ServicioPrestamo/LoanApprovalProcess" xmlns:ns1="http://j2ee.netbeans.org/wsdl/ApprovalService" xmlns:ns2="http://j2ee.netbeans.org/wsdl/AssessorService" xmlns:ns0="http://xml.netbeans.org/schema/Loans" xmlns:ns3="http://j2ee.netbeans.org/wsdl/LoanService" xmlns:uca="http://www.uca.es/xpath/2007/11" name="LoanApprovalProcess" targetNamespace="http://enterprise.netbeans.org/bpel/N6_ServicioPrestamo/LoanApprovalProcess" uca:dummy="dummy"><bpel:extensions xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"><bpel:extension mustUnderstand="no" namespace="http://www.uca.es/xpath/2007/11"/></bpel:extensions>
+  <import namespace="http://j2ee.netbeans.org/wsdl/ApprovalService" location="ApprovalService.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <import namespace="http://j2ee.netbeans.org/wsdl/AssessorService" location="AssessorService.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <import namespace="http://j2ee.netbeans.org/wsdl/LoanService" location="LoanService.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+  <partnerLinks>
+    <partnerLink name="assessor" partnerLinkType="ns2:AssessorService1" partnerRole="AssessorServicePortTypeRole"/>
+    <partnerLink name="approver" partnerLinkType="ns1:ApprovalService1" partnerRole="ApprovalServicePortTypeRole"/>
+    <partnerLink name="client" partnerLinkType="ns3:LoanService1" myRole="LoanServicePortTypeRole"/>
+  </partnerLinks>
+  <bpel:variables xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"><variable name="processOutput" messageType="ns3:LoanServiceOperationReply"/><variable name="dummy_processOutput" uca:instrument="no" messageType="ns3:LoanServiceOperationReply"/><variable name="processInput" messageType="ns3:LoanServiceOperationRequest"/><variable name="dummy_processInput" uca:instrument="no" messageType="ns3:LoanServiceOperationRequest"/><variable name="assessorOutput" messageType="ns2:AssessorServiceOperationReply"/><variable name="dummy_assessorOutput" uca:instrument="no" messageType="ns2:AssessorServiceOperationReply"/><variable name="assessorInput" messageType="ns2:AssessorServiceOperationRequest"/><variable name="dummy_assessorInput" uca:instrument="no" messageType="ns2:AssessorServiceOperationRequest"/><variable name="approverOutput" messageType="ns1:ApprovalServiceOperationReply"/><variable name="dummy_approverOutput" uca:instrument="no" messageType="ns1:ApprovalServiceOperationReply"/><variable name="approverInput" messageType="ns1:ApprovalServiceOperationRequest"/><variable name="dummy_approverInput" uca:instrument="no" messageType="ns1:ApprovalServiceOperationRequest"/></bpel:variables>
+  <sequence name="Main"><receive name="Receive1" createInstance="yes" partnerLink="client" operation="grantLoan" portType="ns3:LoanServicePortType" variable="processInput"/><!--inicio de inspecciones para //*[@name='Main']:::ENTER--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="ENTER"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='Main']:::ENTER--><assign name="DefaultValues">
+      <copy>
+        <from>
+          <literal><ns0:AssessorRequest><ns0:amount>0.0</ns0:amount></ns0:AssessorRequest></literal>
+        </from>
+        <to part="input" variable="assessorInput"/>
+      </copy>
+      <copy>
+        <from>
+          <literal><ns0:ApprovalResponse><ns0:accept>false</ns0:accept></ns0:ApprovalResponse></literal>
+        </from>
+        <to part="output" variable="processOutput"/>
+      </copy>
+      <copy>
+        <from>
+          <literal><ns0:ApprovalRequest><ns0:amount>0.0</ns0:amount></ns0:ApprovalRequest></literal>
+        </from>
+        <to part="input" variable="approverInput"/>
+      </copy>
+    </assign><if name="If1">
+      <condition>uca:ambito(0, '(number(string(uca:imprimirRutas(1, @0@$processInput.input/ns0:amount@0@))) &lt;= 10000.0)')</condition>
+      <sequence name="SmallAmount"><!--inicio de inspecciones para //*[@name='SmallAmount']:::ENTER--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="ENTER"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmount']:::ENTER-->
+        <assign name="copyLoanInfoToAssessorInput">
+          <copy>
+            <from>uca:ambito(0, 'uca:imprimirRutas(1, @0@$processInput.input/ns0:amount@0@)')</from>
+            <to>$assessorInput.input/ns0:amount</to>
+          </copy>
+        </assign>
+        <invoke name="queryAssessor" partnerLink="assessor" operation="assessLoan" portType="ns2:AssessorServicePortType" inputVariable="assessorInput" outputVariable="assessorOutput"/>
+        <if name="If2">
+          <condition>uca:ambito(0, '(string(uca:imprimirRutas(1, @0@$assessorOutput.output/ns0:risk@0@)) = @0@high@0@)')</condition>
+          <sequence name="SmallAmountHighRisk"><!--inicio de inspecciones para //*[@name='SmallAmountHighRisk']:::ENTER--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="ENTER"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmountHighRisk']:::ENTER-->
+            <assign name="copyLoanInfoToApproverInput">
+              <copy>
+                <from>uca:ambito(0, 'uca:imprimirRutas(1, @0@$processInput.input/ns0:amount@0@)')</from>
+                <to>$approverInput.input/ns0:amount</to>
+              </copy>
+            </assign>
+            <invoke name="queryApprover" partnerLink="approver" operation="approveLoan" portType="ns1:ApprovalServicePortType" inputVariable="approverInput" outputVariable="approverOutput"/>
+            <assign name="copyApproval">
+              <copy>
+                <from>uca:ambito(0, 'uca:imprimirRutas(1, @0@$approverOutput.output/ns0:accept@0@)')</from>
+                <to>$processOutput.output/ns0:accept</to>
+              </copy>
+            </assign>
+          <!--inicio de inspecciones para //*[@name='SmallAmountHighRisk']:::EXIT--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="EXIT"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmountHighRisk']:::EXIT--></sequence>
+          <else>
+            <sequence name="SmallAmountLowRisk"><!--inicio de inspecciones para //*[@name='SmallAmountLowRisk']:::ENTER--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="ENTER"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmountLowRisk']:::ENTER-->
+              <assign name="approveLoan">
+                <copy>
+                  <from>uca:ambito(0, 'true()')</from>
+                  <to>$processOutput.output/ns0:accept</to>
+                </copy>
+              </assign>
+            <!--inicio de inspecciones para //*[@name='SmallAmountLowRisk']:::EXIT--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="EXIT"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmountLowRisk']:::EXIT--></sequence>
+          </else>
+        </if>
+      <!--inicio de inspecciones para //*[@name='SmallAmount']:::EXIT--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="EXIT"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='SmallAmount']:::EXIT--></sequence>
+      <else>
+        <sequence name="LargeAmount"><!--inicio de inspecciones para //*[@name='LargeAmount']:::ENTER--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="ENTER"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='LargeAmount']:::ENTER-->
+          <assign name="copyLoanInfoToApproverInput2">
+            <copy>
+              <from>uca:ambito(0, 'uca:imprimirRutas(1, @0@$processInput.input/ns0:amount@0@)')</from>
+              <to>$approverInput.input/ns0:amount</to>
+            </copy>
+          </assign>
+          <invoke name="queryApprover2" partnerLink="approver" operation="approveLoan" portType="ns1:ApprovalServicePortType" inputVariable="approverInput" outputVariable="approverOutput"/>
+          <assign name="copyApproval2">
+            <copy>
+              <from>uca:ambito(0, 'uca:imprimirRutas(1, @0@$approverOutput.output/ns0:accept@0@)')</from>
+              <to>$processOutput.output/ns0:accept</to>
+            </copy>
+          </assign>
+        <!--inicio de inspecciones para //*[@name='LargeAmount']:::EXIT--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="EXIT"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='LargeAmount']:::EXIT--></sequence>
+      </else>
+    </if><!--inicio de inspecciones para //*[@name='Main']:::EXIT--><bpel:assign xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable" uca:punto="EXIT"><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processOutput.output')</bpel:from><bpel:to>$dummy_processOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$processInput.input')</bpel:from><bpel:to>$dummy_processInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorOutput.output')</bpel:from><bpel:to>$dummy_assessorOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$assessorInput.input')</bpel:from><bpel:to>$dummy_assessorInput.input</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverOutput.output')</bpel:from><bpel:to>$dummy_approverOutput.output</bpel:to></bpel:copy><bpel:copy ignoreMissingFromData="yes"><bpel:from>uca:inspeccionar(0, '$approverInput.input')</bpel:from><bpel:to>$dummy_approverInput.input</bpel:to></bpel:copy></bpel:assign><!--fin de inspecciones para //*[@name='Main']:::EXIT--><reply name="Reply1" partnerLink="client" operation="grantLoan" portType="ns3:LoanServicePortType" variable="processOutput"/></sequence>
+</process>
