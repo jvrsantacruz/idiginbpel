@@ -1,0 +1,20 @@
+# GUI Translation strings
+# This file is distributed under the same license as the idg package.
+# Javier Santacruz javier.santacruz@uca.es, 2009.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-08 05:25+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: idgui/main.py:127 idgui/main.py:188
+msgid "Seleccionado el fichero "
+msgstr ""

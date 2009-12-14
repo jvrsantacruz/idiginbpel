@@ -1,0 +1,85 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-08 05:28+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: idg/main.py:38
+msgid "El nombre del proyecto no puede estar vacío"
+msgstr ""
+
+#: idg/main.py:42
+msgid "Ya existe un proyecto con ese nombre"
+msgstr ""
+
+#: idg/main.py:45
+msgid "El fichero no existe "
+msgstr ""
+
+#: idg/proyecto.py:127
+msgid "Buscando_dep_bpel"
+msgstr ""
+
+#: idg/proyecto.py:131
+msgid "Error_no_pudo_abrir "
+msgstr ""
+
+#: idg/proyecto.py:132
+msgid "Error_no_pudo_abrir"
+msgstr ""
+
+#: idg/proyecto.py:139 idg/proyecto.py:140 idg/proyecto.py:224
+msgid "Error al parsear "
+msgstr ""
+
+#: idg/proyecto.py:182
+msgid "Guardando bpel en proyecto: "
+msgstr ""
+
+#: idg/proyecto.py:184
+msgid "Error_guardar_bpel"
+msgstr ""
+
+#: idg/proyecto.py:219
+msgid "Dependencia: "
+msgstr ""
+
+#: idg/proyecto.py:260
+msgid "Error al escribir en el proyecto"
+msgstr ""
+
+#: idg/proyecto.py:281
+msgid "Inicializando proyecto"
+msgstr ""
+
+#: idg/proyecto.py:285
+msgid "Error al iniciar proyecto con base/skel"
+msgstr ""
+
+#: idg/proyecto.py:290
+msgid "Buscando dependencias"
+msgstr ""
+
+#: idg/proyecto.py:298
+msgid "Crear Proyecto: Error al crear ficheros de proyecto"
+msgstr ""
+
+#: idg/proyecto.py:302
+msgid "Proyecto creado correctamente"
+msgstr "Broma"
+
+#: idg/proyecto.py:316
+msgid "No existe el fichero "
+msgstr ""
