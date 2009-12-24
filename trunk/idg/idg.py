@@ -17,7 +17,6 @@ class Idg(object):
     share = ""
     takuan = ""
 
-
     def __init__(self,path,config):
         """@brief Inicializa IndigBPEL
            @param path ruta base de ejecución del programa.
@@ -65,7 +64,7 @@ class Idg(object):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
         # Leer los proyectos existentes en data/proy
         # Eliminar directorios ocultos.
-        self.lista_proyectos = os.listdir(path.join(self.home,"proy"))
+        self.lista_proyectos = os.listdir(os.path.join(self.home,"proy"))
         self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
         self.lista_proyectos.sort()
         print self.lista_proyectos
@@ -78,11 +77,12 @@ class Idg(object):
         """@brief Obtiene todos los parámetros generales de los ficheros de configuración."""
         try: 
             xml = md.parse(self.config)
-            self.home = xml.getElementByTagName('home').getAttr('src')
-            self.share = xml.getElementByTagName('share').getAttr('src')
-            self.takuan = xml.getElementByTagName('takuan').getAttr('src')
         except:
             print _("No se pudo leer el fichero de configuración ") + self.config
+        self.home = xml.getElementsByTagName('home')[0].getAttribute('src')
+        self.share = xml.getElementsByTagName('share')[0].getAttribute('src')
+        self.takuan = xml.getElementsByTagName('takuan')[0].getAttribute('src')
+
 
 
     def config(self, nombre):
