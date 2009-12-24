@@ -104,6 +104,8 @@
 
     <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
         <instrument bpel="${main.bpel}" bpr="${bprfile}"/>
+	<!-- Movemos los ficheros temporales generados al directorio 
+	     de proyecto desde el cual se importó este ant -->
         <move file="${basebuild.basedir}/../catalog.xml" todir="${basebuild.baseprojectdir}"/>
         <move file="${basebuild.basedir}/../tiposReunidos.xml" todir="${basebuild.baseprojectdir}"/>
         <move file="${basebuild.basedir}/../procesoInspeccionado.decls" todir="${basebuild.baseprojectdir}"/>

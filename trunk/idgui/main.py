@@ -23,7 +23,8 @@ class Idgui(object):
 
         ### Ventana principal
         # Leer xml de la ventana principal
-        self.builder.add_from_file("idgui/ui/main.glade")
+        #self.builder.add_from_file("idgui/ui/main.glade")
+        self.builder.add_from_file("base/ui/main.glade")
 
         # Obtener objeto ventana
         self.main_ventana = self.builder.get_object("main_ventana")
@@ -82,7 +83,8 @@ class Idgui(object):
 
         self.nuevo = True
         # Cargar el proyecto desde el glade
-        self.builder.add_from_file("idgui/ui/proyecto_panel.glade")
+        #self.builder.add_from_file("idgui/ui/proyecto_panel.glade")
+        self.builder.add_from_file("base/ui/proyecto_panel.glade")
 
         # Filtro para el selector de ficheros
         self.filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
@@ -146,7 +148,8 @@ class Idgui(object):
 
         # Comprobar si portada está inicializada
         # y cargarla en ese caso
-        self.builder.add_from_file("idgui/ui/portada.glade")
+        #self.builder.add_from_file("idgui/ui/portada.glade")
+        self.builder.add_from_file("base/ui/portada.glade")
         self.portada = self.builder.get_object("portada")
 
         # Ocultar lo que hay en principal ahora mismo
@@ -166,7 +169,8 @@ class Idgui(object):
 
         #res = self.idg.cargar_proyecto(nombre)
 
-        self.builder.add_from_file("idgui/ui/proyecto_base.glade")
+        #self.builder.add_from_file("idgui/ui/proyecto_base.glade")
+        self.builder.add_from_file("base/ui/proyecto_base.glade")
         self.proyecto = self.builder.get_object("proyecto_base")
 
         # Ocultar lo que hay en principal ahora mismo

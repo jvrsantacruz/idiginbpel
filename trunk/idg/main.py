@@ -5,24 +5,33 @@ import os
 import commands
 import shutil
 from proyecto import Proyecto,ProyectoError
+from xml.dom import minidom as md
 import lang
 
 class Idg(object):
     """@Brief Objeto principal, maneja el programa completo."""
 
-    def __init__(self,path):
+    # Rutas a los directorios con los datos 
+    # Y la instalación de takuan
+    home = ""
+    share = ""
+    takuan = ""
+
+
+    def __init__(self,path,config):
         """@brief Inicializa IndigBPEL
-           @param path ruta base de ejecución del programa."""
+           @param path ruta base de ejecución del programa.
+           @param config ruta absoluta del fichero de configuración."""
 
         # Leer parámetros de la configuración
-        #self.leer_config()
+        self.config = config
+        self.leer_config()
 
 	# Ruta base de ejecución
     	self.path = path
 
         # Leer la lista de proyectos
         self.obtener_lista_proyectos()
-
         # Iniciar gui
         from idgui import main
         idgui = main.Idgui(self)
@@ -54,8 +63,10 @@ class Idg(object):
 
     def obtener_lista_proyectos(self):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
-        # Leer los proyectos existentes en data
-        self.lista_proyectos = os.listdir("data")
+        # Leer los proyectos existentes en data/proy
+        # Eliminar directorios ocultos.
+        self.lista_proyectos = os.listdir(path.join(self.home,"proy"))
+        self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
         self.lista_proyectos.sort()
         print self.lista_proyectos
 
@@ -65,12 +76,14 @@ class Idg(object):
 
     def leer_config(self):
         """@brief Obtiene todos los parámetros generales de los ficheros de configuración."""
-        self.config = {}
+        try: 
+            xml = md.parse(self.config)
+            self.home = xml.getElementByTagName('home').getAttr('src')
+            self.share = xml.getElementByTagName('share').getAttr('src')
+            self.takuan = xml.getElementByTagName('takuan').getAttr('src')
+        except:
+            print _("No se pudo leer el fichero de configuración ") + self.config
 
-        # Ruta instrumentador
-        # Ruta base-build.xml
-        # n cpus
-        pass
 
     def config(self, nombre):
         """@brief Obtener parámetros leidos de la configuración. 

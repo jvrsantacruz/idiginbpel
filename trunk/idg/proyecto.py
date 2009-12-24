@@ -53,8 +53,8 @@ class Proyecto(object):
 
     def __init__(self,nombre,bpel=""):
         """@Brief Constructor de la clase proyecto.
-           @nombre Nombre del proyecto
-           @bpel Ruta original del bpel
+           \nombre Nombre del proyecto
+           \bpel Ruta original del bpel
 
         Establece los valores por defecto para las rutas del proyecto.
         Crea el proyecto si se le indica la ruta a un bpel
@@ -69,9 +69,7 @@ class Proyecto(object):
         # Directorio de proyecto
         self.dir        =   path.join("data",nombre)
         self.dir        =   path.abspath( self.dir )
-        # Bpel original
-        self.bpel_o     =   path.abspath( bpel )
-
+        
         # Rutas de Ficheros
         self.bpel   =   path.join( self.dir , self.bpel_nom  )
         self.proy   =   path.join( self.dir , self.proy_nom  )
@@ -92,7 +90,12 @@ class Proyecto(object):
 
         # Si se indica la ruta del bpel, debemos crear el proyecto
         if self.bpel_o :
+            # Bpel original
+            self.bpel_o     =   path.abspath( bpel )
             self.crear()
+        # En caso contrario, inicializamos el proyecto
+        else:
+            self.leer_config()
 
         # Comprueba que la estructura del proyecto está bien
         self.check()
@@ -108,7 +111,6 @@ class Proyecto(object):
         # Invariantes
         self.finvr  =   os.listdir( self.invr_dir )  
 
-
         # Comprueba y sincroniza la configuración del proyecto
         # con la realidad del sistema de ficheros
         self.check_cfg()
@@ -117,7 +119,7 @@ class Proyecto(object):
         """@Brief Busca las dependencias de un bpel recursivamente. 
            Copia el bpel y las dependencias al proyecto.
            Modifica el bpel y las dependencias para adaptarlos al proyecto
-           @returns True si todo va bien, None si algo falla.
+           \returns True si todo va bien, None si algo falla.
            Eleva excepciones ProyectoError.
         """
 
@@ -128,6 +130,11 @@ class Proyecto(object):
 
         # Buscar las dependencias del bpel recursivamente
         self.deps = self.__buscar_dependencias([bpel])
+
+        print "%i dependencias encontradas, %i dependencias rotas, %i \
+        dependencias totales" % \
+        (len(self.deps),len(self.dep_miss),len(self.dep_miss)+len(self.deps))
+
         return True
 
     def __buscar_dependencias(self,files,first=True):
@@ -136,9 +143,9 @@ class Proyecto(object):
         Copia las dependencias al proyecto y las modifica para adaptar los
         import a rutas relativas al proyecto. 
         Añade las dependencias que no han podido ser obtenidas a dep_miss.
-        @param files Lista con rutas a los ficheros en los que buscar
-        @param first Flag para saber si estamos mirando el bpel original.
-        @returns Lista de rutas absolutas con las dependencias originales.
+        \param files Lista con rutas a los ficheros en los que buscar
+        \param first Flag para saber si estamos mirando el bpel original.
+        \returns Lista de rutas absolutas con las dependencias originales.
         """
 
         # Caso base files vacio
@@ -250,8 +257,7 @@ class Proyecto(object):
         # Copiar el bpel (y los wsdl y xsd que faltan)
         print _("Buscando dependencias")
         try:
-            if self.buscar_dependencias(self.bpel_o ) is None:
-                print "Error al buscar dependencias"
+            self.buscar_dependencias(self.bpel_o ) 
         except ProyectoError, error:                    
             # Borramos el intento de proyecto 
             shutil.rmtree(self.dir)
@@ -276,19 +282,19 @@ class Proyecto(object):
             # bpel original
         e = root.find('bpel_o')
         e.attrib['src'] = self.bpel_o
-        e.attrib['timestamp'] = path.getmtime(self.bpel_o)
+        #e.attrib['timestamp'] = path.getmtime(self.bpel_o)
              # bpel proyecto
         e = root.find('bpel')
-        e.attrib['timestamp'] = path.getmtime(self.bpel)
+        #e.attrib['timestamp'] = path.getmtime(self.bpel)
             # dependencias
         e = root.find('dependencias')
 
-        for d in self.dep, self.dep_miss:
+        for d in self.dep + self.dep_miss:
             print d
             sub = et.SubElement(e,'dependencia')
             sub.attrib['nombre'] = path.basename(d)
             sub.attrib['ruta'] = d
-            sub.attrib['rota'] = str( d in self.dep_miss )
+            sub.attrib['rota'] = d in self.dep_miss
 
         tree.write(self.proy)
             #except:
@@ -301,7 +307,8 @@ class Proyecto(object):
         return True
 
     def check(self):
-        """@Brief Comprueba que el proyecto está bien, de lo contrario lanza una excepción. """ 
+        """@Brief Comprueba que el proyecto está bien y sus ficheros de
+        configuración, de lo contrario lanza una excepción ProyectoError. """ 
 
         # Comprobar existencia de la estructura
         for f in ( self.dir, self.bpel, self.proy,
@@ -316,9 +323,10 @@ class Proyecto(object):
         # Instrumentar
         self.instrumentar()
 
-    def check_cfg(self):
-        """@Brief Comprueba los ficheros de configuración con respecto a la realidad del sistema de ficheros y trata de solucionar las incompatibilidades"""
-        pass
+    def leer_config(self):
+        """@Brief Lee e inicializa la clase leyendo de los ficheros de
+        configuración."""
+
 
     def instrumentar(self):
         """@Brief Instrumenta el proyecto o lanza una excepción.""" 
@@ -350,7 +358,7 @@ class Proyecto(object):
 
     def guardado(self):
         """@Brief Comprueba si hay información modificada por guardar.
-           @returns True si está todo guardado."""
+           \returns True si está todo guardado."""
         # Comprobar proyecto.xml
         # |- Comprobar casos
         # |- Comprobar trazas
