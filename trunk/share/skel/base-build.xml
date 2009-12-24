@@ -2,21 +2,21 @@
 <project name="BaseBPELBuildFile" default="abstract" basedir=".">
 
     <!-- Directorio en el que se halla este fichero Ant (así funciona siempre, da igual desde donde se importe) -->
-    <dirname property="basebuild.basedir" file="${ant.file.BaseBPELBuildFile}"/>
+    <dirname property="dir" file="${ant.file.BaseBPELBuildFile}"/>
 
     <!-- Directorio base de takuan, simplifica las localizaciones.  -->
-    <dirname property="basebuild.takuan_basedir" file="${basebuild.basedir}/../../.."/>
+    <property name="takuan" location="${dir}/../../.."/>
 
     <!-- Importamos todas las variables de entorno existentes -->
     <property environment="env"/>
 
     <!-- Ruta al JAR con la tarea Ant de autoinstrumentación -->
     <path id="instr.classpath">
-        <pathelement location="${basebuild.takuan_basedir}/bin/instrumentador_bpel.jar"/>
+        <pathelement location="${takuan}/bin/instrumentador_bpel.jar"/>
     </path>
 
     <!-- Ruta a los guiones de análisis mediante Daikon -->
-    <property name="analyzer.path"  location="${basebuild.takuan_basedir}/src/analizadorDaikon/" />
+    <property name="analyzer.path"  location="${takuan}/src/analizadorDaikon/" />
 
     <!-- Nombre del guión principal de análisis mediante Daikon -->
     <property name="analyzer.name"  value="analizadorDaikon.pl" />
@@ -105,12 +105,13 @@
     <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
         <instrument bpel="${main.bpel}" bpr="${bprfile}"/>
 	<!-- Movemos los ficheros temporales generados al directorio 
-	     de proyecto desde el cual se importó este ant -->
-        <move file="${basebuild.basedir}/../catalog.xml" todir="${basebuild.baseprojectdir}"/>
-        <move file="${basebuild.basedir}/../tiposReunidos.xml" todir="${basebuild.baseprojectdir}"/>
-        <move file="${basebuild.basedir}/../procesoInspeccionado.decls" todir="${basebuild.baseprojectdir}"/>
-        <move file="${basebuild.basedir}/../proceso.pdd" todir="${basebuild.baseprojectdir}"/>
-        <move file="${basebuild.basedir}/../procesoInspeccionado.bpel" todir="${basebuild.baseprojectdir}"/>
+	     de proyecto desde el cual se importó este ant 
+        <move file="${dir}/catalog.xml" todir="${basebuild.baseprojectdir}"/>
+        <move file="${dir}/tiposReunidos.xml" todir="${basebuild.baseprojectdir}"/>
+        <move file="${dir}/procesoInspeccionado.decls" todir="${basebuild.baseprojectdir}"/>
+        <move file="${dir}/proceso.pdd" todir="${basebuild.baseprojectdir}"/>
+        <move file="${dir}/procesoInspeccionado.bpel" todir="${basebuild.baseprojectdir}"/>
+-->
     </target>
 
 </project>

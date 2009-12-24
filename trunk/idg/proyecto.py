@@ -51,7 +51,7 @@ class Proyecto(object):
     mod    =   False # Modificado
 
 
-    def __init__(self,nombre,bpel=""):
+    def __init__(self,nombre,home,share,takuan,bpel=""):
         """@Brief Constructor de la clase proyecto.
            \nombre Nombre del proyecto
            \bpel Ruta original del bpel
@@ -67,15 +67,21 @@ class Proyecto(object):
         self.nombre     =   nombre
 
         # Directorio de proyecto
-        self.dir        =   path.join("data",nombre)
+        # TODO: Hacer que se consulten en 
+        #       un solo sitio
+        self.home       =   home
+        self.share      =   share
+        self.takuan     =   takuan
+        self.dir        =   path.join(home,'proy',nombre) #dir de proy
         self.dir        =   path.abspath( self.dir )
-        
+
         # Rutas de Ficheros
-        self.bpel   =   path.join( self.dir , self.bpel_nom  )
-        self.proy   =   path.join( self.dir , self.proy_nom  )
-        self.build  =   path.join( self.dir , self.build_nom )
-        self.test   =   path.join( self.dir , self.test_nom  )
-        self.bpr    =   path.join( self.dir , self.bpr_nom   )
+        self.bpel_o =   path.abspath( bpel )
+        self.bpel   =   path.join( self.dir , self.bpel_nom  ) #bpel
+        self.proy   =   path.join( self.dir , self.proy_nom  ) #config
+        self.build  =   path.join( self.dir , self.build_nom ) #ant proy
+        self.test   =   path.join( self.dir , self.test_nom  ) #test.bpts
+        self.bpr    =   path.join( self.dir , self.bpr_nom   ) #instrument
 
         # Rutas Directorios
         self.casos_dir  =   path.join( self.dir , self.casos_nom  )
@@ -90,8 +96,6 @@ class Proyecto(object):
 
         # Si se indica la ruta del bpel, debemos crear el proyecto
         if self.bpel_o :
-            # Bpel original
-            self.bpel_o     =   path.abspath( bpel )
             self.crear()
         # En caso contrario, inicializamos el proyecto
         else:
@@ -110,10 +114,6 @@ class Proyecto(object):
         self.ftrazas=   os.listdir( self.trazas_dir )
         # Invariantes
         self.finvr  =   os.listdir( self.invr_dir )  
-
-        # Comprueba y sincroniza la configuración del proyecto
-        # con la realidad del sistema de ficheros
-        self.check_cfg()
 
     def buscar_dependencias(self,bpel):
         """@Brief Busca las dependencias de un bpel recursivamente. 
@@ -248,24 +248,26 @@ class Proyecto(object):
         # Copiar los ficheros básicos [ skel ]
         print _("Inicializando proyecto")
         try:
-            shutil.copytree( 'base/skel' , self.dir )
+            shutil.copytree( path.join(self.share ,'skel') , self.dir )
         except:
-            raise ProyectoError(_("Error al iniciar proyecto con base/skel"))
+            raise ProyectoError(_("Error al iniciar proyecto con: ") +
+                                path.join(self.share,'skel'))
 
         # Inicializar el proyecto copiando skel
 
         # Copiar el bpel (y los wsdl y xsd que faltan)
-        print _("Buscando dependencias")
+        # Si falla borramos el intento de proyecto 
+        # y elevamos de nuevo la excepción
         try:
+            print _("Buscando dependencias")
             self.buscar_dependencias(self.bpel_o ) 
         except ProyectoError, error:                    
-            # Borramos el intento de proyecto 
             shutil.rmtree(self.dir)
             print _("Crear Proyecto: Error al crear ficheros de proyecto")
-            # Elevamos de nuevo la excepción
             raise error
 
         # Abrir self.proy para escribir la info del proyecto
+        # Si falla elevamos una excepción
         tree = et.ElementTree()
         try:
             print self.proy
@@ -276,30 +278,51 @@ class Proyecto(object):
                                  del proyecto"))
 
         # Escribir info en self.proy
-        #try:
+        try:
             # Nombre del proyecto 
-        root.attrib['nombre'] = self.nombre
+            root.attrib['nombre'] = self.nombre
+
             # bpel original
-        e = root.find('bpel_o')
-        e.attrib['src'] = self.bpel_o
-        #e.attrib['timestamp'] = path.getmtime(self.bpel_o)
-             # bpel proyecto
-        e = root.find('bpel')
-        #e.attrib['timestamp'] = path.getmtime(self.bpel)
+            e = root.find('bpel_o')
+            e.attrib['src'] = self.bpel_o
+
+            # bpel proyecto
+            e = root.find('bpel')
+
             # dependencias
-        e = root.find('dependencias')
+            e = root.find('dependencias')
 
-        for d in self.dep + self.dep_miss:
-            print d
-            sub = et.SubElement(e,'dependencia')
-            sub.attrib['nombre'] = path.basename(d)
-            sub.attrib['ruta'] = d
-            sub.attrib['rota'] = d in self.dep_miss
+            for d in self.dep + self.dep_miss:
 
-        tree.write(self.proy)
-            #except:
-        print _("No se pudo escribir el fichero de configuración")
-                #    raise ProyectoError(_("No se pudo escribir el fichero de configuración"))
+                 print d
+                 sub = et.SubElement(e,'dependencia')
+                 sub.attrib['nombre'] = path.basename(d)
+                 sub.attrib['ruta'] = d
+                 sub.attrib['rota'] = d in self.dep_miss
+
+            tree.write(self.proy)
+        except:
+            raise ProyectoError(_("No se pudo escribir el fichero de configuración"))
+
+        # Modificar en base-build la ruta base a la instalación de takuan
+        try:
+            bbuild = md.parse(path.join(self.dir,'base-build.xml'))
+        except:
+            raise ProyectoError(_("No se pudo abrir el fichero base-build.xml"))
+
+        # Buscar el atributo y escribirlo
+        dnms = bbuild.getElementsByTagName('property')
+        dnms = [d for d in dnms if d.getAttribute('name') ==
+                'takuan']
+        if len(dnms) == 0 :
+            print _("No se ha podido configurar base-build.xml")
+        else:
+            dnms[0].setAttribute('location',self.takuan)
+        try:
+            file = open(path.join(self.dir,'base-build.xml'), 'w')
+            file.write(bbuild.toxml('utf-8'))
+        except:
+            raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
         # Imprimir directorios del proyecto
         print _("Proyecto creado correctamente")
@@ -310,7 +333,8 @@ class Proyecto(object):
         """@Brief Comprueba que el proyecto está bien y sus ficheros de
         configuración, de lo contrario lanza una excepción ProyectoError. """ 
 
-        # Comprobar existencia de la estructura
+        # Comprobar existencia de la estructura y de los
+        # ficheros más importantes: proy,dir,text,bpel
         for f in ( self.dir, self.bpel, self.proy,
                 self.build, self.test,
                 self.casos_dir, self.trazas_dir,
@@ -326,7 +350,6 @@ class Proyecto(object):
     def leer_config(self):
         """@Brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
-
 
     def instrumentar(self):
         """@Brief Instrumenta el proyecto o lanza una excepción.""" 

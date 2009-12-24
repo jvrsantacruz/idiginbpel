@@ -2,20 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import os 
+import os.path as path
 import commands
 import shutil
-from proyecto import Proyecto,ProyectoError
 from xml.dom import minidom as md
+
+from proyecto import Proyecto,ProyectoError
+from idgui.idgui import Idgui
 import lang
 
 class Idg(object):
     """@Brief Objeto principal, maneja el programa completo."""
 
     # Rutas a los directorios con los datos 
-    # Y la instalación de takuan
-    home = ""
-    share = ""
-    takuan = ""
+    # y la instalación de takuan
+    # Valores por defecto para cuando no hay config.xml
+    home = "./home"
+    share = "./share"
+    takuan = "~/takuan"
 
     def __init__(self,path,config):
         """@brief Inicializa IndigBPEL
@@ -24,7 +28,7 @@ class Idg(object):
 
         # Leer parámetros de la configuración
         self.config = config
-        self.leer_config()
+        self.set_config()
 
 	# Ruta base de ejecución
     	self.path = path
@@ -32,8 +36,7 @@ class Idg(object):
         # Leer la lista de proyectos
         self.obtener_lista_proyectos()
         # Iniciar gui
-        from idgui import main
-        idgui = main.Idgui(self)
+        idgui = Idgui(self)
 
     def crear_proyecto(self,nombre,bpel):
         """@brief Crea un nuevo proyecto a partir de la ruta de un bpel y el nombre. 
@@ -53,7 +56,7 @@ class Idg(object):
             return _("El fichero no existe ") + bpel 
 
         # Crear un objeto proyecto
-	self.proyecto = Proyecto(nombre,bpel)
+	self.proyecto = Proyecto(nombre,self.home,self.share,self.takuan,bpel)
 
 	# Actualizar la lista de proyectos
         self.obtener_lista_proyectos()
@@ -62,7 +65,7 @@ class Idg(object):
 
     def obtener_lista_proyectos(self):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
-        # Leer los proyectos existentes en data/proy
+        # Leer los proyectos existentes en home/proy
         # Eliminar directorios ocultos.
         self.lista_proyectos = os.listdir(os.path.join(self.home,"proy"))
         self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
@@ -70,30 +73,39 @@ class Idg(object):
         print self.lista_proyectos
 
     def comprobar_proyectos(self):
-        """@brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
+        """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
         pass
 
-    def leer_config(self):
+    def set_config(self):
         """@brief Obtiene todos los parámetros generales de los ficheros de configuración."""
         try: 
             xml = md.parse(self.config)
         except:
             print _("No se pudo leer el fichero de configuración ") + self.config
-        self.home = xml.getElementsByTagName('home')[0].getAttribute('src')
-        self.share = xml.getElementsByTagName('share')[0].getAttribute('src')
-        self.takuan = xml.getElementsByTagName('takuan')[0].getAttribute('src')
+        else:
+            print _("Usando fichero de configuración: ") + self.config
 
+        # Leer valores individuales y establecerlos en el objeto
+        # Nombre del elemento y atributo a leer
+        # Los comprobamos
+        for nom,attr in (('home','src'), ('share','src'), ('takuan','src')):
+            try:
+                val = xml.getElementsByTagName(nom)[0].getAttribute(attr)
+                val = path.abspath(path.expanduser(val))
+                if path.exists(val):
+                    setattr(self, nom , val)
+                else:
+                    print _("No se encuentra el directorio: ") + val
+                    raise Exception()
+            except:
+                print _("Se usará el valor por defecto para: ") + nom 
 
-
-    def config(self, nombre):
-        """@brief Obtener parámetros leidos de la configuración. 
-           @nombre Nombre del parámetro a leer.
-           @returns Valor del parámetro.
-        """
-        pass
+        print "Home: ", self.home
+        print "Share: ",self.share
+        print "Takuan: ",self.takuan
 
     def cerrar(self):
-        """@Brief Realiza comprobaciones y cierra ordenadamente"""
+        """TODO: @Brief Realiza comprobaciones y cierra ordenadamente"""
 
         # Si hay un proyecto abierto y tiene cambios
         # preguntar si debemos guardarlo.

@@ -22,7 +22,7 @@
     <!-- IMPORTACION -->
 
     <!-- Importamos el fichero Ant base -->
-    <import file="${basebuild.baseprojectdir}/../../base/base-build.xml"/>
+    <import file="${basebuild.baseprojectdir}/base-build.xml"/>
 
     <!-- Indicamos que hemos importado -->
     <target name="abstract"/>

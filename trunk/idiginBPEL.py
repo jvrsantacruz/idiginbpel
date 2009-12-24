@@ -7,7 +7,7 @@ Establece la ruta de ejecución y crea el sistema.
 # Añadir el directorio de trabajo al path
 import sys
 from os.path import *
-from idg import idg
+from idg.idg import Idg
 
 # Ruta del programa al ejecutarse
 base = abspath( sys.argv[0] )
@@ -27,4 +27,4 @@ for c in configs:
 # Iniciar la aplicacion
 if __name__ == "__main__":
 	global idgbpel 
-	idgbpel = idg.Idg(path,config)
+	idgbpel = Idg(path,config)
