@@ -1,0 +1,14 @@
+<!-- Fichero de configuración de usuario 
+
+     Orden de búsqueda para la configuración:
+     1. ~/.idiginbpel/config.xml
+     2. ./home/config.xml
+     3. /usr/share/idiginbpel/config.xml -->
+<config>
+    <!-- Directorio del usuario -->
+    <home src="./home"/>
+    <!-- Directorio de instalación -->
+    <share src="./share"/>
+    <!-- Directorio de takuan -->
+    <takuan src="~/takuan"/>
+</config>
