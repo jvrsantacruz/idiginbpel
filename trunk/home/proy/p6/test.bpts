@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fichero base para agrupar todos los casos de prueba -->
+
+<tes:testSuite >
+
+    <!-- Nombre del proyecto -->
+  <tes:name></tes:name>
+
+   <!-- Servidor y puerto (valores por defecto) -->
+  <tes:baseURL>http://localhost:7777/ws</tes:baseURL>
+
+  <!-- Fichero bpr -->
+  <tes:deployment>
+      <!-- Nombre del proyecto -->
+      <tes:put name="" type="activebpel">
+
+        <!-- wsdl test -->
+      <tes:wsdl></tes:wsdl>
+
+      <tes:property name="BPRFile">bpr_file.bpr</tes:property>
+    </tes:put>
+
+    <!-- -->
+    <tes:partner name="assessor" wsdl="AssessorService.wsdl"/>
+    <tes:partner name="approver" wsdl="ApprovalService.wsdl"/>
+  </tes:deployment>
+
+  <tes:testCases>
+  </tes:testCases>
+</tes:testSuite>

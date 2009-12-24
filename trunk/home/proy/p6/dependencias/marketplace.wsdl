@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><definitions targetNamespace="http://docs.active-endpoints.com/activebpel/sample/wsdl/marketplace/2006/09/marketplace.wsdl" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://docs.active-endpoints.com/activebpel/sample/wsdl/marketplace/2006/09/marketplace.wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+   <message name="sellerInfoMessage">
+     <part name="inventoryItem" type="xsd:string"/>
+     <part name="askingPrice" type="xsd:integer"/>
+   </message>
+
+   <message name="buyerInfoMessage">
+     <part name="item" type="xsd:string"/>
+     <part name="offer" type="xsd:integer"/>
+   </message>
+
+   <message name="negotiationMessage">
+     <part name="outcome" type="xsd:string"/>
+   </message>
+
+   <message name="executionFaultMessage"/>
+
+   <portType name="sellerPT">
+      <operation name="submit">
+         <input message="tns:sellerInfoMessage"/>
+         <output message="tns:negotiationMessage"/>
+      </operation>
+   </portType>
+
+   <portType name="buyerPT">
+      <operation name="submit">
+         <input message="tns:buyerInfoMessage"/>
+         <output message="tns:negotiationMessage"/>
+      </operation>
+   </portType>
+
+   <binding name="sellerSOAPBinding" type="tns:sellerPT">
+      <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <operation name="submit">
+        <soap:operation/>
+        <input name="submitRequest"/>
+        <output name="submitResponse"/>
+      </operation>
+   </binding>
+   <binding name="buyerSOAPBinding" type="tns:buyerPT">
+      <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <operation name="submit">
+        <soap:operation/>
+        <input name="submitRequest"/>
+        <output name="submitResponse"/>
+      </operation>
+   </binding>
+   <bpws:property name="negotiatedItem" type="xsd:string"/>
+
+   <bpws:propertyAlias messageType="tns:sellerInfoMessage" part="inventoryItem" propertyName="tns:negotiatedItem" query="/inventoryItem"/>
+
+   <bpws:propertyAlias messageType="tns:buyerInfoMessage" part="item" propertyName="tns:negotiatedItem" query="/item"/>
+
+   <plnk:partnerLinkType name="salesplnk">
+     <plnk:role name="sales" portType="tns:sellerPT">
+       <plnk:portType name="tns:sellerPT"/>
+     </plnk:role>
+   </plnk:partnerLinkType>
+
+   <plnk:partnerLinkType name="buyingplnk">
+     <plnk:role name="buying" portType="tns:buyerPT">
+       <plnk:portType name="tns:buyerPT"/>
+     </plnk:role>
+   </plnk:partnerLinkType>
+
+   <!-- The service name and the TNS represent my service ID QName -->
+   <service name="marketplaceSeller">
+      <port binding="tns:sellerSOAPBinding" name="seller">
+         <soap:address location="http://localhost:8080/active-bpel/services/marketplaceSeller"/>
+      </port>
+   </service>
+   <service name="marketplaceBuyer">
+     <port binding="tns:buyerSOAPBinding" name="buyer">
+       <soap:address location="http://localhost:8080/active-bpel/services/marketplaceBuyer"/>
+     </port>
+   </service>
+
+
+</definitions>
