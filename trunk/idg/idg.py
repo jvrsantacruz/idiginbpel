@@ -69,8 +69,7 @@ class Idg(object):
         if not nombre in self.lista_proyectos:
             return _("No existe el proyecto con nombre: ") + nombre
         else:
-            self.proyecto = \
-            Proyecto(nombre,self.home,self.share,self.takuan)
+            self.proyecto = Proyecto(nombre,self)
 
     def obtener_lista_proyectos(self):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
