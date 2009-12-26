@@ -5,6 +5,7 @@
     <dirname property="dir" file="${ant.file.BaseBPELBuildFile}"/>
 
     <!-- Directorio base de takuan, simplifica las localizaciones.  -->
+    <!-- Se modificará probablemente al crear/cargar el proyecto -->
     <property name="takuan" location="${dir}/../../.."/>
 
     <!-- Importamos todas las variables de entorno existentes -->
@@ -104,14 +105,15 @@
 
     <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
         <instrument bpel="${main.bpel}" bpr="${bprfile}"/>
-	<!-- Movemos los ficheros temporales generados al directorio 
-	     de proyecto desde el cual se importó este ant 
-        <move file="${dir}/catalog.xml" todir="${basebuild.baseprojectdir}"/>
-        <move file="${dir}/tiposReunidos.xml" todir="${basebuild.baseprojectdir}"/>
-        <move file="${dir}/procesoInspeccionado.decls" todir="${basebuild.baseprojectdir}"/>
-        <move file="${dir}/proceso.pdd" todir="${basebuild.baseprojectdir}"/>
-        <move file="${dir}/procesoInspeccionado.bpel" todir="${basebuild.baseprojectdir}"/>
--->
+	<echo>Moviendo ficheros de ${user.dir} a ${proy}</echo>
+	<!-- Movemos los ficheros temporales generados en el directorio
+	     de trabajo al directorio de proyecto desde el cual se
+	     importó este ant  -->
+        <move file="${user.dir}/catalog.xml" todir="${proy}"/>
+        <move file="${user.dir}/tiposReunidos.xml" todir="${proy}"/>
+        <move file="${user.dir}/procesoInspeccionado.decls" todir="${proy}"/>
+        <move file="${user.dir}/proceso.pdd" todir="${proy}"/>
+        <move file="${user.dir}/procesoInspeccionado.bpel" todir="${proy}"/>
     </target>
 
 </project>
