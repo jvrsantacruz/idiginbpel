@@ -5,7 +5,10 @@ import os.path as path
 import pygtk
 pygtk.require("2.0")
 import gtk
+
 import lang
+from proyecto import ProyectoUI
+
 
 class Idgui(object):
     """@Brief Objeto principal de la gui."""
@@ -84,7 +87,6 @@ class Idgui(object):
 
         self.nuevo = True
         # Cargar el proyecto desde el glade
-        #self.builder.add_from_file("idgui/ui/proyecto_panel.glade")
         self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
 
         # Filtro para el selector de ficheros
@@ -116,29 +118,42 @@ class Idgui(object):
             @returns False si todo va bien y se crea el proyecto. El error correspondiente en caso contrario.
         """
 
-        # Obtenemos el nombre que el usuario ha escrito.
-        # Limpiamos los espacios
+        # Obtenemos el nombre que el usuario ha escrito y lo limpiamos.
         nombre = self.builder.get_object("proyecto_nombre").get_text().strip()
+        # Label donde poner los errores
+        errores = self.builder.get_object("proyecto_principal_errores")
+        # Cadena con los errores
+        error_str = ""
+
+         # Comprobar nombre del proyecto
         if nombre == "":
-            return "El nombre del proyecto no puede estar vacío"
+            error_str =  _("El nombre del proyecto no puede estar vacío")
 
         # Obtenemos la ruta del bpel.
         bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
         if bpel is None:
-            return "Fichero bpel no seleccionado"
+            error_str += "\n" + _("Fichero bpel no seleccionado") 
+
+        # Comprobar los errores y mostrarlos
+        if error_str :
+            errores.set_text(error_str)
+            return error_str
 
         print _("Seleccionado el fichero "), bpel
 
-        # Si devuelve False todo va bien.
+        # Creamos el proyecto
+        # False si todo va bien
         res = self.idg.crear_proyecto(nombre,bpel)
 
         # Si el proyecto ha sido creado, cargarlo en pantalla.
         if not res:
             # Actualizar la lista de proyectos
             self.listar_proyectos()
-            return self.cargar_proyecto(nombre)
+            self.cargar_proyecto()
+            return true
         else:
-            print res
+            # Mostrar los errores
+            errores.set_text(res)
             return res
 
     def cargar_portada(self, widget = None):
@@ -161,26 +176,19 @@ class Idgui(object):
         self.portada.reparent( self.principal )
         self.portada.show()
 
-    def cargar_proyecto(self, nombre):
+    def cargar_proyecto(self):
         """ 
             @brief Cargar un proyecto en proyecto_base.
-            @param nombre El nombre del proyecto.
             @return False si todo ha ido bien.
         """
-
-        #res = self.idg.cargar_proyecto(nombre)
-
-        #self.builder.add_from_file("idgui/ui/proyecto_base.glade")
-        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
-        self.proyecto = self.builder.get_object("proyecto_base")
-
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
             child.hide()
 
-        self.proyecto.reparent( self.principal )
+        self.proyecto = ProyectoUI(self.idg,self.builder)
 
+        
     def on_lista_proyectos_cursor_changed(self, treeview):
         """
             @brief Callback de seleccionar un proyecto de la lista de proyectos.
@@ -190,16 +198,15 @@ class Idgui(object):
         # Obtener la selección
         model, sel = treeview.get_selection().get_selected()
         nombre = model.get_value(sel,0)
-        print _("Seleccionado el fichero "), nombre;
-
-        self.cargar_proyecto(nombre);
+        print _("Seleccionado el proyecto: "), nombre;
+        # Cargar el proyecto en idg
+        # Cargar el proyecto en la gui
+        if self.idg.cargar_proyecto(nombre) is None :
+            self.cargar_proyecto();
 
     def error(self,msg):
         pass
 
-    def error_inline(self,msg):
-        pass
 
     def on_main_ventana_destroy(self,widget):
         gtk.main_quit()
-

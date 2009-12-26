@@ -95,11 +95,11 @@ class Proyecto(object):
         self.dep_miss = []
 
         # Si se indica la ruta del bpel, debemos crear el proyecto
-        if self.bpel_o :
-            self.crear()
-        # En caso contrario, inicializamos el proyecto
-        else:
+        # Si ya está creado, lo leemos
+        if not bpel :
             self.leer_config()
+        else:
+            self.crear()
 
         # Comprueba que la estructura del proyecto está bien
         self.check()
@@ -250,7 +250,7 @@ class Proyecto(object):
         try:
             shutil.copytree( path.join(self.share ,'skel') , self.dir )
         except:
-            raise ProyectoError(_("Error al iniciar proyecto con: ") +
+            raise ProyectoError(_("Error al iniciar proyecto con: ") + \
                                 path.join(self.share,'skel'))
 
         # Inicializar el proyecto copiando skel
@@ -357,19 +357,19 @@ class Proyecto(object):
         # Comprobamos si el bpel está instrumentado
         # También si ha cambiado desde la última
         # instrumentación
-        if not path.exists( self.bpr ):
-            self.inst = False
-        else:
-            bpr_time = path.getmtime( self.bpr )
-            bpel_time = path.getmtime( self.bpel )
-            self.inst = bpr_time < bpel_time
+        #if not path.exists( self.bpr ):
+        #    self.inst = False
+        #else:
+        #    bpr_time = path.getmtime( self.bpr )
+        #    bpel_time = path.getmtime( self.bpel )
+        #    self.inst = bpr_time < bpel_time
 
         # Si no está instrumentado, instrumentar
+        self.inst = path.exists(self.bpr)
         if not self.inst:
             out = commands.getoutput('ant -f '+self.build+' build-bpr')
             if not path.exists( self.bpr ) or \
-                    out.rfind('BUILD SUCCESSFUL') == -1 or \
-                    out.rfind('BUILD FAILED') != -1 :
+               out.rfind('BUILD SUCCESSFUL') == -1 :
 
                 raise ProyectoError(_("No se pudo instrumentar") + out )
         else:
