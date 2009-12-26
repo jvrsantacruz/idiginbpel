@@ -1,8 +1,10 @@
-<proyecto nombre="">
+<proyecto nombre="" creado="" guardado="">
     <!-- bpel -->
     <bpel_o src="" timestamp=""/>
     <bpel src="bpel_original.bpel" timestamp=""/>
     <bpr  src="bpr_file.bpr" timestamp=""/>
+
+    <svr url="localhost" port="7777"/>
 
     <!-- dependencias -->
     <dependencias>
