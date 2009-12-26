@@ -27,7 +27,7 @@
           <object class="GtkViewport" id="proyecto_principal_vista_errores">
             <property name="resize_mode">queue</property>
             <child>
-              <object class="GtkLabel" id="proyecto_mensajes">
+              <object class="GtkLabel" id="proyecto_principal_errores">
                 <property name="visible">True</property>
                 <property name="xalign">0.019999999552965164</property>
                 <property name="label" translatable="yes">Errores</property>
