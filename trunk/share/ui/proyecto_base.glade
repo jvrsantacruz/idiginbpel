@@ -10,11 +10,11 @@
   </object>
   <object class="GtkWindow" id="window1">
     <child>
-      <object class="GtkVBox" id="proyecto_base_contenedor">
+      <object class="GtkVBox" id="proy_base_contenedor">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkLabel" id="proyecto_base_errores_label">
+          <object class="GtkLabel" id="proy_base_errores_label">
             <property name="visible">True</property>
             <property name="xalign">0.029999999329447746</property>
             <property name="label" translatable="yes">Errores...</property>
@@ -28,15 +28,15 @@
           </packing>
         </child>
         <child>
-          <object class="GtkNotebook" id="proyecto_base_cuaderno">
+          <object class="GtkNotebook" id="proy_base_cuaderno">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
-              <object class="GtkVBox" id="proyecto_configuracion_contenedor">
+              <object class="GtkVBox" id="proy_config_contenedor">
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkLabel" id="proyecto_configuracion_nombre_label">
+                  <object class="GtkLabel" id="proy_config_nombre_label">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">Nombre del Proyecto</property>
                     <attributes>
@@ -50,7 +50,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTable" id="proyecto_configuracion_tabla1">
+                  <object class="GtkTable" id="proy_config_tabla1">
                     <property name="visible">True</property>
                     <property name="n_rows">3</property>
                     <property name="n_columns">2</property>
@@ -121,13 +121,13 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTable" id="proyecto_configuracion_server">
+                  <object class="GtkTable" id="proy_config_server">
                     <property name="visible">True</property>
                     <property name="n_rows">2</property>
                     <property name="n_columns">2</property>
                     <property name="homogeneous">True</property>
                     <child>
-                      <object class="GtkLabel" id="proyecto_configuracion_configuracion_label">
+                      <object class="GtkLabel" id="proy_config_configuracion_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Configuraci&#xF3;n</property>
                         <attributes>
@@ -140,10 +140,10 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="caja_proyecto_configuracion_puerto">
+                      <object class="GtkHBox" id="proy_config_port_caja">
                         <property name="visible">True</property>
                         <child>
-                          <object class="GtkLabel" id="label_proyecto_configuracion_puerto">
+                          <object class="GtkLabel" id="proy_config_port_label">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Puerto</property>
                           </object>
@@ -152,7 +152,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="texto_proyecto_configuracion_puerto">
+                          <object class="GtkEntry" id="proy_config_port_texto">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x25CF;</property>
@@ -172,10 +172,10 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="caja_proyecto_configuracion_servidor">
+                      <object class="GtkHBox" id="proy_config_svr_caja">
                         <property name="visible">True</property>
                         <child>
-                          <object class="GtkLabel" id="label_proyecto_configuracion_servidor">
+                          <object class="GtkLabel" id="proy_config_svr_label">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Servidor Active Bpel</property>
                           </object>
@@ -184,7 +184,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="texto_proyecto_configuracion_servidor">
+                          <object class="GtkEntry" id="proy_config_svr_texto">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x25CF;</property>
@@ -213,7 +213,7 @@
               </object>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="proyecto_configuracion_label">
+              <object class="GtkLabel" id="proy_config_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Configuraci&#xF3;n</property>
                 <attributes>
