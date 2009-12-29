@@ -51,9 +51,33 @@ class ProyectoUI:
         self.port_texto = self.gtk.get_object("proy_config_port_texto")
         self.port_texto.set_text(self.proy.port)
 
+        # Gestionar posibles errores
+        if len(self.proy.dep_miss) > 0 :
+            self.error("%d dependencias rotas" % len(self.proy.dep_miss))
+
+        # Conectar todas las señales
+        self.gtk.connect_signals(self)
+
         # Situar en el contenedor y mostrar
         self.proyecto_base.reparent(self.principal)
         self.proyecto_base.show()
+
+    def on_proy_config_dep_inst_boton(self,widget):
+        """@Brief Callback de pulsar el botón de buscar dependencias"""
+        try:
+            from idg.proyecto import ProyectoError
+            self.proy.instrumentar()
+        except ProyectoError:
+            self.error(_("Error al instrumentar."))
+
+    def on_proy_config_dep_buscar_boton(self,widget):
+        """@Brief Callback de pulsar el botón de instrumentado"""
+        try:
+            from idg.proyecto import ProyectoError
+            print self.proy.bpel_o
+            self.proy.buscar_dependencias(self.proy.bpel_o)
+        except ProyectoError:
+            self.error(_("Se ha producido un error durante la búsqueda."))
 
     def error(self,msg):
         self.error_label.set_text(msg)
