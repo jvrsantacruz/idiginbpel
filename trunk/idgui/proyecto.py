@@ -11,9 +11,9 @@ class ProyectoUI:
     """@Brief Manejo de la interfaz de usuario del proyecto."""
 
     def __init__(self,idg,builder):
-        """@Brief Cargar un proyecto proy en proyecto_base
+        """@Brief Cargar un proyecto cargado creado rpeviamente en idg en proyecto_base
            @param idg Instancia de la clase de control
-           @param proy Instancia del proyecto 
+           @param builder Instancia del tipo gtkbuilder
            """
 
         # Instancia de id
@@ -25,6 +25,7 @@ class ProyectoUI:
 
         # Cargar el glade del proyecto
         self.gtk.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
+
         # Obtener los elementos importantes
 
         # Contenedor de la gui 
@@ -44,8 +45,11 @@ class ProyectoUI:
         self.nombre_label.set_text(self.proy.nombre)
 
         # Configuración del servidor
-        self.svr_label = self.gtk.get_object("proy_config_svr_label")
-        #self.proy.svr
+        self.svr_texto = self.gtk.get_object("proy_config_svr_texto")
+        self.svr_texto.set_text(self.proy.svr)
+
+        self.port_texto = self.gtk.get_object("proy_config_port_texto")
+        self.port_texto.set_text(self.proy.port)
 
         # Situar en el contenedor y mostrar
         self.proyecto_base.reparent(self.principal)
