@@ -30,19 +30,22 @@ class ProyectoUI:
         # Contenedor de la gui 
         self.principal = self.gtk.get_object("principal")
         # Base del proyecto
-        self.proyecto_base = self.gtk.get_object("proyecto_base_contenedor")
+        self.proyecto_base = self.gtk.get_object("proy_base_contenedor")
         # Cuaderno del proyecto
-        self.proyecto_tab = self.gtk.get_object("proyecto_base_cuaderno")
+        self.proyecto_tab = self.gtk.get_object("proy_base_cuaderno")
 
         # Label indicador de errores y dejarlo vacío
-        self.error_label = self.gtk.get_object("proyecto_base_errores_label")
+        self.error_label = self.gtk.get_object("proy_base_errores_label")
         self.error("")
 
         # Nombre del proyecto
-        self.nombre_label = self.gtk.get_object("proyecto_configuracion_nombre_label")
-        
+        self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
 
         self.nombre_label.set_text(self.proy.nombre)
+
+        # Configuración del servidor
+        self.svr_label = self.gtk.get_object("proy_config_svr_label")
+        #self.proy.svr
 
         # Situar en el contenedor y mostrar
         self.proyecto_base.reparent(self.principal)
@@ -50,5 +53,3 @@ class ProyectoUI:
 
     def error(self,msg):
         self.error_label.set_text(msg)
-
-

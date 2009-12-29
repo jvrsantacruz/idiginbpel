@@ -300,22 +300,24 @@ class Proyecto(object):
                 raise ProyectoError(e)
 
         # Modificar en base-build la ruta base a la instalación de takuan
+        print _("Modificando fichero base-build.xml")
         try:
-            bbuild = md.parse(path.join(self.dir,'base-build.xml'))
+            bbuild =  et.ElementTree()
         except:
             raise ProyectoError(_("No se pudo abrir el fichero base-build.xml"))
 
         # Buscar el atributo y escribirlo
-        dnms = bbuild.getElementsByTagName('property')
-        dnms = [d for d in dnms if d.getAttribute('name') ==
-                'takuan']
+        root = bbuild.parse(path.join(self.dir,'base-build.xml'))
+        dnms = bbuild.findall('property')
+        dnms = [d for d in dnms if 'name' in d.attrib and d.attrib['name'] == 'takuan']
+
         if len(dnms) == 0 :
             print _("No se ha podido configurar base-build.xml")
         else:
-            dnms[0].setAttribute('location',self.takuan)
+            dnms[0].attrib['location'] = self.takuan
+
         try:
-            file = open(path.join(self.dir,'base-build.xml'), 'w')
-            file.write(bbuild.toxml('utf-8'))
+            bbuild.write(path.join(self.dir,'base-build.xml'))
         except:
             raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
@@ -338,24 +340,25 @@ class Proyecto(object):
         # Trabajar con self.proy
         try:
 
-        # fechas
-        self.creado = root.get('creado')
-        self.guardado = root.get('guardado')
+            # fechas
+            self.creado = root.get('creado')
+            self.guardado = root.get('guardado')
 
-        # bpel_o 
-        e = root.find('bpel_o')
-        self.bpel_o = e.attrib['src']
+            # bpel_o 
+            e = root.find('bpel_o')
+            self.bpel_o = e.attrib['src']
 
-        # svr
-        e = root.find('svr')
-        self.svr = e.attrib['url']
-        self.port = e.attrib['port']
+            # svr
+            e = root.find('svr')
+            self.svr = e.attrib['url']
+            self.port = e.attrib['port']
 
-        # dependencias
-        e = root.find('dependencias')
-        e = e.find('')
+            # dependencias
+            e = root.find('dependencias')
+            #e = e.find('')
 
-        # pruebas
+            # pruebas
+            # ...
 
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
@@ -364,20 +367,12 @@ class Proyecto(object):
     def instrumentar(self):
         """@Brief Instrumenta el proyecto o lanza una excepción.""" 
 
-        # Comprobamos si el bpel está instrumentado
-        # También si ha cambiado desde la última
-        # instrumentación
-        #if not path.exists( self.bpr ):
-        #    self.inst = False
-        #else:
-        #    bpr_time = path.getmtime( self.bpr )
-        #    bpel_time = path.getmtime( self.bpel )
-        #    self.inst = bpr_time < bpel_time
-
         # Si no está instrumentado, instrumentar
         self.inst = path.exists(self.bpr)
         if not self.inst:
-            out = commands.getoutput('ant -f '+self.build+' build-bpr')
+            cmd = "ant -f %s build-bpr" % self.build
+            print _("Ejecutando: ") + cmd
+            out = commands.getoutput(cmd)
             if not path.exists( self.bpr ) or \
                out.rfind('BUILD SUCCESSFUL') == -1 :
                 raise ProyectoError(_("No se pudo instrumentar") + out )
@@ -392,7 +387,7 @@ class Proyecto(object):
         # Si falla elevamos una excepción
         tree = et.ElementTree()
         try:
-            print self.proy
+            print _("Leyendo fichero de configuración : "), self.proy
             root = tree.parse(self.proy)
         except:
             raise ProyectoError(_("No se puede abrir el fichero de configuración \
@@ -403,11 +398,12 @@ class Proyecto(object):
             # Fechas
             import datetime 
             now = date.datetime.now().isoformat(' ')
+
             # Fecha de modificación
             root.attrib['guardado'] = now
 
             # Establecer la fecha de creación
-            if not root.attrib['creado']:
+            if root.attrib['creado'] == "" :
                 root.attrib['creado'] = now
 
             # Modificación del nombre!  
@@ -417,6 +413,7 @@ class Proyecto(object):
             # implica el movimiento de directorios
             if root.attrib['nombre'] != self.nombre:
                 root.attrib['nombre'] = self.nombre
+
             # Server 
             e = root.find('svr')
             e.attrib['url'] = self.svr
@@ -433,19 +430,19 @@ class Proyecto(object):
             e = root.find('dependencias')
 
             for d in self.dep,self.dep_miss:
-
                  print d
                  sub = et.SubElement(e,'dependencia')
                  sub.attrib['nombre'] = path.basename(d)
                  sub.attrib['ruta'] = d
                  sub.attrib['rota'] = d in self.dep_miss
-
-            tree.write(self.proy)
-        except:
-            raise ProyectoError(_("No se pudo escribir el fichero de configuración"))
-
-
-        pass
+        except e:
+            raise ProyectoError(_("Error al configurar") + e)
+        else:
+            try:
+                tree.write(self.proy)
+            except e:
+                 raise ProyectoError(_("No se pudo escribir el fichero de \
+                                       configuración en: ") + self.proy )
 
     def guardado(self):
         """@Brief Comprueba si hay información modificada por guardar.

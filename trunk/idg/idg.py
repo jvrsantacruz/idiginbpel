@@ -56,7 +56,7 @@ class Idg(object):
             return _("El fichero no existe ") + bpel 
 
         # Crear un objeto proyecto
-	self.proyecto = Proyecto(nombre,self.home,self.share,self.takuan,bpel)
+	self.proyecto = Proyecto(nombre,self,bpel)
 
 	# Actualizar la lista de proyectos
         self.obtener_lista_proyectos()

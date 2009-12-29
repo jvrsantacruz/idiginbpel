@@ -147,7 +147,7 @@ class Idgui(object):
 
         # Si el proyecto ha sido creado, cargarlo en pantalla.
         if not res:
-            # Actualizar la lista de proyectos
+            # Actualizar la lista de proyectos y cargarlo
             self.listar_proyectos()
             self.cargar_proyecto()
             return true
@@ -186,9 +186,9 @@ class Idgui(object):
         for child in children:
             child.hide()
 
+        # Crear el proyecto UI
         self.proyecto = ProyectoUI(self.idg,self.builder)
 
-        
     def on_lista_proyectos_cursor_changed(self, treeview):
         """
             @brief Callback de seleccionar un proyecto de la lista de proyectos.
