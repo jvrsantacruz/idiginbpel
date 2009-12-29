@@ -14,7 +14,7 @@ base = abspath( sys.argv[0] )
 # Ruta del directorio del script
 path = dirname( base )
 
-# Buscamos la configuración
+# Buscamos la configuración en los posibles home,  o la por defecto en share
 configs = ('~/.idiginbpel', './home', '/usr/share/idiginbpel')
 
 config = ""
