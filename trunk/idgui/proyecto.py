@@ -51,9 +51,11 @@ class ProyectoUI:
         self.port_texto = self.gtk.get_object("proy_config_port_texto")
         self.port_texto.set_text(self.proy.port)
 
-        # Gestionar posibles errores
-        if len(self.proy.dep_miss) > 0 :
-            self.error("%d dependencias rotas" % len(self.proy.dep_miss))
+        # Dependencias
+        self.dep_totales_label = self.gtk.get_object("proy_config_dep_totales_label")
+        self.dep_buenas_label = self.gtk.get_object("proy_config_dep_buenas_label")
+        self.dep_rotas_label = self.gtk.get_object("proy_config_dep_rotas_label")
+        self.actualizar_pantalla_config()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -61,6 +63,23 @@ class ProyectoUI:
         # Situar en el contenedor y mostrar
         self.proyecto_base.reparent(self.principal)
         self.proyecto_base.show()
+
+    def actualizar_pantalla_config(self):
+        """@Brief Actualiza las variables y los datos de la pantalla config."""
+        # Número de dependencias y dependencias rotas
+        ldep = len(self.proy.deps)
+        ldep_miss = len(self.proy.dep_miss)
+
+        print ldep
+        print ldep_miss
+
+        # Mostrar error si hay dependencias rotas
+        if len(self.proy.dep_miss) > 0 :
+            self.error("%d dependencias rotas" % len(self.proy.dep_miss))
+
+        self.dep_totales_label.set_text(str(ldep+ldep_miss))
+        self.dep_buenas_label.set_text(str(ldep))
+        self.dep_rotas_label.set_text(str(ldep_miss))
 
     def on_proy_config_dep_inst_boton(self,widget):
         """@Brief Callback de pulsar el botón de buscar dependencias"""
@@ -78,6 +97,8 @@ class ProyectoUI:
             self.proy.buscar_dependencias(self.proy.bpel_o)
         except ProyectoError:
             self.error(_("Se ha producido un error durante la búsqueda."))
+
+        self.actualizar_pantalla_config()
 
     def error(self,msg):
         self.error_label.set_text(msg)
