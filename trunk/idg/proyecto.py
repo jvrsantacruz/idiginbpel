@@ -122,7 +122,7 @@ class Proyecto(object):
         self.invr_dir   =   path.join(self.dir, self.invr_nom)   # Invariantes
         self.dep_dir    =   path.join(self.dir, self.dep_nom)    # Dependencias
         # Dependencias
-        self.dep = []
+        self.deps = []
         # Dependencias no encontradas
         self.dep_miss = []
         # Proyecto instrumentado o no
