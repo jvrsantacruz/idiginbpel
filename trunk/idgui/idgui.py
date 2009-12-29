@@ -145,8 +145,8 @@ class Idgui(object):
         # False si todo va bien
         try:
             res = self.idg.crear_proyecto(nombre,bpel)
-        except e:
-            print e
+        except:
+            print _("Excepción al crear proyecto")
 
         # Si el proyecto ha sido creado, cargarlo en pantalla.
         if not res:
