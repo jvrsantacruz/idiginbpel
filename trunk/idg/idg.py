@@ -21,6 +21,9 @@ class Idg(object):
     share = "./share"
     takuan = "~/takuan"
 
+    # Referencia al proyecto abierto
+    proyecto = None
+
     def __init__(self,path,config):
         """@brief Inicializa IndigBPEL
            @param path ruta base de ejecución del programa.
@@ -56,7 +59,12 @@ class Idg(object):
             return _("El fichero no existe ") + bpel 
 
         # Crear un objeto proyecto
-	self.proyecto = Proyecto(nombre,self,bpel)
+        try:
+            self.proyecto = Proyecto(nombre,self,bpel)
+        except:
+            err = _("Excepción al crear una instancia del proyecto")
+            print err
+            return err
 
 	# Actualizar la lista de proyectos
         self.obtener_lista_proyectos()

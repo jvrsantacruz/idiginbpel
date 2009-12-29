@@ -138,8 +138,8 @@ class Proyecto(object):
 
         # Comprobar el bpel externo
         if not path.exists( bpel ):
-            print _("Error_no_pudo_abrir "), bpel
-            raise ProyectoError( _("Error_no_pudo_abrir") + bpel)
+            print _("Error no se pudo abrir ") + bpel
+            raise ProyectoError( _("Error no se pudo abrir ") + bpel)
 
         # Buscar las dependencias del bpel recursivamente
         self.deps = self.__buscar_dependencias([bpel])
@@ -390,14 +390,16 @@ class Proyecto(object):
             print _("Leyendo fichero de configuración : "), self.proy
             root = tree.parse(self.proy)
         except:
-            raise ProyectoError(_("No se puede abrir el fichero de configuración \
-                                 del proyecto"))
+            err = _("No se puede abrir el fichero de configuración \
+                                 del proyecto") 
+            print err
+            raise ProyectoError(err)
 
         # Escribir info en self.proy
         try:
             # Fechas
             import datetime 
-            now = date.datetime.now().isoformat(' ')
+            now = datetime.datetime.now().isoformat(' ')
 
             # Fecha de modificación
             root.attrib['guardado'] = now
@@ -429,19 +431,19 @@ class Proyecto(object):
             # dependencias
             e = root.find('dependencias')
 
-            for d in self.dep,self.dep_miss:
-                 print d
-                 sub = et.SubElement(e,'dependencia')
-                 sub.attrib['nombre'] = path.basename(d)
-                 sub.attrib['ruta'] = d
-                 sub.attrib['rota'] = d in self.dep_miss
-        except e:
-            raise ProyectoError(_("Error al configurar") + e)
-        else:
-            try:
-                tree.write(self.proy)
-            except e:
-                 raise ProyectoError(_("No se pudo escribir el fichero de \
+            #for d in self.dep,self.dep_miss:
+            #     print d
+            #     sub = et.SubElement(e,'dependencia')
+            #     sub.attrib['nombre'] = path.basename(d)
+            #     sub.attrib['ruta'] = d
+            #     sub.attrib['rota'] = d in self.dep_miss
+        except:
+            raise ProyectoError(_("Error al configurar"))
+
+        try:
+            tree.write(self.proy)
+        except: 
+            raise ProyectoError(_("No se pudo escribir el fichero de \
                                        configuración en: ") + self.proy )
 
     def guardado(self):
