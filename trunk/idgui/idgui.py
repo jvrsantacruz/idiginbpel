@@ -129,8 +129,16 @@ class Idgui(object):
         error_str = ""
 
          # Comprobar nombre del proyecto
+         # Debe ser un nombre 'unix' válido
         if nombre == "":
             error_str =  _("El nombre del proyecto no puede estar vacío")
+        else:
+            # Caracteres que no deben estar en el nombre del proyecto
+            wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
+            for i in wrong:
+                if nombre.find(i) != -1 :
+                    error_str = _("El nombre del proyecto no puede contener el carácter: ") + '"%c"' % i
+                    break
 
         # Obtenemos la ruta del bpel.
         bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
@@ -147,17 +155,14 @@ class Idgui(object):
         # Creamos el proyecto
         # False si todo va bien
         try:
-            #res = self.idg.crear_proyecto(nombre,bpel)
-            #self.proyecto = ProyectoUI(self.idg,self.builder)
             self.cargar_proyecto(nombre,bpel)
         except:
             print _("Excepción al crear proyecto ") + res
             #errores.set_text(e)
-        else:
-            # Si el proyecto ha sido creado correctamente
-            # Actualizar la lista de proyectos 
-            self.listar_proyectos()
-            #self.cargar_proyecto()
+
+        # Si el proyecto ha sido creado correctamente
+        # Actualizar la lista de proyectos 
+        self.listar_proyectos()
 
         return True
 
@@ -190,6 +195,13 @@ class Idgui(object):
             @param bpel (Opcional) La ruta del bpel si es para crear el
             proyecto por primera vez.
         """
+        # Comprobar que el proyecto actualmente cargado, si lo hay, 
+        #  no es el mismo que pretendemos cargar.
+        if not self.idg.proyecto is None \
+           and self.idg.proyecto.nombre == nombre :
+            print _("Proyecto ya cargado, no se vuelve a cargar.")
+            return False
+
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
