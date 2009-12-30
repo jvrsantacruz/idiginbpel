@@ -198,19 +198,22 @@ class Idgui(object):
             @param bpel (Opcional) La ruta del bpel si es para crear el
             proyecto por primera vez.
         """
-        # Comprobar que el proyecto actualmente cargado, si lo hay, 
-        #  no es el mismo que pretendemos cargar.
-        if not self.idg.proyecto is None \
-           and self.idg.proyecto.nombre == nombre :
-            print _("Proyecto ya cargado, no se vuelve a cargar.")
-            return False
-
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
             child.hide()
 
-        # Crear el proyecto UI
+        # Comprobar que el proyecto actualmente cargado, si lo hay, 
+        #  no es el mismo que pretendemos cargar.
+        if not self.idg.proyecto is None \
+           and self.idg.proyecto.nombre == nombre :
+            print _("Proyecto ya cargado, no se vuelve a cargar.")
+            # Mostrarlo en la interfaz
+            self.proyecto.proyecto_base.reparent(self.proyecto.principal)
+            self.proyecto.proyecto_base.show()
+            return False
+
+                # Crear el proyecto UI
         self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
 
     def on_lista_proyectos_cursor_changed(self, treeview):
