@@ -104,6 +104,8 @@ class ProyectoUI:
             self.proy.instrumentar()
         except ProyectoError:
             self.error(_("Error al instrumentar."))
+        else:
+            self.mensaje(_("Instrumentación correcta."))
 
     def on_proy_config_dep_buscar_boton(self,widget):
         """@Brief Callback de pulsar el botón de instrumentado"""
@@ -117,4 +119,7 @@ class ProyectoUI:
         self.actualizar_pantalla_config()
 
     def error(self,msg):
-        self.error_label.set_text(msg)
+        self.error_label.set_markup('<span color="green">'+msg+'</span>')
+
+    def mensaje(self,msg):
+        self.error_label.set_markup('<span color="black">'+msg+'</span>')
