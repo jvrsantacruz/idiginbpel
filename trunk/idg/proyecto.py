@@ -322,7 +322,8 @@ class Proyecto(object):
             raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
         # Instrumentar
-        self.instrumentar()
+        if not self.inst :
+            self.instrumentar()
 
     def leer_config(self):
         """@Brief Lee e inicializa la clase leyendo de los ficheros de
@@ -367,15 +368,16 @@ class Proyecto(object):
     def instrumentar(self):
         """@Brief Instrumenta el proyecto o lanza una excepción.""" 
 
-        # Si no está instrumentado, instrumentar
-        self.inst = path.exists(self.bpr)
-        if not self.inst:
-            cmd = "ant -f %s build-bpr" % self.build
-            print _("Ejecutando: ") + cmd
-            out = commands.getoutput(cmd)
-            if not path.exists( self.bpr ) or \
-               out.rfind('BUILD SUCCESSFUL') == -1 :
-                raise ProyectoError(_("No se pudo instrumentar") + out )
+        # Comenzar la instrumentación mandando a consola el comando
+        cmd = "ant -f %s build-bpr" % self.build
+        print _("Ejecutando: ") + cmd
+        out = commands.getoutput(cmd)
+
+        # Comprobar que se ha instrumentado correctamente
+        if not path.exists( self.bpr ) or \
+           out.rfind('BUILD SUCCESSFUL') == -1 :
+            self.inst = False
+            raise ProyectoError(_("No se pudo instrumentar") + out )
         else:
             self.inst = True
 
