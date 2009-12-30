@@ -24,16 +24,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkViewport" id="proyecto_principal_vista_errores">
-            <property name="resize_mode">queue</property>
-            <child>
-              <object class="GtkLabel" id="proyecto_principal_errores">
-                <property name="visible">True</property>
-                <property name="xalign">0.019999999552965164</property>
-                <property name="label" translatable="yes">Errores</property>
-                <property name="justify">center</property>
-              </object>
-            </child>
+          <object class="GtkLabel" id="proyecto_principal_errores">
+            <property name="visible">True</property>
+            <property name="xalign">0.019999999552965164</property>
+            <property name="label" translatable="yes">Errores</property>
+            <property name="justify">center</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -49,8 +44,8 @@
               <object class="GtkFileChooserButton" id="proyecto_selector_bpel">
                 <property name="visible">True</property>
                 <property name="extension_events">cursor</property>
-                <property name="create_folders">False</property>
                 <property name="filter">filtro_fichero_bpel</property>
+                <property name="create_folders">False</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
