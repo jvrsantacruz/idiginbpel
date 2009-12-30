@@ -160,7 +160,7 @@ class Idgui(object):
         try:
             self.cargar_proyecto(nombre,bpel)
         except:
-            print _("Excepción al crear proyecto ") + res
+            print _("Excepción al crear proyecto ") 
             #errores.set_text(e)
 
         # Si el proyecto ha sido creado correctamente
