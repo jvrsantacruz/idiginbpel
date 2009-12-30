@@ -41,44 +41,6 @@ class Idg(object):
         # Iniciar gui
         idgui = Idgui(self)
 
-    def crear_proyecto(self,nombre,bpel):
-        """@brief Crea un nuevo proyecto a partir de la ruta de un bpel y el nombre. 
-           @param nombre Nombre del proyecto
-           @param bpel Ruta al fichero bpel.
-           @returns False si se ha creado correctamente. El error correspondiente en caso contrario.
-        """
-        # Comprobar formato del nombre
-        if len(nombre) == 0: 
-            return _("El nombre del proyecto no puede estar vacío")
-
-        # Comprobar que el nombre no existe ya
-        if nombre in self.lista_proyectos:
-            return _("Ya existe un proyecto con ese nombre")
-
-        if not os.path.exists( bpel ):
-            return _("El fichero no existe ") + bpel 
-
-        # Crear un objeto proyecto
-        try:
-            self.proyecto = Proyecto(nombre,self,bpel)
-        except:
-            err = _("Excepción al crear una instancia del proyecto")
-            print err
-            return err
-
-	# Actualizar la lista de proyectos
-        self.obtener_lista_proyectos()
-
-        return False;
-
-    def cargar_proyecto(self,nombre):
-        """@Brief carga un proyecto ya creado"""
-
-        if not nombre in self.lista_proyectos:
-            return _("No existe el proyecto con nombre: ") + nombre
-        else:
-            self.proyecto = Proyecto(nombre,self)
-
     def obtener_lista_proyectos(self):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
         # Leer los proyectos existentes en home/proy
