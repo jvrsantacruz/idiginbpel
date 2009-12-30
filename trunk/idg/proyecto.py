@@ -20,6 +20,12 @@ class ProyectoError(Exception):
     def __str__(self):
         return str(self.msj)
 
+class ProyectoIrrecuperable(ProyectoError):
+    """@Brief Error irrecuperable de la clase Proyecto"""
+
+class ProyectoRecuperable(ProyectoError):
+    """@Brief Error recuperable de la clase Proyecto"""
+
 class Proyecto(object):
     """@Brief Clase Proyecto con todas las operaciones sobre un proyecto
     idiginBPEL. Realiza la creación de un nuevo proyecto, la comprobación, el
@@ -43,6 +49,7 @@ class Proyecto(object):
     bpel_url = 'http://docs.oasis-open.org/wsbpel/2.0/process/executable'
     wsdl_url =   'http://schemas.xmlsoap.org/wsdl/'
     xsd_url  =   'http://www.w3.org/2001/XMLSchema'
+
     # Configuración de conexión por defecto
     svr    =   'localhost'
     port   =   '7777'
@@ -286,7 +293,7 @@ class Proyecto(object):
 
     def check(self):
         """@Brief Comprueba que el proyecto está bien y sus ficheros de
-        configuración, de lo contrario lanza una excepción ProyectoError. """ 
+        configuración y trata de arreglarlo, de lo contrario lanza una excepción ProyectoError. """ 
 
         # Comprobar existencia de la estructura y de los
         # ficheros más importantes: proy,dir,text,bpel
@@ -299,27 +306,32 @@ class Proyecto(object):
                 print e
                 raise ProyectoError(e)
 
-        # Modificar en base-build la ruta base a la instalación de takuan
+        # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
+        # incorrecta.
         print _("Modificando fichero base-build.xml")
+
+        # Abrir base-build.xml
         try:
             bbuild =  et.ElementTree()
         except:
             raise ProyectoError(_("No se pudo abrir el fichero base-build.xml"))
 
-        # Buscar el atributo y escribirlo
+        # Buscar el atributo y comprobarlo
         root = bbuild.parse(path.join(self.dir,'base-build.xml'))
         dnms = bbuild.findall('property')
         dnms = [d for d in dnms if 'name' in d.attrib and d.attrib['name'] == 'takuan']
 
-        if len(dnms) == 0 :
-            print _("No se ha podido configurar base-build.xml")
-        else:
-            dnms[0].attrib['location'] = self.takuan
+        # Si es distinto del que tenemos en memoria, modificarlo.
+        if dnms[0].attrib['location'] != self.takuan:
+            if len(dnms) == 0 :
+                print _("No se ha podido configurar base-build.xml")
+            else:
+                dnms[0].attrib['location'] = self.takuan
 
-        try:
-            bbuild.write(path.join(self.dir,'base-build.xml'))
-        except:
-            raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
+            try:
+                bbuild.write(path.join(self.dir,'base-build.xml'))
+            except:
+                raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
         # Instrumentar
         if not self.inst :
@@ -340,7 +352,6 @@ class Proyecto(object):
 
         # Trabajar con self.proy
         try:
-
             # fechas
             self.creado = root.get('creado')
             self.guardado = root.get('guardado')
@@ -356,11 +367,18 @@ class Proyecto(object):
 
             # dependencias
             e = root.find('dependencias')
-            #e = e.find('')
+            echilds = e.getchildren()
+
+            # Añadir las dependencias donde correspondan
+            for d in echilds:
+                ruta = d.attrib['ruta']
+                if d.attrib['rota'] == 'False':
+                    self.deps.append(ruta)
+                else:
+                    self.dep_miss.append(ruta)
 
             # pruebas
             # ...
-
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
                                 self.proy)
@@ -415,8 +433,8 @@ class Proyecto(object):
             # realidad (self.nombre) hacia el proy.xml pero no al revés.  
             # El nombre del proyecto está en la ruta física del mismo y su cambio
             # implica el movimiento de directorios
-            if root.attrib['nombre'] != self.nombre:
-                root.attrib['nombre'] = self.nombre
+            #if root.attrib['nombre'] != self.nombre:
+            #    root.attrib['nombre'] = self.nombre
 
             # Server 
             e = root.find('svr')
@@ -432,13 +450,19 @@ class Proyecto(object):
 
             # dependencias
             e = root.find('dependencias')
+            echilds = e.getchildren()
+            dnames = [d.attrib['nombre'] for d in echilds]
 
-            #for d in self.dep,self.dep_miss:
-            #     print d
-            #     sub = et.SubElement(e,'dependencia')
-            #     sub.attrib['nombre'] = path.basename(d)
-            #     sub.attrib['ruta'] = d
-            #     sub.attrib['rota'] = d in self.dep_miss
+            # Comprobar las dependencias
+            for d in self.deps + self.dep_miss:
+                # Si no está, añadirlo
+                if not d in dnames:
+                    sub = et.SubElement(e,'dependencia')
+
+                # Añadir/Actualizar los atributos
+                sub.attrib['nombre'] = path.basename(d)
+                sub.attrib['ruta'] = d
+                sub.attrib['rota'] = str(d in self.dep_miss)
         except:
             raise ProyectoError(_("Error al configurar"))
 
@@ -458,4 +482,3 @@ class Proyecto(object):
         # `- Comprobar ejecuciones
         pass
         return self.mod
-
