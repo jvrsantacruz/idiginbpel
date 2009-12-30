@@ -5,22 +5,38 @@ import os.path as path
 import pygtk
 pygtk.require("2.0")
 import gtk
+
+from idg.proyecto import Proyecto,ProyectoError
 import lang
 
 class ProyectoUI:
     """@Brief Manejo de la interfaz de usuario del proyecto."""
 
-    def __init__(self,idg,builder):
-        """@Brief Cargar un proyecto cargado creado rpeviamente en idg en proyecto_base
+    def __init__(self,idg,builder,nombre,bpel=""):
+        """@Brief Clase que maneja la interfaz de un proyecto. Lo carga o crea
+        al instanciarse.
            @param idg Instancia de la clase de control
            @param builder Instancia del tipo gtkbuilder
+           @param nombre Nombre del proyecto a cargar/crear
+           @param bpel (Opcional) Ruta al bpel para crear el proyecto.
            """
 
-        # Instancia de id
+        # Instancia de idg
         self.idg = idg
-        # Instancia del proyecto
-        self.proy = self.idg.proyecto 
-        # Objeto gtkbuilder de idg
+
+        # Crear el proyecto
+        try:
+            self.proy = Proyecto(nombre,idg,bpel)
+            self.idg.proyecto = self.proy
+        except:
+            # Por ahora cualquier excepción al crear el proyecto, lo manda todo
+            # a tomar por saco.
+            # TODO: Hacer excepciones recuperables y no recuperables.
+            # Mostrar las recuperables en los errores en la interfaz.
+            print _("Excepción [recuperable o no] al crear el proyecto")
+            raise Exception()
+
+        # Objeto gtkbuilder de idgui
         self.gtk = builder
 
         # Cargar el glade del proyecto

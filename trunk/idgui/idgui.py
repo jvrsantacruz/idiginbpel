@@ -113,10 +113,13 @@ class Idgui(object):
 
     def crear_proyecto(self,widget):
         """
-            @brief Callback de presionar el botón Crear, en Nuevo Proyecto.
+            @brief Callback de presionar el botón Crear, en Nuevo Proyecto. 
+            Toma los datos del proyecto desde la interfaz y crea una
+            instancia de ProyectoUI. Muestra los errores en la interfaz si
+            fuese el caso.
+
             @param widget El botón que se pulsó.
-            @returns False si todo va bien y se crea el proyecto. El error correspondiente en caso contrario.
-        """
+            """
 
         # Obtenemos el nombre que el usuario ha escrito y lo limpiamos.
         nombre = self.builder.get_object("proyecto_nombre").get_text().strip()
@@ -139,27 +142,24 @@ class Idgui(object):
             errores.set_text(error_str)
             return error_str
 
-        print _("Seleccionado el fichero "), bpel
+        print _("Creando proyecto con el fichero bpel: "), bpel
 
         # Creamos el proyecto
         # False si todo va bien
-        res = ""
         try:
-            res = self.idg.crear_proyecto(nombre,bpel)
+            #res = self.idg.crear_proyecto(nombre,bpel)
+            #self.proyecto = ProyectoUI(self.idg,self.builder)
+            self.cargar_proyecto(nombre,bpel)
         except:
             print _("Excepción al crear proyecto ") + res
-            return res
-
-        # Si el proyecto ha sido creado, cargarlo en pantalla.
-        if not res:
-            # Actualizar la lista de proyectos y cargarlo
-            self.listar_proyectos()
-            self.cargar_proyecto()
-            return True
+            #errores.set_text(e)
         else:
-            # Mostrar los errores
-            errores.set_text(res)
-            return res
+            # Si el proyecto ha sido creado correctamente
+            # Actualizar la lista de proyectos 
+            self.listar_proyectos()
+            #self.cargar_proyecto()
+
+        return True
 
     def cargar_portada(self, widget = None):
         """ 
@@ -181,10 +181,14 @@ class Idgui(object):
         self.portada.reparent( self.principal )
         self.portada.show()
 
-    def cargar_proyecto(self):
+    def cargar_proyecto(self,nombre,bpel=""):
         """ 
-            @brief Cargar un proyecto en proyecto_base.
-            @return False si todo ha ido bien.
+            @brief Oculta todo lo que hay en el contenedor principal de la
+            aplicación  y carga un proyecto creando una instancia de
+            ProyectoUI.
+            @param nombre Nombre del proyecto a cargar
+            @param bpel (Opcional) La ruta del bpel si es para crear el
+            proyecto por primera vez.
         """
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
@@ -192,11 +196,12 @@ class Idgui(object):
             child.hide()
 
         # Crear el proyecto UI
-        self.proyecto = ProyectoUI(self.idg,self.builder)
+        self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
 
     def on_lista_proyectos_cursor_changed(self, treeview):
         """
-            @brief Callback de seleccionar un proyecto de la lista de proyectos.
+            @brief Callback de seleccionar un proyecto de la lista de
+            proyectos. Toma el nombre de la interfaz y carga el proyecto.
             @param treeview El widget treeview con la lista de proyectos
         """
 
@@ -206,12 +211,12 @@ class Idgui(object):
         print _("Seleccionado el proyecto: "), nombre;
         # Cargar el proyecto en idg
         # Cargar el proyecto en la gui
-        if self.idg.cargar_proyecto(nombre) is None :
-            self.cargar_proyecto();
+        self.cargar_proyecto(nombre)
+        #if self.idg.cargar_proyecto(nombre) is None :
+        #    self.cargar_proyecto();
 
     def error(self,msg):
         pass
-
 
     def on_main_ventana_destroy(self,widget):
         gtk.main_quit()
