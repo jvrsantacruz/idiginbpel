@@ -97,6 +97,11 @@ class Idgui(object):
         # Obtener el objeto ventana del proyecto
         principal_proyecto = self.builder.get_object("proyecto_principal")
 
+        # Label para los errores
+        self.errores_label = self.builder.get_object("proyecto_principal_errores")
+        self.errores_label.set_text("")
+
+
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
@@ -123,15 +128,13 @@ class Idgui(object):
 
         # Obtenemos el nombre que el usuario ha escrito y lo limpiamos.
         nombre = self.builder.get_object("proyecto_nombre").get_text().strip()
-        # Label donde poner los errores
-        errores = self.builder.get_object("proyecto_principal_errores")
         # Cadena con los errores
         error_str = ""
 
          # Comprobar nombre del proyecto
          # Debe ser un nombre 'unix' válido
         if nombre == "":
-            error_str =  _("El nombre del proyecto no puede estar vacío")
+            error_str =  _("El nombre del proyecto no puede estar vacío.") 
         else:
             # Caracteres que no deben estar en el nombre del proyecto
             wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
@@ -147,7 +150,7 @@ class Idgui(object):
 
         # Comprobar los errores y mostrarlos
         if error_str :
-            errores.set_text(error_str)
+            self.errores_label.set_text(error_str)
             return error_str
 
         print _("Creando proyecto con el fichero bpel: "), bpel
