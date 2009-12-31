@@ -11,7 +11,7 @@ from proyecto import ProyectoUI
 
 
 class Idgui(object):
-    """@Brief Objeto principal de la gui."""
+    """@brief Objeto principal de la gui."""
 
     def __init__(self,idg):
         """
@@ -19,10 +19,10 @@ class Idgui(object):
            @param idg Instancia de IndigBPEL
         """
 
-        # Instancia de gtkbuilder
+        ## Instancia de gtkbuilder
         self.builder = gtk.Builder()
 
-        # Instancia de la clase idg
+        ## Instancia de la clase idg
         self.idg = idg;
 
         ### Ventana principal
@@ -30,20 +30,20 @@ class Idgui(object):
         #self.builder.add_from_file("idgui/ui/main.glade")
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
 
-        # Obtener objeto ventana
+        ## Obtener objeto ventana
         self.main_ventana = self.builder.get_object("main_ventana")
 
-        # Obtener objeto panel principal
+        ## Obtener objeto panel principal
         self.principal = self.builder.get_object("principal")
 
-        ### Cargar portada en principal
+        # Cargar portada en principal
         self.cargar_portada()
 
-        ### Lista de proyectos 
-        # Modelo ListStore
+        # Lista de proyectos 
+        ## Modelo ListStore con la lista de proyectos
         self.modelo_lista_proyectos = gtk.ListStore( str )
 
-        # Vista ListStore
+        ## Vista ListStore para la lista de proyectos
         self.vista_lista_proyectos = self.builder.get_object("lista_proyectos_vista");
         self.vista_lista_proyectos.set_model( self.modelo_lista_proyectos );
 
@@ -78,43 +78,53 @@ class Idgui(object):
             if p not in self.modelo_lista_proyectos:
                 self.modelo_lista_proyectos.append( [p] )
 
-    def nuevo_proyecto(self, widget):
+    def cargar_proyecto(self,nombre,bpel=""):
+        """ 
+            @brief Oculta todo lo que hay en el contenedor principal de la
+            aplicación  y carga un proyecto creando una instancia de
+            ProyectoUI.
+            @param nombre Nombre del proyecto a cargar
+            @param bpel (Opcional) La ruta del bpel si es para crear el
+            proyecto por primera vez.
         """
-            @brief Callback de presionar el botón de Nuevo Proyecto
-                    carga la pantalla de crear un nuevo proyecto.
-            @param widget El botón que se pulsó.
-        """
-
-        self.nuevo = True
-        # Cargar el proyecto desde el glade
-        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
-
-        # Filtro para el selector de ficheros
-        self.filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
-        self.filtro_fichero_bpel.add_pattern("*.bpel");
-        self.builder.get_object("proyecto_selector_bpel").add_filter(self.filtro_fichero_bpel);
-
-        # Obtener el objeto ventana del proyecto
-        principal_proyecto = self.builder.get_object("proyecto_principal")
-
-        # Label para los errores
-        self.errores_label = self.builder.get_object("proyecto_principal_errores")
-        self.errores_label.set_text("")
-
-
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
             child.hide()
 
-        # Añadir a principal
-        principal_proyecto.reparent( self.principal )
+        # Comprobar que el proyecto actualmente cargado, si lo hay, 
+        #  no es el mismo que pretendemos cargar.
+        if not self.idg.proyecto is None \
+           and self.idg.proyecto.nombre == nombre :
+            print _("Proyecto ya cargado, no se vuelve a cargar.")
+            # Mostrarlo en la interfaz
+            self.proyecto.proyecto_base.reparent(self.proyecto.principal)
+            self.proyecto.proyecto_base.show()
+            return False
 
-        # Mostrar
-        principal_proyecto.show()
+        ## Crear el proyecto UI
+        ## Referencia a la instancia de ProyectoUI abierta en el momento
+        self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
 
-        # Conectar señales nuevas
-        self.builder.connect_signals(self)
+    def error(self,msg):
+        pass
+
+    ## @name Callbacks 
+    ## @{
+
+    def on_lista_proyectos_cursor_changed(self, treeview):
+        """
+            @brief Callback de seleccionar un proyecto de la lista de
+            proyectos. Toma el nombre de la interfaz y carga el proyecto.
+            @param treeview El widget treeview con la lista de proyectos
+        """
+
+        # Obtener la selección
+        model, sel = treeview.get_selection().get_selected()
+        nombre = model.get_value(sel,0)
+        print _("Seleccionado el proyecto: "), nombre;
+        # Cargar el proyecto en la gui
+        self.cargar_proyecto(nombre)
 
     def crear_proyecto(self,widget):
         """
@@ -169,6 +179,44 @@ class Idgui(object):
 
         return True
 
+    def nuevo_proyecto(self, widget):
+        """
+            @brief Callback de presionar el botón de Nuevo Proyecto
+                    carga la pantalla de crear un nuevo proyecto.
+            @param widget El botón que se pulsó.
+        """
+
+        self.nuevo = True
+        # Cargar el proyecto desde el glade
+        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
+
+        # Filtro para el selector de ficheros
+        self.filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
+        self.filtro_fichero_bpel.add_pattern("*.bpel");
+        self.builder.get_object("proyecto_selector_bpel").add_filter(self.filtro_fichero_bpel);
+
+        # Obtener el objeto ventana del proyecto
+        principal_proyecto = self.builder.get_object("proyecto_principal")
+
+        ## Label para los errores
+        self.errores_label = self.builder.get_object("proyecto_principal_errores")
+        self.errores_label.set_text("")
+
+
+        # Ocultar lo que hay en principal ahora mismo
+        children = self.principal.get_children()
+        for child in children:
+            child.hide()
+
+        # Añadir a principal
+        principal_proyecto.reparent( self.principal )
+
+        # Mostrar
+        principal_proyecto.show()
+
+        # Conectar señales nuevas
+        self.builder.connect_signals(self)
+
     def cargar_portada(self, widget = None):
         """ 
             @brief Carga la portada del programa
@@ -177,8 +225,8 @@ class Idgui(object):
 
         # Comprobar si portada está inicializada
         # y cargarla en ese caso
-        #self.builder.add_from_file("idgui/ui/portada.glade")
         self.builder.add_from_file(path.join(self.idg.share,"ui/portada.glade"))
+        ## Portada de la aplicación con el dibujo de bienvenida
         self.portada = self.builder.get_object("portada")
 
         # Ocultar lo que hay en principal ahora mismo
@@ -189,52 +237,8 @@ class Idgui(object):
         self.portada.reparent( self.principal )
         self.portada.show()
 
-    def cargar_proyecto(self,nombre,bpel=""):
-        """ 
-            @brief Oculta todo lo que hay en el contenedor principal de la
-            aplicación  y carga un proyecto creando una instancia de
-            ProyectoUI.
-            @param nombre Nombre del proyecto a cargar
-            @param bpel (Opcional) La ruta del bpel si es para crear el
-            proyecto por primera vez.
-        """
-        # Ocultar lo que hay en principal ahora mismo
-        children = self.principal.get_children()
-        for child in children:
-            child.hide()
-
-        # Comprobar que el proyecto actualmente cargado, si lo hay, 
-        #  no es el mismo que pretendemos cargar.
-        if not self.idg.proyecto is None \
-           and self.idg.proyecto.nombre == nombre :
-            print _("Proyecto ya cargado, no se vuelve a cargar.")
-            # Mostrarlo en la interfaz
-            self.proyecto.proyecto_base.reparent(self.proyecto.principal)
-            self.proyecto.proyecto_base.show()
-            return False
-
-                # Crear el proyecto UI
-        self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
-
-    def on_lista_proyectos_cursor_changed(self, treeview):
-        """
-            @brief Callback de seleccionar un proyecto de la lista de
-            proyectos. Toma el nombre de la interfaz y carga el proyecto.
-            @param treeview El widget treeview con la lista de proyectos
-        """
-
-        # Obtener la selección
-        model, sel = treeview.get_selection().get_selected()
-        nombre = model.get_value(sel,0)
-        print _("Seleccionado el proyecto: "), nombre;
-        # Cargar el proyecto en idg
-        # Cargar el proyecto en la gui
-        self.cargar_proyecto(nombre)
-        #if self.idg.cargar_proyecto(nombre) is None :
-        #    self.cargar_proyecto();
-
-    def error(self,msg):
-        pass
-
     def on_main_ventana_destroy(self,widget):
         gtk.main_quit()
+
+    ## @}
+

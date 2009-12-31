@@ -10,10 +10,10 @@ from idg.proyecto import Proyecto,ProyectoError
 import lang
 
 class ProyectoUI:
-    """@Brief Manejo de la interfaz de usuario del proyecto."""
+    """@brief Manejo de la interfaz de usuario del proyecto."""
 
     def __init__(self,idg,builder,nombre,bpel=""):
-        """@Brief Clase que maneja la interfaz de un proyecto. Lo carga o crea
+        """@brief Clase que maneja la interfaz de un proyecto. Lo carga o crea
         al instanciarse.
            @param idg Instancia de la clase de control
            @param builder Instancia del tipo gtkbuilder
@@ -21,11 +21,12 @@ class ProyectoUI:
            @param bpel (Opcional) Ruta al bpel para crear el proyecto.
            """
 
-        # Instancia de idg
+        ## Instancia de idg
         self.idg = idg
 
         # Crear el proyecto
         try:
+            ## Referencia a la instancia del Proyecto actual
             self.proy = Proyecto(nombre,idg,bpel)
             self.idg.proyecto = self.proy
         except:
@@ -36,7 +37,7 @@ class ProyectoUI:
             print _("Excepción [recuperable o no] al crear el proyecto")
             raise Exception()
 
-        # Objeto gtkbuilder de idgui
+        ## Objeto gtkbuilder de idgui
         self.gtk = builder
 
         # Cargar el glade del proyecto
@@ -44,32 +45,37 @@ class ProyectoUI:
 
         # Obtener los elementos importantes
 
-        # Contenedor de la gui 
+        ## Contenedor de la gui 
         self.principal = self.gtk.get_object("principal")
-        # Base del proyecto
+        ## Base del proyecto
         self.proyecto_base = self.gtk.get_object("proy_base_contenedor")
-        # Cuaderno del proyecto
+        ## Cuaderno del proyecto
         self.proyecto_tab = self.gtk.get_object("proy_base_cuaderno")
 
-        # Label indicador de errores y dejarlo vacío
+        ## Label indicador de errores y dejarlo vacío
         self.error_label = self.gtk.get_object("proy_base_errores_label")
         self.error("")
 
-        # Nombre del proyecto
+        ## Nombre del proyecto
         self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
 
         self.nombre_label.set_text(self.proy.nombre)
 
         # Configuración del servidor
+        ## Texto Url de conexión del servidor Active Bpel
         self.svr_texto = self.gtk.get_object("proy_config_svr_texto")
         self.svr_texto.set_text(self.proy.svr)
 
+        ## Texto Puerto de conexión del servidor Active Bpel
         self.port_texto = self.gtk.get_object("proy_config_port_texto")
         self.port_texto.set_text(self.proy.port)
 
         # Dependencias
+        ## Label con el número total de dependencias
         self.dep_totales_label = self.gtk.get_object("proy_config_dep_totales_label")
+        ## Label con el número de dependencias encontradas
         self.dep_buenas_label = self.gtk.get_object("proy_config_dep_buenas_label")
+        ## Label con el número de dependencias rotas
         self.dep_rotas_label = self.gtk.get_object("proy_config_dep_rotas_label")
         self.actualizar_pantalla_config()
 
@@ -81,7 +87,7 @@ class ProyectoUI:
         self.proyecto_base.show()
 
     def actualizar_pantalla_config(self):
-        """@Brief Actualiza las variables y los datos de la pantalla config."""
+        """@brief Actualiza las variables y los datos de la pantalla config."""
         # Número de dependencias y dependencias rotas
         ldep = len(self.proy.deps)
         ldep_miss = len(self.proy.dep_miss)
@@ -97,8 +103,17 @@ class ProyectoUI:
         self.dep_buenas_label.set_text(str(ldep))
         self.dep_rotas_label.set_text(str(ldep_miss))
 
+    def error(self,msg):
+        self.error_label.set_markup('<span color="green">'+msg+'</span>')
+
+    def mensaje(self,msg):
+        self.error_label.set_markup('<span color="black">'+msg+'</span>')
+
+    # Callbacks ##############################
+
     def on_proy_config_dep_inst_boton(self,widget):
-        """@Brief Callback de pulsar el botón de buscar dependencias"""
+        """@brief Callback de pulsar el botón de buscar dependencias
+        @param widget Botón"""
         try:
             from idg.proyecto import ProyectoError
             self.proy.instrumentar()
@@ -108,7 +123,8 @@ class ProyectoUI:
             self.mensaje(_("Instrumentación correcta."))
 
     def on_proy_config_dep_buscar_boton(self,widget):
-        """@Brief Callback de pulsar el botón de instrumentado"""
+        """@brief Callback de pulsar el botón de instrumentado
+        @param widget Botón"""
         try:
             from idg.proyecto import ProyectoError
             print self.proy.bpel_o
@@ -118,8 +134,3 @@ class ProyectoUI:
 
         self.actualizar_pantalla_config()
 
-    def error(self,msg):
-        self.error_label.set_markup('<span color="green">'+msg+'</span>')
-
-    def mensaje(self,msg):
-        self.error_label.set_markup('<span color="black">'+msg+'</span>')

@@ -12,7 +12,7 @@ from xml.etree import ElementTree as et
 import lang
 
 class ProyectoError(Exception):
-    """@Brief Clase excepción para la clase Proyecto"""
+    """@brief Clase excepción para la clase Proyecto"""
 
     def __init__(self,msj):
         self.msj = msj
@@ -21,45 +21,76 @@ class ProyectoError(Exception):
         return str(self.msj)
 
 class ProyectoIrrecuperable(ProyectoError):
-    """@Brief Error irrecuperable de la clase Proyecto"""
+    """@brief Error irrecuperable de la clase Proyecto"""
 
 class ProyectoRecuperable(ProyectoError):
-    """@Brief Error recuperable de la clase Proyecto"""
+    """@brief Error recuperable de la clase Proyecto"""
 
 class Proyecto(object):
-    """@Brief Clase Proyecto con todas las operaciones sobre un proyecto
+    """@brief Clase Proyecto con todas las operaciones sobre un proyecto
     idiginBPEL. Realiza la creación de un nuevo proyecto, la comprobación, el
     guardado y la eliminación así como todas las otras operaciones que tengan
     relación con un proyecto. """
 
-    # Nombres de ficheros por defecto
+    ## @name Nombres de ficheros por defecto
+    ## @{
+
+    ## Nombre del bpel importado
     bpel_nom   =   'bpel_original.bpel'
+    ## Nombre del fichero de configuración de proyecto
     proy_nom   =   'proyecto.xml'
+    ## Nombre del ant a ejecutar para realizar las acciones
     build_nom  =   'build.xml'
+    ## Nombre del fichero que reune los casos de prueba
     test_nom   =   'test.bpts'
+    ## Nombre del fichero bpr generado por la instrumentación
     bpr_nom    =   'bpr_file.bpr'
+    ## @}
 
-    # Directorios
+    ## @name Directorios de Proyecto
+    ## @{
+
+    ## Directorio con los casos de prueba
     casos_nom  =    'casos'
+    ## Directorio con las trazas generadas por la ejecución
     trazas_nom =    'trazas'
+    ## Directorio con los invariantes generados
     invr_nom   =    'invariantes'
+    ## Directorio con las dependencias del bpel
     dep_nom    =    'dependencias'
+    ## @}
 
-    # Url de Namespaces 
+    ## @name Url de Namespaces 
+    ## @{
+
     bpel_url = 'http://docs.oasis-open.org/wsbpel/2.0/process/executable'
     wsdl_url =   'http://schemas.xmlsoap.org/wsdl/'
     xsd_url  =   'http://www.w3.org/2001/XMLSchema'
+    ## @}
 
-    # Configuración de conexión por defecto
+    ## @name Configuración de conexión por defecto
+    ## @{
+
+    ## Url del servidor Active Bpel
     svr    =   'localhost'
+    ## Puerto del servidor Active Bpel
     port   =   '7777'
+    ## @}
 
-    # Flags de estado y propiedades
-    inst   =   False # Instrumentado
-    mod    =   False # Modificado
+    ## @name Flags de estado y propiedades
+    ## @{
+
+    ## Flag de instrumentado
+    inst   =   False 
+    ## Flag de modificado el proyecto
+    mod    =   False 
+    # @}
+
+    ## @name Inicialización 
+    ## @{
 
     def __init__(self,nombre,idg,bpel=""):
-        """@Brief Constructor de la clase proyecto.
+        """@brief Constructor de la clase proyecto.
         Establece los valores por defecto para las rutas del proyecto.
         Crea el proyecto si se le indica la ruta a un bpel
         Lee la configuración del proyecto ya creado si no
@@ -70,13 +101,13 @@ class Proyecto(object):
         """
         # Valores por defecto de proyecto
 
-        # Nombre y rutas absolutas
+        ## Nombre del proyecto (se emplea en la ruta)
         self.nombre = nombre
 
-        # Instancia del control del proyecto
+        ## Instancia del control del proyecto
         self.idg = idg
 
-        # Ruta del bpel original (si está especificado)
+        ## Ruta del bpel original (si está especificado)
         self.bpel_o =   path.abspath( bpel ) if bpel else ""
 
         # Variables internas, rutas, etc...
@@ -95,13 +126,13 @@ class Proyecto(object):
 
         # Listados
 
-        # Ficheros en directorio
+        ## Lista con los ficheros en el proyecto
         self.fichs  =   os.listdir( self.dir )
-        # Casos de prueba (.bpts)
+        ## Lista con los ficheros de casos de prueba (.bpts)
         self.fcasos =   os.listdir( self.casos_dir )
-        # Trazas
+        ## Lista con los ficheros de las trazas
         self.ftrazas=   os.listdir( self.trazas_dir )
-        # Invariantes
+        ## Lista con los ficheros de invariantes
         self.finvr  =   os.listdir( self.invr_dir )  
 
     def _set_vars(self):
@@ -112,31 +143,51 @@ class Proyecto(object):
         self.share      =   self.idg.share
         self.takuan     =   self.idg.takuan
 
-        # Directorio del proyecto
+        ## Directorio del proyecto
         self.dir        =   path.join(self.home,'proy',self.nombre) 
         self.dir        =   path.abspath( self.dir )
 
-        # Rutas de Ficheros 
-        self.bpel   =   path.join(self.dir, self.bpel_nom)  #bpel
-        self.proy   =   path.join(self.dir, self.proy_nom)  #config
-        self.build  =   path.join(self.dir, self.build_nom) #ant proy
-        self.test   =   path.join(self.dir, self.test_nom)  #test.bpts
-        self.bpr    =   path.join(self.dir, self.bpr_nom)   #instrument
+        ## @name Rutas de Ficheros 
+        ## @{
 
-        # Rutas Directorios 
+        ## Ruta al bpel importado, se emplea para ejecutar etc...
+        self.bpel   =   path.join(self.dir, self.bpel_nom)  # bpel
+        ## Ruta al fichero de configuración  del proyecto.
+        self.proy   =   path.join(self.dir, self.proy_nom)  # config proy
+        ## Ruta al fichero ant para realizar las ejecuciones.
+        self.build  =   path.join(self.dir, self.build_nom) # ant proy
+        ## Ruta al fichero bpts que contiene los casos de prueba.
+        self.test   =   path.join(self.dir, self.test_nom)  # test.bpts
+        ## Ruta al fichero bpr que se genera en la instrumentación.
+        self.bpr    =   path.join(self.dir, self.bpr_nom)   # instrument
+        ## @}
+
+        ## @name Rutas Directorios 
+        ## @{
+
+        ## Ruta al directorio que contiene los casos de prueba
         self.casos_dir  =   path.join(self.dir, self.casos_nom ) # Casos
+        ## Ruta al directorio que contiene las trazas
         self.trazas_dir =   path.join(self.dir, self.trazas_nom) # Trazas
+        ## Ruta al directorio que contiene los invariantes
         self.invr_dir   =   path.join(self.dir, self.invr_nom)   # Invariantes
+        ## Ruta al directorio que contiene las dependencias
         self.dep_dir    =   path.join(self.dir, self.dep_nom)    # Dependencias
-        # Dependencias
+        ## Lista con las rutas de las dependencias del bpel
         self.deps = []
-        # Dependencias no encontradas
+        ## Lista con las rutas de las dependencias no encontradas del bpel
         self.dep_miss = []
         # Proyecto instrumentado o no
         self.inst = path.exists(self.bpr)
+        ## @}
+#
+    ## @}
+
+    ## @name Tratar Bpel
+    ## @{
 
     def buscar_dependencias(self,bpel):
-        """@Brief Busca las dependencias de un bpel recursivamente. 
+        """@brief Busca las dependencias de un bpel recursivamente. 
            Copia el bpel y las dependencias al proyecto.
            Modifica el bpel y las dependencias para adaptarlos al proyecto
            \returns True si todo va bien, None si algo falla.
@@ -149,6 +200,7 @@ class Proyecto(object):
             raise ProyectoError( _("Error no se pudo abrir ") + bpel)
 
         # Buscar las dependencias del bpel recursivamente
+        ## Lista de rutas con las dependencias del bpel
         self.deps = self.__buscar_dependencias([bpel])
 
         print "%i dependencias encontradas, %i dependencias rotas, %i \
@@ -158,7 +210,7 @@ class Proyecto(object):
         return True
 
     def __buscar_dependencias(self,files,first=True):
-        """@Brief Busca las dependencias xsd y wsdl recursivamente en los
+        """@brief Busca las dependencias xsd y wsdl recursivamente en los
         ficheros y devuelve sus rutas completas. 
         Copia las dependencias al proyecto y las modifica para adaptar los
         import a rutas relativas al proyecto. 
@@ -255,8 +307,28 @@ class Proyecto(object):
             files.extend(self.__buscar_dependencias(deps, False))
             return files
 
+    def instrumentar(self):
+        """@brief Instrumenta el proyecto o lanza una excepción.""" 
+
+        # Comenzar la instrumentación mandando a consola el comando
+        cmd = "ant -f %s build-bpr" % self.build
+        print _("Ejecutando: ") + cmd
+        out = commands.getoutput(cmd)
+
+        # Comprobar que se ha instrumentado correctamente
+        if not path.exists( self.bpr ) or \
+           out.rfind('BUILD SUCCESSFUL') == -1 :
+            self.inst = False
+            raise ProyectoError(_("No se pudo instrumentar") + out )
+        else:
+            self.inst = True
+    ## @}
+
+    ## @name Cargar y Crear
+    ## @{
+
     def crear(self):
-        """@Brief Crea el proyecto. """
+        """@brief Crea el proyecto. """
 
         # Comprobar el nombre
         if len(str(self.nombre).strip()) == 0: 
@@ -292,7 +364,7 @@ class Proyecto(object):
         return True
 
     def check(self):
-        """@Brief Comprueba que el proyecto está bien y sus ficheros de
+        """@brief Comprueba que el proyecto está bien y sus ficheros de
         configuración y trata de arreglarlo, de lo contrario lanza una excepción ProyectoError. """ 
 
         # Comprobar existencia de la estructura y de los
@@ -338,7 +410,7 @@ class Proyecto(object):
             self.instrumentar()
 
     def leer_config(self):
-        """@Brief Lee e inicializa la clase leyendo de los ficheros de
+        """@brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
 
         # Abrir self.proy para leer 
@@ -382,25 +454,13 @@ class Proyecto(object):
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
                                 self.proy)
+    ## @}
 
-    def instrumentar(self):
-        """@Brief Instrumenta el proyecto o lanza una excepción.""" 
-
-        # Comenzar la instrumentación mandando a consola el comando
-        cmd = "ant -f %s build-bpr" % self.build
-        print _("Ejecutando: ") + cmd
-        out = commands.getoutput(cmd)
-
-        # Comprobar que se ha instrumentado correctamente
-        if not path.exists( self.bpr ) or \
-           out.rfind('BUILD SUCCESSFUL') == -1 :
-            self.inst = False
-            raise ProyectoError(_("No se pudo instrumentar") + out )
-        else:
-            self.inst = True
+    ## @name Guardar
+    ## @{
 
     def guardar(self):
-        """@Brief Guarda todas las propiedades del proyecto en el fichero de
+        """@brief Guarda todas las propiedades del proyecto en el fichero de
         configuración."""
 
         # Abrir self.proy para escribir la info del proyecto
@@ -473,7 +533,7 @@ class Proyecto(object):
                                        configuración en: ") + self.proy )
 
     def guardado(self):
-        """@Brief Comprueba si hay información modificada por guardar.
+        """@brief Comprueba si hay información modificada por guardar.
            \returns True si está todo guardado."""
         # Comprobar proyecto.xml
         # |- Comprobar casos
@@ -482,3 +542,4 @@ class Proyecto(object):
         # `- Comprobar ejecuciones
         pass
         return self.mod
+    ## @}
