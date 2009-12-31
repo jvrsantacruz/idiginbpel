@@ -7,7 +7,7 @@ Establece la ruta de ejecución y crea el sistema.
 # Añadir el directorio de trabajo al path
 import sys
 import os.path as path
-from idg.idg import Idg
+from idg.main import Idg
 
 # Ruta del programa al ejecutarse
 abspath = path.realpath(__file__)

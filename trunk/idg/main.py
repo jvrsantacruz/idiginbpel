@@ -8,7 +8,7 @@ import shutil
 from xml.dom import minidom as md
 
 from proyecto import Proyecto,ProyectoError
-from idgui.idgui import Idgui
+from idgui.main import Idgui
 import lang
 
 class Idg(object):
