@@ -54,8 +54,7 @@ class Idgui(object):
         # Actualizar la lista de proyectos
         self.listar_proyectos()
 
-        ### Conectar señales 
-        ##self.builder.connect_signals({ "on_main_ventana_destroy" : gtk.main_quit })
+        # Conectar señales 
         self.builder.connect_signals(self)
 
         # Mostrar la ventana
@@ -142,9 +141,15 @@ class Idgui(object):
         error_str = ""
 
          # Comprobar nombre del proyecto
-         # Debe ser un nombre 'unix' válido
+        # No debe estar vacio
         if nombre == "":
             error_str =  _("El nombre del proyecto no puede estar vacío.") 
+
+        # No debe estar usado
+        elif nombre in self.idg.lista_proyectos:
+            error_str =  _("Ya existe un proyecto con ese nombre.") 
+
+         # Debe ser un nombre 'unix' válido
         else:
             # Caracteres que no deben estar en el nombre del proyecto
             wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
@@ -155,8 +160,12 @@ class Idgui(object):
 
         # Obtenemos la ruta del bpel.
         bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
+
+        # No debe estar vacía
         if bpel is None:
-            error_str += "\n" + _("Fichero bpel no seleccionado") 
+            error_str = _("Fichero bpel no seleccionado") 
+        elif not os.access(bpel, F_OK or R_OK or W_OK):
+            error_str = _("El fichero bpel seleccionado no existe")
 
         # Comprobar los errores y mostrarlos
         if error_str :
