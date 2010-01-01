@@ -146,7 +146,7 @@ class Idgui(object):
 
          # Comprobar nombre del proyecto
         # No debe estar vacio
-        if nombre == "":
+        if not nombre:
             error_str =  _("El nombre del proyecto no puede estar vacío.") 
 
         # No debe estar usado
@@ -154,7 +154,7 @@ class Idgui(object):
             error_str =  _("Ya existe un proyecto con ese nombre.") 
 
          # Debe ser un nombre 'unix' válido
-        else nombre:
+        else:
             # Caracteres que no deben estar en el nombre del proyecto
             wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
             for i in wrong:
