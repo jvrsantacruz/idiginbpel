@@ -137,6 +137,10 @@ class Idgui(object):
 
         # Obtenemos el nombre que el usuario ha escrito y lo limpiamos.
         nombre = self.builder.get_object("proyecto_nombre").get_text().strip()
+
+        # Obtenemos la ruta del bpel.
+        bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
+
         # Cadena con los errores
         error_str = ""
 
@@ -150,7 +154,7 @@ class Idgui(object):
             error_str =  _("Ya existe un proyecto con ese nombre.") 
 
          # Debe ser un nombre 'unix' válido
-        else:
+        else nombre:
             # Caracteres que no deben estar en el nombre del proyecto
             wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
             for i in wrong:
@@ -158,10 +162,7 @@ class Idgui(object):
                     error_str = _("El nombre del proyecto no puede contener el carácter: ") + '"%c"' % i
                     break
 
-        # Obtenemos la ruta del bpel.
-        bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
-
-        # No debe estar vacía
+        # La ruta debe estar seleccionada
         if bpel is None:
             error_str = _("Fichero bpel no seleccionado") 
         elif not os.access(bpel, F_OK or R_OK or W_OK):
