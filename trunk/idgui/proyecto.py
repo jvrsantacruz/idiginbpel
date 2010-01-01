@@ -7,7 +7,7 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
-from idg.proyecto import Proyecto,ProyectoError
+from idg.proyecto import *
 import lang
 
 class ProyectoUI:
@@ -28,16 +28,16 @@ class ProyectoUI:
         # Crear el proyecto
         try:
             ## Referencia a la instancia del Proyecto actual
+            error = ""
             self.proy = Proyecto(nombre,idg,bpel)
             self.idg.proyecto = self.proy
-        except:
-            # Por ahora cualquier excepción al crear el proyecto, lo manda todo
-            # a tomar por saco.
-            # TODO: Hacer excepciones recuperables y no recuperables.
+        except ProyectoRecuperable as e:
             # Mostrar las recuperables en los errores en la interfaz.
-            print _("Excepción [recuperable o no] al crear el proyecto")
-            sys.exc_info()[0]
-            raise 
+            print _("Excepción recuperable al crear el proyecto")
+            error = e
+        except (ProyectoError): 
+            print _("Excepción irrecuperable al crear el proyecto")
+            raise
 
         ## Objeto gtkbuilder de idgui
         self.gtk = builder
@@ -56,7 +56,7 @@ class ProyectoUI:
 
         ## Label indicador de errores y dejarlo vacío
         self.error_label = self.gtk.get_object("proy_base_errores_label")
-        self.error("")
+        self.error(error)
 
         ## Nombre del proyecto
         self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
