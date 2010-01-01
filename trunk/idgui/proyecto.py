@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os.path as path
+import sys
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -35,7 +36,8 @@ class ProyectoUI:
             # TODO: Hacer excepciones recuperables y no recuperables.
             # Mostrar las recuperables en los errores en la interfaz.
             print _("Excepción [recuperable o no] al crear el proyecto")
-            raise Exception()
+            sys.exc_info()[0]
+            raise 
 
         ## Objeto gtkbuilder de idgui
         self.gtk = builder
