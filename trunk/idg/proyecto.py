@@ -201,7 +201,7 @@ class Proyecto(object):
 
         # Buscar las dependencias del bpel recursivamente
         ## Lista de rutas con las dependencias del bpel
-        self.deps = self.__buscar_dependencias([bpel])
+        self.deps, self.dep_miss = self.__buscar_dependencias([bpel])
 
         print "%i dependencias encontradas, %i dependencias rotas, %i \
         dependencias totales" % \
@@ -209,102 +209,117 @@ class Proyecto(object):
 
         return True
 
-    def __buscar_dependencias(self,files,first=True):
+    def __buscar_dependencias(self,files,deps=set(),miss=set(),first=True):
         """@brief Busca las dependencias xsd y wsdl recursivamente en los
         ficheros y devuelve sus rutas completas. 
         Copia las dependencias al proyecto y las modifica para adaptar los
         import a rutas relativas al proyecto. 
         Añade las dependencias que no han podido ser obtenidas a dep_miss.
-        \param files Lista con rutas a los ficheros en los que buscar
-        \param first Flag para saber si estamos mirando el bpel original.
-        \returns Lista de rutas absolutas con las dependencias originales.
+        @param files Lista con rutas a los ficheros en los que buscar
+        @param first Flag para saber si estamos mirando el bpel original.
+        @retval (deps,deps_miss) Listas con las rutas de las dependencias,
+        encontradas y rotas.
         """
 
-        # Caso base files vacio
+        # Caso de parada de la función
         if len(files) == 0 :
             return []
-        else:
-            # deps son las rutas encontradas
-            deps = []
 
-            # Buscamos en todos los ficheros que recibamos
-            for f in files:
-                # Nombre y directorio del fichero dependencia
-                nom = path.basename(f)
-                dir = path.dirname(f)
+        local_deps = set()
 
-                # Si el fichero ya existe, no lo evaluamos
-                if path.exists( path.join( self.dep_dir , nom) ):
+        # Buscamos en todas las rutas de ficheros que recibamos
+        for f in files:
+
+            # Si es la primera vez, añadimos a deps
+            if first:
+                deps.add(f)
+
+            nom = path.basename(f) # Nombre del fichero
+            dir = path.dirname(f)  # Directorio del fichero
+            proy = path.join(self.dep_dir, nom) # Ruta dentro del proyecto
+
+            if path.exists(proy):   # Si ya existe en el proyecto
+                miss.discard(dir)  # Quitamos de las dependencias rotas 
+
+            print _("Dependencia: "), nom
+
+            # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
+            # y lo serializamos de nuevo pero dentro del proyecto.
+
+            # Cargar fichero en memoria
+            try:
+                xml = md.parse( f )
+            except:
+                # Mostramos un error y añadimos 
+                # a las dependencias rotas
+                print _("Error al parsear "),f
+                miss.add(f)
+                continue
+
+            # Buscar los imports en el fichero
+            # empleando los distintos namespaces
+            imps = xml.getElementsByTagName('import')
+            imps += xml.getElementsByTagName('xsd:import')
+
+            # Modificar los import a rutas al mismo directorio
+            # Obtener las rutas absolutas  meterlas en deps
+            for i in imps:
+                attr = 'location' if i.hasAttribute('location') else 'schemaLocation'
+                # Si no está el atributo por alguna razón, continuar.
+                ruta = i.getAttribute(attr) 
+                if not ruta:
                     continue
 
-                print _("Dependencia: "), nom
-                # Cargar fichero en memoria
+                # Ruta real de la dependencia encontrada
+                dep = path.abspath(path.join(dir, ruta))
+
+                # Añadir la dependencia al conjunto local y total
+                local_deps.add(dep)
+                deps.add(dep)
+
+                print nom , " --> " , path.basename(ruta)
+
+                # Si es el bpel original (first) la dependencia apuntará al
+                # directorio de dependencias (self.dep_nom)
+                # Si es una dependencia más, sus imports estarán en el
+                # mismo directorio.
+                ruta = path.basename(ruta) if not first else  \
+                        path.join(self.dep_nom, path.basename(ruta))
+
+                # Modificar el atributo con la ruta correcta
+                i.setAttribute(attr, ruta)
+
+
+                # Copiar el fichero en el proyecto
                 try:
-                    xml = md.parse( f )
-                except:
-                    # Mostramos un error y añadimos 
-                    # a las dependencias rotas
-                    print _("Error al parsear "),f
-                    self.dep_miss.append( f )
-                    continue
-
-                # Buscar los imports en el fichero
-                # empleando los distintos namespaces
-                imps = xml.getElementsByTagName('import')
-                imps += xml.getElementsByTagName('xsd:import')
-
-                # Modificar los import a rutas al mismo directorio
-                # Obtener las rutas absolutas  meterlas en deps
-                for i in imps:
-                    attr = ""
-                    if i.hasAttribute('location'):
-                        attr = 'location'
-                    elif i.hasAttribute('schemaLocation'):
-                        attr = 'schemaLocation'
-
-                    # Si no es ninguna de las dos, saltarlo
-                    else:
-                        continue
-
-                    # Meter en deps la ruta absoluta 
-                    # de la dependencia
-                    ruta = i.getAttribute(attr)
-                    dep = path.join(dir,ruta)
-                    dep = path.abspath(dep)
-                    deps.append(dep)
-
-                    # Poner la ruta del import en el mismo directorio
-                    # Si es el bpel original
-                    if first:
-                        i.setAttribute(attr, path.join( self.dep_nom , \
-                                                       path.basename(ruta)))
-                    # Si es una dependencia más, en el mismo directorio
-                    else:
-                        i.setAttribute(attr, path.basename(ruta))
-
-                # Copiar las dependencias en proyecto
-                try:
-                    # Volcar el xml a un fichero en el directorio self.dep_dir
+                    # Serializar el xml a un fichero en el directorio self.dep_dir
                     # Con el nombre adecuado si es el bpel original
                     if first :
                         file = open(self.bpel,'w')
                     else:
                         file = open(path.join(self.dep_dir,nom), 'w')
-                    file.write(xml.toxml('utf-8'))
+                        file.write(xml.toxml('utf-8'))
                 except:
+                    # Si no se ha podido escribir la versión modificada del
+                    # fichero, añadirlo a las dependencias rotas 
                     print _("Error al escribir en el proyecto"), nom
-                    self.dep_miss.append(f)
-                else:
-                    # Eliminar de dep_miss dependencias 
-                    # que finalmente si se han podido copiar
-                    for d in deps:
-                        if d in self.dep_miss:
-                            self.dep_miss.remove(d)
+                    miss.add(ruta)
 
-            # Devolvemos las dependencias que ha recibido la función
-            #  más las que encontraremos en la próxima vuelta.
-            #  False en la llamada porque ya no es la primera.
-            files.extend(self.__buscar_dependencias(deps, False))
+                # Quitamos de deps las que están en miss
+                # deps = deps.difference_update(miss)
+
+                # fin del for
+        # fin del for
+
+        # Llamada recursiva, false porque ya no es la primera llamada.
+        self.__buscar_dependencias(list(local_deps), deps, miss, False)
+
+        # Si es la primera llamada, devolvemos todas las dependencias.
+        if first: 
+            return list(deps), list(miss)
+        # Si es una llamada normal, devolvemos los ficheros a mirar en
+        # la siguiente iteración.
+        else:
             return files
 
     def instrumentar(self):
