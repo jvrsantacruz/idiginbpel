@@ -108,61 +108,20 @@
                     <child>
                       <object class="GtkTable" id="proy_config_dep_tabla">
                         <property name="visible">True</property>
-                        <property name="n_rows">4</property>
+                        <property name="n_rows">3</property>
                         <property name="n_columns">2</property>
                         <child>
                           <object class="GtkLabel" id="proy_config_dep_totales-titulo_label">
                             <property name="visible">True</property>
                             <property name="xalign">0.10000000149011612</property>
                             <property name="label" translatable="yes">Total:</property>
+                            <attributes>
+                              <attribute name="weight" value="semibold"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="x_options">GTK_FILL</property>
                             <property name="y_options"></property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="proy_config_dep_buenas-titulo_label">
-                            <property name="visible">True</property>
-                            <property name="xalign">0.10000000149011612</property>
-                            <property name="label" translatable="yes">Encontradas:</property>
-                          </object>
-                          <packing>
-                            <property name="top_attach">1</property>
-                            <property name="bottom_attach">2</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="proy_config_dep_rotas-titulo_label">
-                            <property name="visible">True</property>
-                            <property name="xalign">0.10000000149011612</property>
-                            <property name="label" translatable="yes">Rotas:</property>
-                          </object>
-                          <packing>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
-                            <property name="x_options">GTK_FILL</property>
-                            <property name="y_options"></property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButton" id="proy_config_dep_inst_boton">
-                            <property name="label" translatable="yes">Instrumentar</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <signal name="released" handler="on_proy_config_dep_inst_boton"/>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
-                            <property name="top_attach">3</property>
-                            <property name="bottom_attach">4</property>
-                            <property name="x_options">GTK_EXPAND</property>
-                            <property name="y_options">GTK_EXPAND</property>
-                            <property name="y_padding">20</property>
                           </packing>
                         </child>
                         <child>
@@ -179,14 +138,12 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="proy_config_dep_buenas_label">
+                          <object class="GtkLabel" id="proy_config_dep_rotas-titulo_label">
                             <property name="visible">True</property>
                             <property name="xalign">0.10000000149011612</property>
-                            <property name="label" translatable="yes">0</property>
+                            <property name="label" translatable="yes">Rotas:</property>
                           </object>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="right_attach">2</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
                             <property name="x_options">GTK_FILL</property>
@@ -202,8 +159,8 @@
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
-                            <property name="top_attach">2</property>
-                            <property name="bottom_attach">3</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
                             <property name="x_options">GTK_FILL</property>
                             <property name="y_options"></property>
                           </packing>
@@ -219,17 +176,36 @@
                             <signal name="released" handler="on_proy_config_dep_buscar_boton"/>
                           </object>
                           <packing>
-                            <property name="top_attach">3</property>
-                            <property name="bottom_attach">4</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
                             <property name="x_options"></property>
                             <property name="y_options"></property>
                             <property name="y_padding">21</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="proy_config_dep_inst_boton">
+                            <property name="label" translatable="yes">Instrumentar</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="released" handler="on_proy_config_dep_inst_boton"/>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                            <property name="x_options">GTK_EXPAND</property>
+                            <property name="y_options">GTK_EXPAND</property>
+                            <property name="y_padding">20</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="pack_type">end</property>
                         <property name="position">1</property>
                       </packing>
                     </child>

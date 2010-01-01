@@ -75,8 +75,6 @@ class ProyectoUI:
         # Dependencias
         ## Label con el número total de dependencias
         self.dep_totales_label = self.gtk.get_object("proy_config_dep_totales_label")
-        ## Label con el número de dependencias encontradas
-        self.dep_buenas_label = self.gtk.get_object("proy_config_dep_buenas_label")
         ## Label con el número de dependencias rotas
         self.dep_rotas_label = self.gtk.get_object("proy_config_dep_rotas_label")
 
@@ -109,14 +107,13 @@ class ProyectoUI:
             self.error("%d dependencias rotas" % len(self.proy.dep_miss))
 
         self.dep_totales_label.set_text(str(ldep+ldep_miss))
-        self.dep_buenas_label.set_text(str(ldep))
         self.dep_rotas_label.set_text(str(ldep_miss))
 
         # Iconos
         roto = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
         buena = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
 
-        # Limpiar la lista de dependencias y añadir las nuevas
+        # Limpiar la lista de dependencias y actualizarlas 
         self.dep_list.clear()
         for d in self.proy.deps + self.proy.dep_miss :
             if d in self.proy.dep_miss:
