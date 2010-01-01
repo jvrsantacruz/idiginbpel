@@ -290,20 +290,23 @@ class Proyecto(object):
                 i.setAttribute(attr, ruta)
 
 
-                # Copiar el fichero en el proyecto
-                try:
-                    # Serializar el xml a un fichero en el directorio self.dep_dir
-                    # Con el nombre adecuado si es el bpel original
-                    if first :
-                        file = open(self.bpel,'w')
-                    else:
-                        file = open(path.join(self.dep_dir,nom), 'w')
-                        file.write(xml.toxml('utf-8'))
-                except:
-                    # Si no se ha podido escribir la versión modificada del
-                    # fichero, añadirlo a las dependencias rotas 
-                    print _("Error al escribir en el proyecto"), nom
-                    miss.add(ruta)
+            # Copiar el fichero en el proyecto
+            try:
+                # Serializar el xml a un fichero en el directorio self.dep_dir
+                # Con el nombre adecuado si es el bpel original
+                if first :
+                    file = open(self.bpel,'w')
+                else:
+                    file = open(path.join(self.dep_dir,nom), 'w')
+
+                file.write(xml.toxml('utf-8'))
+            except:
+                # Si no se ha podido escribir la versión modificada del
+                # fichero, añadirlo a las dependencias rotas 
+                print _("Error al escribir en el proyecto"), nom
+                miss.add(ruta)
+            finally:
+                file.close()
 
                 # Quitamos de deps las que están en miss
                 # deps = deps.difference_update(miss)
@@ -333,8 +336,17 @@ class Proyecto(object):
         # Comprobar que se ha instrumentado correctamente
         if not path.exists( self.bpr ) or \
            out.rfind('BUILD SUCCESSFUL') == -1 :
-            self.inst = False
-            raise ProyectoError(_("No se pudo instrumentar") + out )
+            # Si ha sido por la falta de un fichero, volvemos a buscar
+            # dependencias e intentamos instrumentar de nuevo.
+            if( not self.inst is None  
+               and out.rfind('java.io.FileNotFoundException') != -1):
+                self.inst = None
+                bpel = self.bpel_o if path.exists(self.bpel_o) else self.bpel
+                self.buscar_dependencias(bpel)
+                self.instrumentar()
+            else:
+                self.inst = False
+                raise ProyectoRecuperable(_("No se pudo instrumentar") + out )
         else:
             self.inst = True
     ## @}
