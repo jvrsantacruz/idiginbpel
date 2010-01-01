@@ -77,6 +77,13 @@ class ProyectoUI:
         self.dep_buenas_label = self.gtk.get_object("proy_config_dep_buenas_label")
         ## Label con el número de dependencias rotas
         self.dep_rotas_label = self.gtk.get_object("proy_config_dep_rotas_label")
+
+        ## Lista de depencencias Modelo Datos 
+        self.dep_list = self.gtk.get_object("proy_config_dep_list")
+        ## Lista de dependencias TreeView
+        self.dep_view = self.gtk.get_object("proy_config_dep_view")
+
+        # Actualizar la información de la configuración
         self.actualizar_pantalla_config()
 
         # Conectar todas las señales
@@ -102,6 +109,23 @@ class ProyectoUI:
         self.dep_totales_label.set_text(str(ldep+ldep_miss))
         self.dep_buenas_label.set_text(str(ldep))
         self.dep_rotas_label.set_text(str(ldep_miss))
+
+        # Iconos
+        roto = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
+        buena = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
+
+        # Limpiar la lista de dependencias y añadir las nuevas
+        self.dep_list.clear()
+        for d in self.proy.deps + self.proy.dep_miss :
+            if d in self.proy.dep_miss:
+                l = [ roto , path.basename(d), d ]
+            else:
+                l = [ buena, path.basename(d), _("Dentro del proyecto") ]
+            self.dep_list.append(l)
+
+    def listar_dependencias_config(self):
+        """@brief Actualiza la lista de dependencias en el tree de config"""
+        pass
 
     def error(self,msg):
         self.error_label.set_markup('<span color="green">'+msg+'</span>')
