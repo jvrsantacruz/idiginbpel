@@ -67,6 +67,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="model">proy_config_dep_list</property>
+                        <property name="headers_clickable">False</property>
                         <child>
                           <object class="GtkTreeViewColumn" id="proy_config_dep_view_estado_col">
                             <property name="title">Estado</property>
@@ -357,14 +358,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox2">
+              <object class="GtkVBox" id="proy_casos_contenedor">
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkHBox" id="hbox1">
+                  <object class="GtkHBox" id="proy_casos_arriba_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkLabel" id="label1">
+                      <object class="GtkLabel" id="proy_casos_bpts_label">
                         <property name="visible">True</property>
                         <property name="xpad">15</property>
                         <property name="label" translatable="yes">A&#xF1;adir fichero</property>
@@ -375,7 +376,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFileChooserButton" id="filechooserbutton1">
+                      <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
                         <property name="create_folders">False</property>
                       </object>
@@ -390,10 +391,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox2">
+                  <object class="GtkHBox" id="proy_casos_abajo_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkTreeView" id="treeview1">
+                      <object class="GtkTreeView" id="proy_casos_view">
                         <property name="height_request">300</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -401,7 +402,7 @@
                         <property name="headers_clickable">False</property>
                         <property name="search_column">9</property>
                         <child>
-                          <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+                          <object class="GtkTreeViewColumn" id="proy_casos_column">
                             <property name="title">Casos de prueba</property>
                           </object>
                         </child>
@@ -411,32 +412,32 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbox3">
+                      <object class="GtkVBox" id="proy_casos_der_caja">
                         <property name="visible">True</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkFrame" id="frame1">
+                          <object class="GtkFrame" id="proy_casos_frame">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="alignment1">
+                              <object class="GtkAlignment" id="proy_casos_align">
                                 <property name="visible">True</property>
                                 <property name="left_padding">12</property>
                                 <child>
-                                  <object class="GtkTable" id="table2">
+                                  <object class="GtkTable" id="proy_casos_table">
                                     <property name="visible">True</property>
                                     <property name="n_rows">3</property>
                                     <property name="n_columns">2</property>
                                     <property name="row_spacing">25</property>
                                     <child>
-                                      <object class="GtkLabel" id="label6">
+                                      <object class="GtkLabel" id="proy_casos_info_nombre_titulo_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">Nombre de fichero:</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label7">
+                                      <object class="GtkLabel" id="proy_casos_info_nombre_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">nombre_fichero_bpts1</property>
                                       </object>
@@ -446,7 +447,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label8">
+                                      <object class="GtkLabel" id="proy_casos_info_n_titulo_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">N&#xBA; de casos de prueba:</property>
                                       </object>
@@ -456,7 +457,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label9">
+                                      <object class="GtkLabel" id="proy_casos_info_n_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">5</property>
                                       </object>
@@ -468,7 +469,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label10">
+                                      <object class="GtkLabel" id="proy_casos_info_tmp_titulo_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">&#xDA;ltima modificaci&#xF3;n</property>
                                       </object>
@@ -478,7 +479,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label11">
+                                      <object class="GtkLabel" id="proy_casos_info_tmp_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">timestamp</property>
                                       </object>
@@ -494,7 +495,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label5">
+                              <object class="GtkLabel" id="proy_casos_info_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Datos&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
@@ -511,7 +512,7 @@
                             <property name="visible">True</property>
                             <property name="homogeneous">True</property>
                             <child>
-                              <object class="GtkButton" id="button3">
+                              <object class="GtkButton" id="proy_casos_ejec_boton">
                                 <property name="label" translatable="yes">Ejecutar</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -523,7 +524,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkButton" id="button4">
+                              <object class="GtkButton" id="proy_casos_ejec_ana_boton">
                                 <property name="label" translatable="yes">Ejecutar y Analizar</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -556,7 +557,7 @@
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="proyecto_casos_prueba">
+              <object class="GtkLabel" id="proy_casos_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">1. Casos de Prueba</property>
               </object>
@@ -566,14 +567,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox4">
+              <object class="GtkVBox" id="proy_ejec_contenedor">
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkHBox" id="hbox4">
+                  <object class="GtkHBox" id="proy_ejec_arriba_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkLabel" id="label4">
+                      <object class="GtkLabel" id="proy_ejec_svr_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Estado del servidor Active Bpel:</property>
                       </object>
@@ -584,7 +585,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="button5">
+                      <object class="GtkButton" id="proy_ejec_svr_boton">
                         <property name="label" translatable="yes">Comprobar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -599,7 +600,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label12">
+                      <object class="GtkLabel" id="proy_ejec_svr-estado_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">OK</property>
                         <attributes>
@@ -620,10 +621,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="hbox5">
+                  <object class="GtkHBox" id="proy_ejec_abajo_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkTreeView" id="treeview2">
+                      <object class="GtkTreeView" id="proy_ejec_view">
                         <property name="height_request">300</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -631,7 +632,7 @@
                         <property name="headers_clickable">False</property>
                         <property name="search_column">9</property>
                         <child>
-                          <object class="GtkTreeViewColumn" id="treeviewcolumn2">
+                          <object class="GtkTreeViewColumn" id="proy_ejec_column">
                             <property name="title">Casos de prueba</property>
                           </object>
                         </child>
@@ -641,25 +642,25 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbox5">
+                      <object class="GtkVBox" id="proy_ejec_der_caja">
                         <property name="visible">True</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkFrame" id="frame2">
+                          <object class="GtkFrame" id="proy_ejec_frame">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="alignment2">
+                              <object class="GtkAlignment" id="proy_ejec_align">
                                 <property name="visible">True</property>
                                 <property name="left_padding">12</property>
                                 <child>
-                                  <object class="GtkVBox" id="vbox6">
+                                  <object class="GtkVBox" id="proy_ejec_control_caja">
                                     <property name="visible">True</property>
                                     <property name="orientation">vertical</property>
                                     <property name="spacing">2</property>
                                     <child>
-                                      <object class="GtkLabel" id="label14">
+                                      <object class="GtkLabel" id="proy_ejec_control_label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">Ejecuci&#xF3;n</property>
                                       </object>
@@ -670,7 +671,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkProgressBar" id="progressbar1">
+                                      <object class="GtkProgressBar" id="proy_ejec_control_bar">
                                         <property name="visible">True</property>
                                         <property name="show_text">True</property>
                                         <property name="fraction">0.59999999999999998</property>
@@ -680,10 +681,10 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkHBox" id="hbox6">
+                                      <object class="GtkHBox" id="proy_ejec_control_abajo_caja">
                                         <property name="visible">True</property>
                                         <child>
-                                          <object class="GtkLabel" id="label15">
+                                          <object class="GtkLabel" id="proy_ejec_control_tiempo-titulo_label">
                                             <property name="visible">True</property>
                                             <property name="xalign">0.98000001907348633</property>
                                             <property name="label" translatable="yes">Tiempo estimado:</property>
@@ -693,7 +694,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel" id="label16">
+                                          <object class="GtkLabel" id="proy_ejec_control_tiempo_label">
                                             <property name="visible">True</property>
                                             <property name="xalign">0</property>
                                             <property name="label" translatable="yes">00:50:15 min</property>
@@ -714,7 +715,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label13">
+                              <object class="GtkLabel" id="proy_ejec_control_titulo_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Control de Ejecuci&#xF3;n&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
@@ -727,8 +728,8 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="button6">
-                            <property name="label" translatable="yes">Detener</property>
+                          <object class="GtkButton" id="proy_ejec_control_boton">
+                            <property name="label" translatable="yes">Ejecutar</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -740,16 +741,16 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="frame3">
+                          <object class="GtkFrame" id="proy_ejec_log_frame">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="alignment3">
+                              <object class="GtkAlignment" id="proy_ejec_log_align">
                                 <property name="visible">True</property>
                                 <property name="left_padding">12</property>
                                 <child>
-                                  <object class="GtkTextView" id="textview1">
+                                  <object class="GtkTextView" id="proy_ejec_log_text">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="buffer">textbuffer1</property>
@@ -758,7 +759,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label17">
+                              <object class="GtkLabel" id="proy_ejec_log_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Log&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
@@ -785,7 +786,7 @@
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="proyecto_ejecucion">
+              <object class="GtkLabel" id="proyecto_ejecucion_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">2. Ejecuci&#xF3;n</property>
               </object>
