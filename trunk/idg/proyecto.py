@@ -125,6 +125,9 @@ class Proyecto(object):
             self.guardar()
             self.idg.obtener_lista_proyectos()
 
+        # Proyecto instrumentado o no
+        self.inst = path.exists(self.bpr)
+
         # Comprueba que la estructura del proyecto está bien
         self.check()
 
@@ -141,10 +144,8 @@ class Proyecto(object):
         self.finvr  =   os.listdir( self.invr_dir )  
         ## @}
 
-        # Proyecto instrumentado o no
-        self.inst = path.exists(self.bpr)
+        # Número de casos
         self.hay_casos = len(self.fcasos) > 0
-
 
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
@@ -197,7 +198,6 @@ class Proyecto(object):
         self.casos = []
                 ## @}
 
-       
     ## @}
 
     ## @name Tratar Bpel
@@ -547,10 +547,8 @@ class Proyecto(object):
 
         # Abrir el test.bpts y comprobar la configuración del servidor 
         try:
-            print self.test
             bpts = et.ElementTree()
             bproot = bpts.parse(self.test)
-            print self.test
         except:
             raise ProyectoRecuperable(_("No se pudo abrir el fichero de casos\
             de prueba general"))
@@ -571,7 +569,7 @@ class Proyecto(object):
                                         casos de prueba"))
 
         # Instrumentar si hace falta
-        if not self.inst :
+        if self.inst == False:
             self.instrumentar()
 
     def leer_proy(self):
@@ -609,10 +607,11 @@ class Proyecto(object):
             # Añadir las dependencias donde correspondan
             for d in echilds:
                 ruta = d.attrib['ruta']
-                if d.attrib['rota'] == 'False':
-                    self.deps.append(ruta)
-                else:
-                    self.dep_miss.append(ruta)
+                if ruta not in self.deps:
+                    if d.attrib['rota'] == 'False':
+                        self.deps.append(ruta)
+                    else:
+                        self.dep_miss.append(ruta)
 
             # pruebas
             e = root.find('pruebas')
@@ -684,19 +683,19 @@ class Proyecto(object):
             # dependencias
             e = root.find('dependencias')
             echilds = e.getchildren()
-            dnames = [d.attrib['nombre'] for d in echilds]
-            print dnames
+            drutas = [d.attrib['ruta'] for d in echilds]
+            print drutas
 
             # Comprobar las dependencias
             for d in self.deps + self.dep_miss:
                 # Si no está, añadirlo
-                if not d in dnames:
+                if not d in drutas:
                     sub = et.SubElement(e,'dependencia')
 
-                # Añadir/Actualizar los atributos
-                sub.attrib['nombre'] = path.basename(d)
-                sub.attrib['ruta'] = d
-                sub.attrib['rota'] = str(d in self.dep_miss)
+                    # Añadir/Actualizar los atributos
+                    sub.attrib['nombre'] = path.basename(d)
+                    sub.attrib['ruta'] = d
+                    sub.attrib['rota'] = str(d in self.dep_miss)
         except:
             raise ProyectoError(_("Error al configurar"))
 

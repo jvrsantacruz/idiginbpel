@@ -110,6 +110,7 @@ class Idgui(object):
             self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
         except:
             print "Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value)
+            self.cargar_portada()
 
     def error(self,msg):
         pass
