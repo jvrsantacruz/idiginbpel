@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Fichero base para agrupar todos los casos de prueba -->
-
-<tes:testSuite >
-
+<tes:testSuite 
+    xmlns:tes="http://www.bpelunit.org/schema/testSuite">
     <!-- Nombre del proyecto -->
   <tes:name></tes:name>
 
@@ -12,7 +11,7 @@
   <!-- Fichero bpr -->
   <tes:deployment>
       <!-- Nombre del proyecto -->
-      <tes:put name="" type="activebpel">
+      <tes:put name="bpel_original" type="activebpel">
 
         <!-- wsdl test -->
       <tes:wsdl></tes:wsdl>
@@ -20,9 +19,7 @@
       <tes:property name="BPRFile">bpr_file.bpr</tes:property>
     </tes:put>
 
-    <!-- -->
-    <tes:partner name="assessor" wsdl="AssessorService.wsdl"/>
-    <tes:partner name="approver" wsdl="ApprovalService.wsdl"/>
+    <!-- <tes:partner name="assessor" wsdl="AssessorService.wsdl"/> -->
   </tes:deployment>
 
   <tes:testCases>

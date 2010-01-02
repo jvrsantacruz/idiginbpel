@@ -64,8 +64,9 @@ class Proyecto(object):
     ## @{
 
     bpel_url = 'http://docs.oasis-open.org/wsbpel/2.0/process/executable'
-    wsdl_url =   'http://schemas.xmlsoap.org/wsdl/'
-    xsd_url  =   'http://www.w3.org/2001/XMLSchema'
+    wsdl_url = 'http://schemas.xmlsoap.org/wsdl/'
+    xsd_url  = 'http://www.w3.org/2001/XMLSchema'
+    test_url = 'http://www.bpelunit.org/schema/testSuite'
     ## @}
 
     ## @name Configuración de conexión por defecto
@@ -84,6 +85,8 @@ class Proyecto(object):
     inst   =   False 
     ## Flag de modificado el proyecto
     mod    =   False 
+    ## Flag de si hay casos de prueba incluidos
+    hay_casos = False
     # @}
 
     ## @name Inicialización 
@@ -116,15 +119,17 @@ class Proyecto(object):
         # Si se indica la ruta del bpel, debemos crear el proyecto 
         # Si ya está creado, leemos su configuración
         if not bpel :
-            self.leer_config()
+            self.leer_proy()
         else:
             self.crear()
             self.guardar()
+            self.idg.obtener_lista_proyectos()
 
         # Comprueba que la estructura del proyecto está bien
         self.check()
 
-        # Listados
+        ## @name Listas
+        ## @{
 
         ## Lista con los ficheros en el proyecto
         self.fichs  =   os.listdir( self.dir )
@@ -134,6 +139,12 @@ class Proyecto(object):
         self.ftrazas=   os.listdir( self.trazas_dir )
         ## Lista con los ficheros de invariantes
         self.finvr  =   os.listdir( self.invr_dir )  
+        ## @}
+
+        # Proyecto instrumentado o no
+        self.inst = path.exists(self.bpr)
+        self.hay_casos = len(self.fcasos) > 0
+
 
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
@@ -173,14 +184,20 @@ class Proyecto(object):
         self.invr_dir   =   path.join(self.dir, self.invr_nom)   # Invariantes
         ## Ruta al directorio que contiene las dependencias
         self.dep_dir    =   path.join(self.dir, self.dep_nom)    # Dependencias
+        ## @}
+
+        ## @name Listas 
+        ## @{
+
         ## Lista con las rutas de las dependencias del bpel
         self.deps = []
         ## Lista con las rutas de las dependencias no encontradas del bpel
         self.dep_miss = []
-        # Proyecto instrumentado o no
-        self.inst = path.exists(self.bpr)
-        ## @}
-#
+        ## Lista con los casos de prueba disponibles
+        self.casos = []
+                ## @}
+
+       
     ## @}
 
     ## @name Tratar Bpel
@@ -351,6 +368,102 @@ class Proyecto(object):
             self.inst = True
     ## @}
 
+    ## @name Casos de prueba
+    ## @{
+
+    def add_bpts(self,ruta):
+        """@brief Añade un fichero con casos de prueba al proyecto.
+        @param ruta Ruta al fichero .bpts.
+        El primer bpts que se añade es el que nos proporcionará la información
+        referida al <put>.
+        Eleva ProyectoRecuperable en caso de error."""
+
+        # Comprobamos que exista y se pueda leer
+        if not path.exists(ruta) or not os.access(ruta, os.F_OK or os.R_OK):
+            raise ProyectoRecuperable(_("No existe el fichero de casos de prueba o no es accesible"))
+
+        # Nombre del fichero y directorio de la ruta
+        nom = path.basename(ruta)
+        dir = path.dirname(ruta)
+
+        # Lo copiamos al proyecto en casos_dir
+        # Aseguramos el nombre para no sobreescribir
+        i = 1
+        pnom = nom
+        pruta = path.join(self.casos_dir,pnom)
+
+        while path.exists(pruta):
+            pnom = "%s-%d" % (nom,i)
+            pruta = path.join(self.casos_dir,pnom)
+            ++i
+
+        try:
+            # Copiar de ruta a pruta (en el proyecto)
+            shutil.copy(ruta,pruta)
+        except:
+            raise ProyectoRecuperable(_("No se pudo copiar al proyecto el\
+                                        fichero de casos de prueba: ") + ruta)
+        # Añadimos el fichero a fcasos
+        self.fcasos.append(pnom)
+
+        # Lo parseamos con ElementTree
+        try:
+            bpts = et.ElementTree()
+            bproot = bpts.parse(pruta)
+        except:
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba"))
+
+        # Construir los nombres con la uri es un peñazo
+        nsname = lambda ns, nm: "{%s}%s" % (ns, nm)
+        nstest = lambda nm: nsname(self.test_url, nm)
+
+        # Encontramos elementos básicos
+        testSuite = bproot
+        name = bproot.find(nstest('name'))
+        baseURL = bproot.find(nstest('baseURL'))
+        testCases = bproot.find(nstest('testCases'))
+
+        # Buscamos todos los casos de prueba
+        casos = testCases.findall(nstest('testCase'))
+        nmcasos = [c.attrib['name'] for c in casos]
+        # Los añadimos a self.casos precedidos por el nombre de fichero
+        self.casos.extend(["%s:%s" % (pnom,c) for c in nmcasos])
+
+        # Escribir los casos de prueba en el proy
+        self.actualizar_casos_prueba()
+
+        # Si es el primer btps, incorporamos la información a test.bpts 
+        if not self.hay_casos :
+            # Encontramos el put con el wsdl,el property y los partners
+            deploy = bproot.find(nstest('deployment'))
+            partners = deploy.findall(nstest('partner')) 
+
+            put = deploy.find(nstest('put'))
+            wsdl = put.find(nstest('wsdl'))  
+
+            # Abrimos el fichero general de casos de prueba
+            try:
+                test = et.ElementTree()
+                troot = test.parse(self.test)
+            except:
+                ProyectoRecuperable(_("No se ha podido cargar el fichero de \
+                                      tests") + self.test )
+
+            # Buscamos el put con el wsdl
+            tdeploy = troot.find(nstest('deployment'))
+            tput = tdeploy.find(nstest('put'))
+            twsdl = tput.find(nstest('wsdl'))
+
+            # Copiar el wsdl y los partner
+            twsdl.text = wsdl.text
+            for p in partners:
+                sub = et.SubElement(tdeploy,nstest('partner'))
+                sub.attrib['name'] = p.attrib['name']
+                sub.attrib['wsdl'] = p.attrib['wsdl']
+
+            self.hay_casos = True
+    ## @}
+
     ## @name Cargar y Crear
     ## @{
 
@@ -392,7 +505,9 @@ class Proyecto(object):
 
     def check(self):
         """@brief Comprueba que el proyecto está bien y sus ficheros de
-        configuración y trata de arreglarlo, de lo contrario lanza una excepción ProyectoError. """ 
+        configuración reflejan el estado del mismo. En otro caso trata de
+        arreglarlo. Puede lanzar una excepción ProyectoError,
+        ProyectoIrrecuperable y ProyectoRecuperable.""" 
 
         # Comprobar existencia de la estructura y de los
         # ficheros más importantes: proy,dir,text,bpel
@@ -403,19 +518,17 @@ class Proyecto(object):
             if not path.exists( f ):
                 e =  _("No existe el fichero: ") + f
                 print e
-                raise ProyectoError(e)
+                raise ProyectoIrrecuperable(e)
 
         # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
         # incorrecta.
-
-        # Abrir base-build.xml
         try:
             bbuild =  et.ElementTree()
+            root = bbuild.parse(path.join(self.dir,'base-build.xml'))
         except:
-            raise ProyectoError(_("No se pudo abrir el fichero base-build.xml"))
+            raise ProyectoRecuperable(_("No se pudo abrir el fichero base-build.xml"))
 
         # Buscar el atributo y comprobarlo
-        root = bbuild.parse(path.join(self.dir,'base-build.xml'))
         dnms = bbuild.findall('property')
         dnms = [d for d in dnms if 'name' in d.attrib and d.attrib['name'] == 'takuan']
 
@@ -432,11 +545,36 @@ class Proyecto(object):
             except:
                 raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
-        # Instrumentar
+        # Abrir el test.bpts y comprobar la configuración del servidor 
+        try:
+            print self.test
+            bpts = et.ElementTree()
+            bproot = bpts.parse(self.test)
+            print self.test
+        except:
+            raise ProyectoRecuperable(_("No se pudo abrir el fichero de casos\
+            de prueba general"))
+        # Buscar y establecer el nombre del proyecto
+        ns = "{%s}" % self.test_url
+        bpname = bproot.find(ns + 'name')
+        bpname.text = self.nombre
+
+        # Buscar y establecer la dirección correctamente
+        bpbaseURL = bproot.find(ns + 'baseURL')
+        bpbaseURL.text = "http://%s:%s/ws" % (self.svr, self.port)
+
+        # Guardarlo
+        try:
+            bpts.write(self.test)
+        except:
+            raise ProyectoRecuperable(_("No se pudo escribir el fichero de \
+                                        casos de prueba"))
+
+        # Instrumentar si hace falta
         if not self.inst :
             self.instrumentar()
 
-    def leer_config(self):
+    def leer_proy(self):
         """@brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
 
@@ -477,13 +615,21 @@ class Proyecto(object):
                     self.dep_miss.append(ruta)
 
             # pruebas
-            # ...
+            e = root.find('pruebas')
+            echilds = e.getchildren()
+
+            # Añadir los casos de prueba a casos
+            for p in echilds:
+                f = p.attrib['fichero']
+                n = p.attrib['nombre']
+                self.casos.append("%s:%s" % (f, n))
+
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
                                 self.proy)
     ## @}
 
-    ## @name Guardar
+    ## @name Guardar y Configurar
     ## @{
 
     def guardar(self):
@@ -494,7 +640,7 @@ class Proyecto(object):
         # Si falla elevamos una excepción
         tree = et.ElementTree()
         try:
-            print _("Leyendo fichero de configuración : "), self.proy
+            print _("Escribiendo fichero de configuración : "), self.proy
             root = tree.parse(self.proy)
         except:
             err = _("No se puede abrir el fichero de configuración \
@@ -539,6 +685,7 @@ class Proyecto(object):
             e = root.find('dependencias')
             echilds = e.getchildren()
             dnames = [d.attrib['nombre'] for d in echilds]
+            print dnames
 
             # Comprobar las dependencias
             for d in self.deps + self.dep_miss:
@@ -570,4 +717,38 @@ class Proyecto(object):
         pass
         return self.mod
 
+    def actualizar_casos_prueba(self):
+        """@brief Actualiza la información de casos de prueba en el
+        proyecto.xml con respecto al proyecto. Añade los nuevos, elimina los
+        viejos."""
+
+        # Abrir fichero configuración
+        try:
+            tree = et.ElementTree()
+            root = et.parse(self.proy)
+        except:
+            raise ProyectoRecuperable(_("Error al abrir proyecto.xml"))
+
+        # Leer casos listados en proy
+        padre = root.find('pruebas')
+        pruebas = padre.getchildren()
+        nmpruebas = ["%s:%s" % (p.attrib['fichero'],p.attrib['nombre']) \
+                     for p in pruebas ]
+
+        # Borrar los viejos que ya no están en casos
+        [padre.remove(p) for p in nmpruebas if p not in self.casos]
+        # Añadir los nuevos que no están en proy
+        nuevos = [p for p in self.casos if p not in nmpruebas]
+        for p in nuevos :
+            sub = et.SubElement(padre,'prueba')
+            p = p.split(':',1)
+            sub.attrib['nombre'] = nm[1]
+            sub.attrib['fichero'] = nm[0]
+
+        # Si hemos escrito algo en el proy, guardarlo
+        if len(nuevos) > 0 :
+            try:
+                tree.write(self.proy)
+            except:
+                raise ProyectoRecuperable(_("Error al escribir proyecto.xml"))
     ## @}

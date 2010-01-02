@@ -1,7 +1,9 @@
 # Clase de Interfaz de usuario
 # -*- coding: utf-8 -*-
 
+import os
 import os.path as path
+import sys
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -91,6 +93,7 @@ class Idgui(object):
         for child in children:
             child.hide()
 
+
         # Comprobar que el proyecto actualmente cargado, si lo hay, 
         #  no es el mismo que pretendemos cargar.
         if not self.idg.proyecto is None \
@@ -103,7 +106,10 @@ class Idgui(object):
 
         ## Crear el proyecto UI
         ## Referencia a la instancia de ProyectoUI abierta en el momento
-        self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
+        try:
+            self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
+        except:
+            print "Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value)
 
     def error(self,msg):
         pass
@@ -165,7 +171,7 @@ class Idgui(object):
         # La ruta debe estar seleccionada
         if bpel is None:
             error_str = _("Fichero bpel no seleccionado") 
-        elif not os.access(bpel, F_OK or R_OK or W_OK):
+        elif not os.access(bpel, os.F_OK or os.R_OK or os.W_OK):
             error_str = _("El fichero bpel seleccionado no existe")
 
         # Comprobar los errores y mostrarlos

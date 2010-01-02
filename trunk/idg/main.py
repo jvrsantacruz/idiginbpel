@@ -7,7 +7,7 @@ import commands
 import shutil
 from xml.dom import minidom as md
 
-from proyecto import Proyecto,ProyectoError
+#from proyecto import Proyecto,ProyectoError
 from idgui.main import Idgui
 import lang
 
@@ -26,7 +26,6 @@ class Idg(object):
 
     ## Referencia al objeto Proyecto abierto actualmente
     proyecto = None
-
 
     def __init__(self,path,config):
         """@brief Inicializa idiginBPEL y mantiene los datos básicos para el
@@ -89,6 +88,67 @@ class Idg(object):
         print "Home: ", self.home
         print "Share: ",self.share
         print "Takuan: ",self.takuan
+
+    def exportar(self,nombre,ruta):
+        """@brief Realiza un paquete tar en bz2 del directorio del proyecto.
+        @param nombre Nombre del proyecto a exportar.
+        @param ruta Ruta en la que se intentará depositar la exportación del
+        proyecto."""
+
+        if nombre not in self.lista_proyectos:
+            return False
+
+        eruta = path.join(ruta,nombre + '.proy')
+        if path.exists(eruta) or os.access(ruta, R_OK or W_OK):
+            return False
+
+        # Comprimir el directorio del proyecto en tar
+        try:
+            import tarfile
+            tar = tarfile.open(eruta, "w:bz2")
+            tar.add(path.join(self.home,"proy",nombre))
+            tar.close()
+        except TarError:
+            return False
+
+        return True
+
+    def importar(self,ruta):
+        """@brief Importa un proyecto desde un paquete.
+        @param nombre Nombre del proyecto a exportar.
+        @retval True si todo va bien. False si no se ha podido importar."""
+
+        # Si no existe o si no se puede leer, error
+        if not path.exists(ruta) or os.access(ruta,F_OK or R_OK):
+            return False
+
+        try:
+            import tarfile
+            tar = tarfile.open(ruta, "r:bz2")
+        except TarError:
+            return False
+
+        try:
+            # Si el primer elemento no es un directorio 
+            # es que el formato del proyecto está mal.
+            if not tar[0].isdir():
+                return False
+
+            # El nombre del proyecto será el del 1º dir
+            nom = tar[0].name
+
+            # Comprobamos que el nombre del proyecto no esté ya usado
+            i = 1
+            while nom in self.lista_proyectos:
+                nom = "%s-%d" % (tar[0].name,i)
+                ++i
+            # Descomprimimos
+            tar.extractall(path.join(self.home,"proy"))
+        except TarError:
+            return False
+        # Actualizar la lista de proyectos
+        self.obtener_lista_proyectos()
+        return True
 
     def cerrar(self):
         """TODO: @brief Realiza comprobaciones y cierra ordenadamente"""

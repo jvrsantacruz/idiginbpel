@@ -31,11 +31,10 @@ class ProyectoUI:
             error = ""
             self.proy = Proyecto(nombre,idg,bpel)
             self.idg.proyecto = self.proy
-        except ProyectoRecuperable as e:
+        except (ProyectoRecuperable) as e:
             # Mostrar las recuperables en los errores en la interfaz.
-            print _("Excepción recuperable al crear el proyecto")
-            error = e
-        except (ProyectoError): 
+            print e
+        except:
             print _("Excepción irrecuperable al crear el proyecto")
             raise
 
@@ -132,7 +131,8 @@ class ProyectoUI:
     def mensaje(self,msg):
         self.error_label.set_markup('<span color="black">'+msg+'</span>')
 
-    # Callbacks ##############################
+    ## @name Callbacks 
+    ## @{
 
     def on_proy_config_dep_inst_boton(self,widget):
         """@brief Callback de pulsar el botón de buscar dependencias
@@ -156,4 +156,8 @@ class ProyectoUI:
             self.error(_("Se ha producido un error durante la búsqueda."))
 
         self.actualizar_pantalla_config()
+
+    def on_proy_config_guardar_boton(self,widget):
+        self.proy.guardar()
+    ## @}
 
