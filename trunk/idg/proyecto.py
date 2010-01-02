@@ -407,7 +407,6 @@ class Proyecto(object):
 
         # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
         # incorrecta.
-        print _("Modificando fichero base-build.xml")
 
         # Abrir base-build.xml
         try:
@@ -425,6 +424,7 @@ class Proyecto(object):
             if len(dnms) == 0 :
                 print _("No se ha podido configurar base-build.xml")
             else:
+                print _("Modificando fichero base-build.xml")
                 dnms[0].attrib['location'] = self.takuan
 
             try:
@@ -569,4 +569,5 @@ class Proyecto(object):
         # `- Comprobar ejecuciones
         pass
         return self.mod
+
     ## @}
