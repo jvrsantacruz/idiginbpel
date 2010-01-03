@@ -433,34 +433,52 @@ class Proyecto(object):
 
         # Si es el primer btps, incorporamos la información a test.bpts 
         if not self.hay_casos :
-            # Encontramos el put con el wsdl,el property y los partners
-            deploy = bproot.find(nstest('deployment'))
-            partners = deploy.findall(nstest('partner')) 
+            add_bpts_info(bpts)
 
-            put = deploy.find(nstest('put'))
-            wsdl = put.find(nstest('wsdl'))  
+    def add_bpts_info(self,bpts):
+        """@brief Añade al bpts general del proyecto la información necesaria
+        para la ejecución. Esto sucede la primera vez que se añade un bpts.
+        @param bpts ElementTree con el bpts parseado."""
 
-            # Abrimos el fichero general de casos de prueba
-            try:
-                test = et.ElementTree()
-                troot = test.parse(self.test)
-            except:
-                ProyectoRecuperable(_("No se ha podido cargar el fichero de \
-                                      tests") + self.test )
+        # Namespace
+        ns = "{%s}" % self.test_url
+        # Raiz del bpts
+        bproot = bpts.getroot()
 
-            # Buscamos el put con el wsdl
-            tdeploy = troot.find(nstest('deployment'))
-            tput = tdeploy.find(nstest('put'))
-            twsdl = tput.find(nstest('wsdl'))
+        # Encontramos el put con el wsdl,el property y los partners
+        deploy = bproot.find(ns + 'deployment')
+        partners = deploy.findall(ns + 'partner') 
+        put = deploy.find(ns + 'put')
+        wsdl = put.find(ns + 'wsdl')  
 
-            # Copiar el wsdl y los partner
-            twsdl.text = wsdl.text
-            for p in partners:
-                sub = et.SubElement(tdeploy,nstest('partner'))
-                sub.attrib['name'] = p.attrib['name']
-                sub.attrib['wsdl'] = p.attrib['wsdl']
+        # Abrimos el fichero general de casos de prueba
+        try:
+            test = et.ElementTree()
+            troot = test.parse(self.test)
+        except:
+            ProyectoRecuperable(_("No se ha podido cargar el fichero de \
+            tests") + self.test )
 
-            self.hay_casos = True
+        # Buscamos el put con el wsdl
+        tdeploy = troot.find(nstest('deployment'))
+        tput = tdeploy.find(nstest('put'))
+        twsdl = tput.find(nstest('wsdl'))
+
+        # Copiar el wsdl y los partner
+        twsdl.text = wsdl.text
+        for p in partners:
+            sub = et.SubElement(tdeploy,nstest('partner'))
+            sub.attrib['name'] = p.attrib['name']
+            sub.attrib['wsdl'] = p.attrib['wsdl']
+
+        try:
+            test.write(self.test)
+        except:
+            ProyectoRecuperable(_("No se ha podido escribir el fichero de \
+            tests") + self.test)
+
+        self.hay_casos = True
+
     ## @}
 
     ## @name Cargar y Crear
