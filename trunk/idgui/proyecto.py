@@ -158,10 +158,16 @@ class ProyectoUI:
         self.actualizar_pantalla_config()
 
     def on_proy_config_guardar_boton(self,widget):
+        """@brief Callback de pulsar el botón de guardar en la pantalla de
+        configuración de un proyecto."""
         # Recolectar información de los labels
         self.proy.svr = self.svr_texto.get_text()
         self.proy.port = self.port_texto.get_text()
         # Guardar el proyecto
         self.proy.guardar()
+
+    def on_proy_casos_bpts_fichero(self,widget):
+        pass
+
     ## @}
 

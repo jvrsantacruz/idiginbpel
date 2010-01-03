@@ -414,17 +414,16 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba"))
 
         # Construir los nombres con la uri es un peñazo
-        nsname = lambda ns, nm: "{%s}%s" % (ns, nm)
-        nstest = lambda nm: nsname(self.test_url, nm)
+        ns = "{%s}" % self.test_url
 
         # Encontramos elementos básicos
         testSuite = bproot
-        name = bproot.find(nstest('name'))
-        baseURL = bproot.find(nstest('baseURL'))
-        testCases = bproot.find(nstest('testCases'))
+        name = bproot.find(ns + 'name')
+        baseURL = bproot.find(ns + 'baseURL')
+        testCases = bproot.find(ns + 'testCases')
 
         # Buscamos todos los casos de prueba
-        casos = testCases.findall(nstest('testCase'))
+        casos = testCases.findall(ns + 'testCase')
         nmcasos = [c.attrib['name'] for c in casos]
         # Los añadimos a self.casos precedidos por el nombre de fichero
         self.casos.extend(["%s:%s" % (pnom,c) for c in nmcasos])
