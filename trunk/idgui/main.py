@@ -40,9 +40,6 @@ class Idgui(object):
         # Cargar la lista de proyectos
         self.__init_lista_proyectos()
 
-        # Cargar pantalla de nuevo proyecto
-        self.
-
         # Conectar señales 
         self.builder.connect_signals(self)
 
@@ -72,7 +69,6 @@ class Idgui(object):
         # Filtro para el selector de ficheros
         filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
         filtro_fichero_bpel.add_pattern("*.bpel");
-        self.builder.get_object("proyecto_selector_bpel").add_filter(filtro_fichero_bpel);
 
     def listar_proyectos(self, widget=None):
         """ 

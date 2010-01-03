@@ -379,6 +379,7 @@
                     <child>
                       <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
+                        <property name="filter">proy_casos_bpts_filtro</property>
                         <property name="create_folders">False</property>
                       </object>
                       <packing>
@@ -1123,4 +1124,5 @@ Fichero_prueba.Caso_prueba:::EXIT
 
 </property>
   </object>
+  <object class="GtkFileFilter" id="proy_casos_bpts_filtro"/>
 </interface>
