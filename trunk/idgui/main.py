@@ -100,10 +100,10 @@ class Idgui(object):
             self.proyecto.proyecto_base.show()
             return False
 
-        ## Crear el proyecto UI
-        ## Referencia a la instancia de ProyectoUI abierta en el momento
+        # Crear el proyecto UI
         try:
-            self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
+            ## Referencia a la instancia de ProyectoUI abierta en el momento
+            self.proyecto = ProyectoUI(self.idg,self,nombre,bpel)
         except:
             print "Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value)
             self.estado("Error al cargar el proyecto")

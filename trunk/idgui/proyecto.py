@@ -13,22 +13,26 @@ import lang
 class ProyectoUI:
     """@brief Manejo de la interfaz de usuario del proyecto."""
 
-    def __init__(self,idg,builder,nombre,bpel=""):
+    def __init__(self,idg,idgui,nombre,bpel=""):
         """@brief Clase que maneja la interfaz de un proyecto. Lo carga o crea
         al instanciarse.
            @param idg Instancia de la clase de control
-           @param builder Instancia del tipo gtkbuilder
+           @param idgui Instancia de la clase de control de la gui
            @param nombre Nombre del proyecto a cargar/crear
            @param bpel (Opcional) Ruta al bpel para crear el proyecto.
            """
 
         ## Instancia de idg
         self.idg = idg
+        ## Instancia de idgui
+        self.idgui = idgui
+        ## Objeto gtkbuilder de idgui
+        self.gtk = idgui.builder
 
         # Crear el proyecto
         try:
-            ## Referencia a la instancia del Proyecto actual
             error = ""
+            ## Referencia a la instancia del Proyecto actual
             self.proy = Proyecto(nombre,idg,bpel)
             self.idg.proyecto = self.proy
         except (ProyectoRecuperable) as e:
@@ -38,13 +42,9 @@ class ProyectoUI:
             print _("Excepción irrecuperable al crear el proyecto")
             raise
 
-        ## Objeto gtkbuilder de idgui
-        self.gtk = builder
-
         # Cargar el glade del proyecto
         self.gtk.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
-
-        # Obtener los elementos importantes
+        # Obtener los elementos de la gui
 
         ## Contenedor de la gui 
         self.principal = self.gtk.get_object("principal")
