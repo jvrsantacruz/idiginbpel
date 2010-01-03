@@ -40,6 +40,9 @@ class Idgui(object):
         # Cargar la lista de proyectos
         self.__init_lista_proyectos()
 
+        # Cargar pantalla de nuevo proyecto
+        self.
+
         # Conectar señales 
         self.builder.connect_signals(self)
 
@@ -60,6 +63,16 @@ class Idgui(object):
 
         # Actualizar la lista de proyectos
         self.listar_proyectos()
+
+    def __init_pantalla_nuevo_proyecto(self):
+        """@brief Inicializa la gui de la pantalla de nuevo proyecto."""
+        # Cargar glade de pantalla de nuevo proyecto
+        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
+
+        # Filtro para el selector de ficheros
+        filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
+        filtro_fichero_bpel.add_pattern("*.bpel");
+        self.builder.get_object("proyecto_selector_bpel").add_filter(filtro_fichero_bpel);
 
     def listar_proyectos(self, widget=None):
         """ 
@@ -205,14 +218,7 @@ class Idgui(object):
         """
 
         self.nuevo = True
-        # Cargar el proyecto desde el glade
-        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
-
-        # Filtro para el selector de ficheros
-        self.filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
-        self.filtro_fichero_bpel.add_pattern("*.bpel");
-        self.builder.get_object("proyecto_selector_bpel").add_filter(self.filtro_fichero_bpel);
-
+        self.__init_pantalla_nuevo_proyecto()
         # Obtener el objeto ventana del proyecto
         principal_proyecto = self.builder.get_object("proyecto_principal")
 
@@ -226,10 +232,8 @@ class Idgui(object):
         for child in children:
             child.hide()
 
-        # Añadir a principal
+        # Añadir a principal y mostrar
         principal_proyecto.reparent( self.principal )
-
-        # Mostrar
         principal_proyecto.show()
 
         # Conectar señales nuevas
