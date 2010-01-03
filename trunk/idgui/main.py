@@ -67,11 +67,10 @@ class Idgui(object):
     def __init_pantalla_nuevo_proyecto(self):
         """@brief Inicializa la gui de la pantalla de nuevo proyecto."""
         # Cargar glade de pantalla de nuevo proyecto
-        self.builder.add_from_file(path.join(self.idg.share,"ui/proyecto_panel.glade"))
+        self.builder.add_from_file(path.join(self.idg.share,"ui/nuevo_proyecto.glade"))
 
         # Filtro para el selector de ficheros
-        filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
-        filtro_fichero_bpel.add_pattern("*.bpel");
+        filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel");
 
     ## @}
 

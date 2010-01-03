@@ -44,8 +44,9 @@
               <object class="GtkFileChooserButton" id="proyecto_selector_bpel">
                 <property name="visible">True</property>
                 <property name="extension_events">cursor</property>
-                <property name="filter">filtro_fichero_bpel</property>
+                <property name="filter">proyecto_filtro_fichero_bpel</property>
                 <property name="create_folders">False</property>
+                <property name="title" translatable="yes">Nuevo fichero de casos de prueba</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -141,5 +142,5 @@
       </object>
     </child>
   </object>
-  <object class="GtkFileFilter" id="filtro_fichero_bpel"/>
+  <object class="GtkFileFilter" id="proyecto_filtro_fichero_bpel"/>
 </interface>
