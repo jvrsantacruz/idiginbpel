@@ -46,7 +46,7 @@
                 <property name="extension_events">cursor</property>
                 <property name="filter">proyecto_filtro_fichero_bpel</property>
                 <property name="create_folders">False</property>
-                <property name="title" translatable="yes">Nuevo fichero de casos de prueba</property>
+                <property name="title" translatable="yes">Seleccionar fichero bpel</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
