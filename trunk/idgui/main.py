@@ -31,6 +31,8 @@ class Idgui(object):
         self.main_ventana = self.builder.get_object("main_ventana")
         ## Contenedor Principal
         self.principal = self.builder.get_object("principal")
+        ## Barra de estado
+        self.barra_estado = self.builder.get_object("main_estado")
 
         # Cargar portada en principal
         self.cargar_portada()
@@ -104,10 +106,15 @@ class Idgui(object):
             self.proyecto = ProyectoUI(self.idg,self.builder,nombre,bpel)
         except:
             print "Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value)
+            self.estado("Error al cargar el proyecto")
             self.cargar_portada()
 
-    def error(self,msg):
-        pass
+    def estado(self,msg,dsc=""):
+        """@brief Añadir estado a la barra de estado de la aplicación.
+        @param msg Mensaje a añadir.
+        @param dsc Descripción del mensaje en la statusbar."""
+        id = self.barra_estado.get_context_id(dsc)
+        self.barra_estado.push(id,msg)
 
     ## @name Callbacks 
     ## @{
