@@ -20,20 +20,16 @@ class Idgui(object):
            @brief Inicializa la GUI de IndigBPEL
            @param idg Instancia de IndigBPEL
         """
-
         ## Instancia de gtkbuilder
         self.builder = gtk.Builder()
-
         ## Instancia de la clase idg
         self.idg = idg;
 
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
-
-        ## Obtener objeto ventana
+        ## Objeto ventana
         self.main_ventana = self.builder.get_object("main_ventana")
-
-        ## Obtener objeto panel principal
+        ## Contenedor Principal
         self.principal = self.builder.get_object("principal")
 
         # Cargar portada en principal
@@ -53,17 +49,12 @@ class Idgui(object):
 
     def __init_lista_proyectos(self):
         """@brief Inicializa la gui de la lista de proyectos."""
-        # Lista de proyectos 
         ## Modelo ListStore con la lista de proyectos
-        self.modelo_lista_proyectos = gtk.ListStore( str )
+        self.modelo_lista_proyectos = \
+        self.builder.get_object("main_lista_proyectos")
 
         ## Vista ListStore para la lista de proyectos
-        self.vista_lista_proyectos = self.builder.get_object("lista_proyectos_vista");
-        self.vista_lista_proyectos.set_model( self.modelo_lista_proyectos );
-
-        # Añadir columna
-        columna = gtk.TreeViewColumn('Proyectos', gtk.CellRendererText() , text=0)
-        self.vista_lista_proyectos.append_column( columna )
+        self.vista_lista_proyectos = self.builder.get_object("main_lista_proyectos_vista");
 
         # Actualizar la lista de proyectos
         self.listar_proyectos()
