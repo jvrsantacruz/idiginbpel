@@ -325,10 +325,11 @@
                     </child>
                     <child>
                       <object class="GtkButton" id="proy_config_next_boton">
-                        <property name="label" translatable="yes">Siguiente</property>
+                        <property name="label" translatable="yes">Comenzar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="released" handler="proy_notebook_next"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

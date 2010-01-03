@@ -50,8 +50,8 @@ class ProyectoUI:
         self.principal = self.gtk.get_object("principal")
         ## Base del proyecto
         self.proyecto_base = self.gtk.get_object("proy_base_contenedor")
-        ## Cuaderno del proyecto
-        self.proyecto_tab = self.gtk.get_object("proy_base_cuaderno")
+        ## Notebook en el que está contenido el proyecto
+        self.proyecto_notebook = self.gtk.get_object("proy_base_cuaderno")
 
         ## Label indicador de errores y dejarlo vacío
         self.error_label = self.gtk.get_object("proy_base_errores_label")
@@ -165,6 +165,10 @@ class ProyectoUI:
         self.proy.port = self.port_texto.get_text()
         # Guardar el proyecto
         self.proy.guardar()
+
+    def proy_notebook_next(self,widget=None):
+        """@brief Callback de pulsar el botón siguiente en el proyecto."""
+        self.proyecto_notebook.next_page()
 
     def on_proy_casos_bpts_fichero(self,widget):
         pass
