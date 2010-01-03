@@ -29,6 +29,7 @@ class ProyectoUI:
         ## Objeto gtkbuilder de idgui
         self.gtk = idgui.builder
 
+        idgui.estado(_("Iniciando el proyecto"))
         # Crear el proyecto
         try:
             error = ""
@@ -38,9 +39,11 @@ class ProyectoUI:
         except (ProyectoRecuperable) as e:
             # Mostrar las recuperables en los errores en la interfaz.
             print e
+            idgui.estado(e)
         except:
             print _("Excepción irrecuperable al crear el proyecto")
             raise
+
 
         # Cargar el glade del proyecto
         self.gtk.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
@@ -92,6 +95,8 @@ class ProyectoUI:
         self.proyecto_base.reparent(self.principal)
         self.proyecto_base.show()
 
+        idgui.estado(_("Proyecto iniciado correctamente."))
+
     def actualizar_pantalla_config(self):
         """@brief Actualiza las variables y los datos de la pantalla config."""
         # Número de dependencias y dependencias rotas
@@ -135,18 +140,22 @@ class ProyectoUI:
     ## @{
 
     def on_proy_config_dep_inst_boton(self,widget):
-        """@brief Callback de pulsar el botón de buscar dependencias
+        """@brief Callback de pulsar el botón de instrumentar.
         @param widget Botón"""
+
+        self.idgui.estado(_("Instrumentando..."))
         try:
             from idg.proyecto import ProyectoError
             self.proy.instrumentar()
         except ProyectoError:
             self.error(_("Error al instrumentar."))
+            self.idgui.estado(_("Error al instrumentar."))
         else:
-            self.mensaje(_("Instrumentación correcta."))
+            self.idgui.estado(_("Instrumentación correcta."))
+            #self.mensaje(_("Instrumentación correcta."))
 
     def on_proy_config_dep_buscar_boton(self,widget):
-        """@brief Callback de pulsar el botón de instrumentado
+        """@brief Callback de pulsar el botón de buscar dependencias
         @param widget Botón"""
         try:
             from idg.proyecto import ProyectoError
@@ -156,6 +165,8 @@ class ProyectoUI:
             self.error(_("Se ha producido un error durante la búsqueda."))
 
         self.actualizar_pantalla_config()
+        self.idgui.estado(_("Dependencias encontradas: ") + \
+                          str(len(self.proy.deps)))
 
     def on_proy_config_guardar_boton(self,widget):
         """@brief Callback de pulsar el botón de guardar en la pantalla de
@@ -165,6 +176,7 @@ class ProyectoUI:
         self.proy.port = self.port_texto.get_text()
         # Guardar el proyecto
         self.proy.guardar()
+        self.idgui.estado(_("Proyecto guardado."))
 
     def proy_notebook_next(self,widget=None):
         """@brief Callback de pulsar el botón siguiente en el proyecto."""
