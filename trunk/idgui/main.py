@@ -15,10 +15,13 @@ from proyecto import ProyectoUI
 class Idgui(object):
     """@brief Objeto principal de la gui."""
 
+    ## @name Inicialización
+    ## @{
+
     def __init__(self,idg):
         """
            @brief Inicializa la GUI de IndigBPEL
-           @param idg Instancia de IndigBPEL
+           @param idg Instancia de Idg
         """
         ## Instancia de gtkbuilder
         self.builder = gtk.Builder()
@@ -69,6 +72,11 @@ class Idgui(object):
         # Filtro para el selector de ficheros
         filtro_fichero_bpel = self.builder.get_object("filtro_fichero_bpel");
         filtro_fichero_bpel.add_pattern("*.bpel");
+
+    ## @}
+
+    ## @name Actualizar
+    ## @{
 
     def listar_proyectos(self, widget=None):
         """ 
@@ -124,6 +132,7 @@ class Idgui(object):
         @param dsc Descripción del mensaje en la statusbar."""
         id = self.barra_estado.get_context_id(dsc)
         self.barra_estado.push(id,msg)
+    ## @}
 
     ## @name Callbacks 
     ## @{
