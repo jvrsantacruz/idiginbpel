@@ -28,8 +28,6 @@ class Idgui(object):
         self.idg = idg;
 
         ### Ventana principal
-        # Leer xml de la ventana principal
-        #self.builder.add_from_file("idgui/ui/main.glade")
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
 
         ## Obtener objeto ventana
@@ -41,6 +39,20 @@ class Idgui(object):
         # Cargar portada en principal
         self.cargar_portada()
 
+        # Cargar la lista de proyectos
+        self.__init_lista_proyectos()
+
+        # Conectar señales 
+        self.builder.connect_signals(self)
+
+        # Mostrar la ventana
+        self.main_ventana.show()
+
+        # Bucle principal
+        gtk.main()
+
+    def __init_lista_proyectos(self):
+        """@brief Inicializa la gui de la lista de proyectos."""
         # Lista de proyectos 
         ## Modelo ListStore con la lista de proyectos
         self.modelo_lista_proyectos = gtk.ListStore( str )
@@ -55,15 +67,6 @@ class Idgui(object):
 
         # Actualizar la lista de proyectos
         self.listar_proyectos()
-
-        # Conectar señales 
-        self.builder.connect_signals(self)
-
-        # Mostrar la ventana
-        self.main_ventana.show()
-
-        # Bucle principal
-        gtk.main()
 
     def listar_proyectos(self, widget=None):
         """ 
