@@ -395,7 +395,8 @@ class Proyecto(object):
         while path.exists(pruta):
             pnom = "%s-%d" % (nom,i)
             pruta = path.join(self.casos_dir,pnom)
-            ++i
+            i = i + 1
+            print pruta
 
         try:
             # Copiar de ruta a pruta (en el proyecto)
@@ -741,7 +742,7 @@ class Proyecto(object):
         # Abrir fichero configuración
         try:
             tree = et.ElementTree()
-            root = et.parse(self.proy)
+            root = tree.parse(self.proy)
         except:
             raise ProyectoRecuperable(_("Error al abrir proyecto.xml"))
 
@@ -758,13 +759,14 @@ class Proyecto(object):
         for p in nuevos :
             sub = et.SubElement(padre,'prueba')
             p = p.split(':',1)
-            sub.attrib['nombre'] = nm[1]
-            sub.attrib['fichero'] = nm[0]
+            sub.attrib['nombre'] = p[1]
+            sub.attrib['fichero'] = p[0]
 
         # Si hemos escrito algo en el proy, guardarlo
         if len(nuevos) > 0 :
             try:
                 tree.write(self.proy)
             except:
-                raise ProyectoRecuperable(_("Error al escribir proyecto.xml"))
+                raise
+                #raise ProyectoRecuperable(_("Error al escribir proyecto.xml"))
     ## @}
