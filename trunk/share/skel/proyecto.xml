@@ -15,7 +15,9 @@
     <test_bpts src="test.bpts" timestamp=""/>
 
     <pruebas>
-	<!-- <prueba nombre="" src="" timestamp="" ncasos="" /> -->
+	    <!-- <fprueba nombre="" src="" ncasos=""> 
+		 <prueba nombre="" src="" timestamp=""/> 
+		 </fprueba> -->
     </pruebas>
 
     <trazas>
