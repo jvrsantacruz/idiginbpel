@@ -72,6 +72,9 @@ class ProyectoUI:
 
         idgui.estado(_("Proyecto iniciado correctamente."))
 
+    ## @name Config
+    ## @{
+
     def __init_config(self):
         """@brief Inicializar la pantalla de configuración."""
         ## Nombre del proyecto
@@ -101,13 +104,6 @@ class ProyectoUI:
 
         # Actualizar la información de la configuración
         self.actualizar_pantalla_config()
-
-    def __init_casos(self):
-        """@brief Inicializar la pantalla de casos de prueba."""
-        # Configurar el filtro de ficheros btps
-        self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
-        # Selector de fichero
-        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
 
     def actualizar_pantalla_config(self):
         """@brief Actualiza las variables y los datos de la pantalla config."""
@@ -141,12 +137,7 @@ class ProyectoUI:
     def listar_dependencias_config(self):
         """@brief Actualiza la lista de dependencias en el tree de config"""
         pass
-
-    def error(self,msg):
-        self.error_label.set_markup('<span color="green">'+msg+'</span>')
-
-    def mensaje(self,msg):
-        self.error_label.set_markup('<span color="black">'+msg+'</span>')
+    ## @}
 
     ## @name Callbacks Config
     ## @{
@@ -190,9 +181,17 @@ class ProyectoUI:
         self.proy.guardar()
         self.idgui.estado(_("Proyecto guardado."))
 
-    def proy_notebook_next(self,widget=None):
-        """@brief Callback de pulsar el botón siguiente en el proyecto."""
-        self.proyecto_notebook.next_page()
+    ## @}
+
+    ## @name Casos
+    ## @{
+
+    def __init_casos(self):
+        """@brief Inicializar la pantalla de casos de prueba."""
+        # Configurar el filtro de ficheros btps
+        self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
+        # Selector de fichero
+        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
     ## @}
 
     ## @name Callbacks Casos
@@ -210,3 +209,17 @@ class ProyectoUI:
             self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
             self.bpts_fichero.unselect_all()
     ##@}
+
+    def error(self,msg):
+        self.error_label.set_markup('<span color="red">'+msg+'</span>')
+
+    def mensaje(self,msg):
+        self.error_label.set_markup('<span color="black">'+msg+'</span>')
+
+    ## @name Callbacks
+    ## @{
+
+    def proy_notebook_next(self,widget=None):
+        """@brief Callback de pulsar el botón siguiente en el proyecto."""
+        self.proyecto_notebook.next_page()
+    ## @}

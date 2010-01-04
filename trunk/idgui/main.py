@@ -70,7 +70,7 @@ class Idgui(object):
         self.builder.add_from_file(path.join(self.idg.share,"ui/nuevo_proyecto.glade"))
 
         # Filtro para el selector de ficheros
-        filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel");
+        filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel")
 
     ## @}
 
