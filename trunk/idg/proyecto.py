@@ -5,6 +5,7 @@ import os
 import os.path as path
 import commands 
 import shutil 
+import sys
 
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
@@ -194,9 +195,11 @@ class Proyecto(object):
         self.deps = []
         ## Lista con las rutas de las dependencias no encontradas del bpel
         self.dep_miss = []
-        ## Lista con los casos de prueba disponibles
-        self.casos = []
-                ## @}
+        ## Lista con los casos de prueba disponibles "fichero:nom_caso"
+        self.casos = {}
+        # Map fichero de casos : [caso1, caso2 ... ]
+        self.fich_casos = {}
+        ## @}
 
     ## @}
 
@@ -408,6 +411,7 @@ class Proyecto(object):
         self.fcasos.append(pnom)
 
         # Lo parseamos con ElementTree
+        # Abrirlo
         try:
             bpts = et.ElementTree()
             bproot = bpts.parse(pruta)
@@ -419,16 +423,10 @@ class Proyecto(object):
 
         # Encontramos elementos básicos
         testSuite = bproot
-        name = bproot.find(ns + 'name')
-        baseURL = bproot.find(ns + 'baseURL')
-        testCases = bproot.find(ns + 'testCases')
+        tCases = bproot.find(ns + 'testCases')
 
-        # Buscamos todos los casos de prueba
-        casos = testCases.findall(ns + 'testCase')
-        nmcasos = [c.attrib['name'] for c in casos]
-        # Los añadimos a self.casos precedidos por el nombre de fichero
-        self.casos.extend(["%s:%s" % (pnom,c) for c in nmcasos])
-
+        # Buscamos todos los casos de prueba y los añadimos a self.casos
+        self.casos[pnom] = [c.get('name') for c in tCases.findall(ns + 'testCase')]
         # Escribir los casos de prueba en el proy
         self.actualizar_casos_prueba()
 
@@ -619,31 +617,20 @@ class Proyecto(object):
             self.port = e.attrib['port']
 
             # dependencias
-            e = root.find('dependencias')
-            echilds = e.getchildren()
+            deps = root.findall('.//dependencia')
+            for d in deps:
+                r = d.get('ruta')
+                # Si no estaba la añadimos
+                if r not in (self.deps + self.dep_miss):
+                    self.deps.append(r) if d.get('rota') == 'False' \
+                                        else self.dep_miss.append(r)
 
-            # Añadir las dependencias donde correspondan
-            for d in echilds:
-                ruta = d.attrib['ruta']
-                if ruta not in self.deps:
-                    if d.attrib['rota'] == 'False':
-                        self.deps.append(ruta)
-                    else:
-                        self.dep_miss.append(ruta)
-
-            # pruebas
-            e = root.find('pruebas')
-            echilds = e.getchildren()
-
-            # Añadir los casos de prueba a casos
-            for p in echilds:
-                f = p.attrib['fichero']
-                n = p.attrib['nombre']
-                self.casos.append("%s:%s" % (f, n))
+            # Añadir las dependencias 
+            self.actualizar_casos_prueba(tree)
 
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
-                                self.proy)
+                                self.proy + " " + str(sys.exc_value))
     ## @}
 
     ## @name Guardar y Configurar
@@ -711,9 +698,9 @@ class Proyecto(object):
                     sub = et.SubElement(e,'dependencia')
 
                     # Añadir/Actualizar los atributos
-                    sub.attrib['nombre'] = path.basename(d)
-                    sub.attrib['ruta'] = d
-                    sub.attrib['rota'] = str(d in self.dep_miss)
+                    sub.set('nombre', path.basename(d))
+                    sub.set('ruta', d)
+                    sub.set('rota', str(d in self.dep_miss))
         except:
             raise ProyectoError(_("Error al configurar"))
 
@@ -734,39 +721,73 @@ class Proyecto(object):
         pass
         return self.mod
 
-    def actualizar_casos_prueba(self):
-        """@brief Actualiza la información de casos de prueba en el
-        proyecto.xml con respecto al proyecto. Añade los nuevos, elimina los
-        viejos."""
+    def actualizar_casos_prueba(self,tree=None):
+        """@brief Actualiza la información de los casos de prueba a partir de
+        proyecto.xml. Añade al xml los que no estén. 
+        @param (Opcional) El dom ElementTree de proy.xml abierto
+        """
 
-        # Abrir fichero configuración
-        try:
-            tree = et.ElementTree()
-            root = tree.parse(self.proy)
-        except:
-            raise ProyectoRecuperable(_("Error al abrir proyecto.xml"))
+        itree = tree
+        if itree is None:
+            # Si no se pasa ya abierto, abrir proy
+            try:
+                itree = et.ElementTree()
+                itree.parse(self.proy)
+            except:
+                raise ProyectoRecuperable(_("Error al abrir proyecto.xml"))
 
-        # Leer casos listados en proy
-        padre = root.find('pruebas')
-        pruebas = padre.getchildren()
-        nmpruebas = ["%s:%s" % (p.attrib['fichero'],p.attrib['nombre']) \
-                     for p in pruebas ]
+        # self.casos es un diccionario del tipo 'fichero' : ['caso', 'caso']
+        # No se pueden emplear expresiones xpath tan molonas como las
+        # siguientes debido a que se añadirán a ElementTree en la versión 1.3. 
+        # La versión actual de Python 2.6 trae ElementTree 1.2.6
+        #fnode = proot.find("./fprueba[@nombre='%s']" % f) 
+        #cnode = fnode.find(".//prueba[@nombre='%s']" % c)
+        root = itree.getroot()
+        proot = root.find('pruebas')
+        fpruebas = proot.getchildren()
+        nuevos = False
 
-        # Borrar los viejos que ya no están en casos
-        [padre.remove(p) for p in nmpruebas if p not in self.casos]
-        # Añadir los nuevos que no están en proy
-        nuevos = [p for p in self.casos if p not in nmpruebas]
-        for p in nuevos :
-            sub = et.SubElement(padre,'prueba')
-            p = p.split(':',1)
-            sub.attrib['nombre'] = p[1]
-            sub.attrib['fichero'] = p[0]
+        # Ahora añadir al xml los que están 
+        # en el proyecto y no en el xml
+        for f in self.casos:
+            # Buscarlo entre los nodos prueba
+            try:
+                fnode = [fp for fp in fpruebas if fp.get('nombre') == f][0]
+            except:
+                fnode = et.SubElement(fpruebas, 'fprueba')
+                fnode.set('nombre', f)
+                nuevos = True
 
-        # Si hemos escrito algo en el proy, guardarlo
-        if len(nuevos) > 0 :
+            fchild = fnode.getchildren()
+            # Buscamos sus casos
+            for c in self.casos[f]:
+                # Buscarlo entre los casos de f
+                try:
+                    cnode = [fc for fc in fchild if fc.get('nombre') == c][0]
+                except:
+                    cnode = et.SubElement(fnode, 'prueba')
+                    cnode.set('nombre', c)
+                    nuevos = True
+            # Número de casos que tiene el fichero
+            fnode.attrib['ncasos'] = str(len(self.casos[f]))
+
+        # Añadir al proyecto los que están en el xml
+        for f in fpruebas:
+            fnom = f.attrib['nombre']
+            casos = f.getchildren()
+            for c in casos:
+                cnom = c.attrib['nombre']
+                if (cnom not in self.casos[f]) :
+                    if f not in self.casos :
+                        self.casos[f] = [cnom]
+                    else:
+                        self.casos[f].append(cnom)
+
+        # Escribir solo si es necesario
+        # y si no se nos ha pasado el dom abierto
+        if nuevos and not tree is None:
             try:
                 tree.write(self.proy)
             except:
                 raise
-                #raise ProyectoRecuperable(_("Error al escribir proyecto.xml"))
     ## @}
