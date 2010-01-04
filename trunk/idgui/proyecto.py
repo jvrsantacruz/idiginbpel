@@ -44,9 +44,9 @@ class ProyectoUI:
             print _("Excepción irrecuperable al crear el proyecto")
             raise
 
-
         # Cargar el glade del proyecto
         self.gtk.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
+
         # Obtener los elementos de la gui
 
         ## Contenedor de la gui 
@@ -60,6 +60,20 @@ class ProyectoUI:
         self.error_label = self.gtk.get_object("proy_base_errores_label")
         self.error(error)
 
+        self.__init_config()
+        self.__init_casos()
+
+        # Conectar todas las señales
+        self.gtk.connect_signals(self)
+
+        # Situar en el contenedor y mostrar
+        self.proyecto_base.reparent(self.principal)
+        self.proyecto_base.show()
+
+        idgui.estado(_("Proyecto iniciado correctamente."))
+
+    def __init_config(self):
+        """@brief Inicializar la pantalla de configuración."""
         ## Nombre del proyecto
         self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
 
@@ -88,14 +102,12 @@ class ProyectoUI:
         # Actualizar la información de la configuración
         self.actualizar_pantalla_config()
 
-        # Conectar todas las señales
-        self.gtk.connect_signals(self)
-
-        # Situar en el contenedor y mostrar
-        self.proyecto_base.reparent(self.principal)
-        self.proyecto_base.show()
-
-        idgui.estado(_("Proyecto iniciado correctamente."))
+    def __init_casos(self):
+        """@brief Inicializar la pantalla de casos de prueba."""
+        # Configurar el filtro de ficheros btps
+        self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
+        # Selector de fichero
+        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
 
     def actualizar_pantalla_config(self):
         """@brief Actualiza las variables y los datos de la pantalla config."""
@@ -136,7 +148,7 @@ class ProyectoUI:
     def mensaje(self,msg):
         self.error_label.set_markup('<span color="black">'+msg+'</span>')
 
-    ## @name Callbacks 
+    ## @name Callbacks Config
     ## @{
 
     def on_proy_config_dep_inst_boton(self,widget):
@@ -181,9 +193,20 @@ class ProyectoUI:
     def proy_notebook_next(self,widget=None):
         """@brief Callback de pulsar el botón siguiente en el proyecto."""
         self.proyecto_notebook.next_page()
-
-    def on_proy_casos_bpts_fichero(self,widget):
-        pass
-
     ## @}
 
+    ## @name Callbacks Casos
+    ## @{
+
+    def on_proy_casos_bpts_fichero(self,widget):
+        """@brief Callback de seleccionar un fichero bpts."""
+        bpts = self.bpts_fichero.get_filename()
+        try:
+            self.proy.add_bpts(bpts)
+        except(ProyectoRecuperable):
+            self.idgui.estado(_("Error al añadir fichero de casos de prueba"))
+            print sys.exc_type, sys.exc_value
+        else:
+            self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
+            self.bpts_fichero.unselect_all()
+    ##@}
