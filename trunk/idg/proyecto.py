@@ -688,10 +688,18 @@ class Proyecto(object):
             # dependencias
             e = root.find('dependencias')
             echilds = e.getchildren()
-            drutas = [d.attrib['ruta'] for d in echilds]
-            print drutas
+            drutas = []
+
+            # Quitar las que están en el xml pero no en el proyecto
+            for d in echilds:
+                ruta = d.get('ruta')
+                if ruta not in self.deps + self.dep_miss:
+                    e.remove(d)
+                else:
+                    drutas.append(ruta)
 
             # Comprobar las dependencias
+            # Las que están en proyecto y no en el xml
             for d in self.deps + self.dep_miss:
                 # Si no está, añadirlo
                 if not d in drutas:
