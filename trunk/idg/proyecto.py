@@ -130,7 +130,10 @@ class Proyecto(object):
         self.inst = path.exists(self.bpr)
 
         # Comprueba que la estructura del proyecto está bien
-        self.check()
+        try:
+            self.check()
+        except (ProyectoRecuperable) as e:
+            print _("El proyecto se ha creado con errores: " + str(e))
 
         ## @name Listas
         ## @{
@@ -279,7 +282,6 @@ class Proyecto(object):
             # Buscar los imports en el fichero
             # empleando los distintos namespaces
             imps = xml.getElementsByTagName('import')
-            imps += xml.getElementsByTagName('xsd:import')
 
             # Modificar los import a rutas al mismo directorio
             # Obtener las rutas absolutas  meterlas en deps
@@ -545,16 +547,17 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("No se pudo abrir el fichero base-build.xml"))
 
         # Buscar el atributo y comprobarlo
+        # dnms = root.find("./property[@name='takuan']")
         dnms = bbuild.findall('property')
-        dnms = [d for d in dnms if 'name' in d.attrib and d.attrib['name'] == 'takuan']
+        dnms = [d for d in dnms if 'name' in d.attrib and d.get('name') == 'takuan']
 
         # Si es distinto del que tenemos en memoria, modificarlo.
-        if dnms[0].attrib['location'] != self.takuan:
+        if dnms[0].get('location') != self.takuan:
             if len(dnms) == 0 :
                 print _("No se ha podido configurar base-build.xml")
             else:
                 print _("Modificando fichero base-build.xml")
-                dnms[0].attrib['location'] = self.takuan
+                dnms[0].attrib['location'] =  self.takuan
 
             try:
                 bbuild.write(path.join(self.dir,'base-build.xml'))
@@ -584,9 +587,16 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("No se pudo escribir el fichero de \
                                         casos de prueba"))
 
-        # Instrumentar si hace falta
-        if self.inst == False:
-            self.instrumentar()
+        # Si hay dependencias rotas, avisar.
+        if len(self.dep_miss) != 0:
+            msg = _("Hay dependencias rotas en el proyecto, solucione la \
+            situación y realice una búsqueda o cree de nuevo el proyecto")
+            self.idgui.estado(msg)
+            self.error(msg)
+        else:
+            # Instrumentar si hace falta
+            if self.inst == False :
+                self.instrumentar()
 
     def leer_proy(self):
         """@brief Lee e inicializa la clase leyendo de los ficheros de
@@ -609,12 +619,12 @@ class Proyecto(object):
 
             # bpel_o 
             e = root.find('bpel_o')
-            self.bpel_o = e.attrib['src']
+            self.bpel_o = e.get('src')
 
             # svr
             e = root.find('svr')
-            self.svr = e.attrib['url']
-            self.port = e.attrib['port']
+            self.svr = e.get('url')
+            self.port = e.get('port')
 
             # dependencias
             deps = root.findall('.//dependencia')
@@ -659,11 +669,11 @@ class Proyecto(object):
             now = datetime.datetime.now().isoformat(' ')
 
             # Fecha de modificación
-            root.attrib['guardado'] = now
+            root.attrib['guardado'] =  now
 
             # Establecer la fecha de creación
-            if root.attrib['creado'] == "" :
-                root.attrib['creado'] = now
+            if root.get('creado') == "" :
+                root.attrib['creado'] =  now
 
             # Modificación del nombre!  
             # Cuidado, la modificación del nombre puede hacerse desde la
@@ -675,8 +685,8 @@ class Proyecto(object):
 
             # Server 
             e = root.find('svr')
-            e.attrib['url'] = self.svr
-            e.attrib['port'] = self.port
+            e.attrib['url'] =  self.svr
+            e.attrib['port'] =  self.port
 
             # bpel original
             e = root.find('bpel_o')
@@ -706,9 +716,9 @@ class Proyecto(object):
                     sub = et.SubElement(e,'dependencia')
 
                     # Añadir/Actualizar los atributos
-                    sub.set('nombre', path.basename(d))
-                    sub.set('ruta', d)
-                    sub.set('rota', str(d in self.dep_miss))
+                    sub.attrib['nombre'] =  path.basename(d)
+                    sub.attrib['ruta'] =  d
+                    sub.attrib['rota'] =  str(d in self.dep_miss)
         except:
             raise ProyectoError(_("Error al configurar"))
 
@@ -749,7 +759,7 @@ class Proyecto(object):
         # siguientes debido a que se añadirán a ElementTree en la versión 1.3. 
         # La versión actual de Python 2.6 trae ElementTree 1.2.6
         #fnode = proot.find("./fprueba[@nombre='%s']" % f) 
-        #cnode = fnode.find(".//prueba[@nombre='%s']" % c)
+        #cnode = fnode.find("./prueba[@nombre='%s']" % c)
         root = itree.getroot()
         proot = root.find('pruebas')
         fpruebas = proot.getchildren()
@@ -762,8 +772,8 @@ class Proyecto(object):
             try:
                 fnode = [fp for fp in fpruebas if fp.get('nombre') == f][0]
             except:
-                fnode = et.SubElement(fpruebas, 'fprueba')
-                fnode.set('nombre', f)
+                fnode = et.SubElement(proot, 'fprueba')
+                fnode.attrib['nombre'] =  f
                 nuevos = True
 
             fchild = fnode.getchildren()
@@ -774,22 +784,22 @@ class Proyecto(object):
                     cnode = [fc for fc in fchild if fc.get('nombre') == c][0]
                 except:
                     cnode = et.SubElement(fnode, 'prueba')
-                    cnode.set('nombre', c)
+                    cnode.attrib['nombre'] =  c
                     nuevos = True
             # Número de casos que tiene el fichero
             fnode.attrib['ncasos'] = str(len(self.casos[f]))
 
         # Añadir al proyecto los que están en el xml
+        fpruebas = proot.getchildren()
         for f in fpruebas:
-            fnom = f.attrib['nombre']
+            fnom = f.get('nombre')
             casos = f.getchildren()
+            if fnom not in self.casos:
+                self.casos[fnom] = []
             for c in casos:
-                cnom = c.attrib['nombre']
-                if (cnom not in self.casos[f]) :
-                    if f not in self.casos :
-                        self.casos[f] = [cnom]
-                    else:
-                        self.casos[f].append(cnom)
+                cnom = c.get('nombre')
+                if cnom not in self.casos[fnom]:
+                    self.casos[f].append(cnom)
 
         # Escribir solo si es necesario
         # y si no se nos ha pasado el dom abierto
@@ -798,4 +808,6 @@ class Proyecto(object):
                 tree.write(self.proy)
             except:
                 raise
+
+        print self.casos
     ## @}
