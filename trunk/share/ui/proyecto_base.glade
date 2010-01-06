@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkTreeStore" id="treestore1">
+  <object class="GtkTreeStore" id="proy_casos_tree">
     <columns>
       <!-- column-name Caso -->
       <column type="gint"/>
@@ -18,7 +18,7 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkWindow" id="window1">
+  <object class="GtkWindow" id="proy_fake_window">
     <child>
       <object class="GtkVBox" id="proy_base_contenedor">
         <property name="visible">True</property>
@@ -380,8 +380,8 @@
                       <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
                         <property name="events">GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
-                        <property name="filter">proy_casos_bpts_filtro</property>
                         <property name="create_folders">False</property>
+                        <property name="filter">proy_casos_bpts_filtro</property>
                         <signal name="file_set" handler="on_proy_casos_bpts_fichero"/>
                       </object>
                       <packing>
@@ -402,12 +402,28 @@
                         <property name="height_request">300</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="model">treestore1</property>
+                        <property name="model">proy_casos_tree</property>
                         <property name="headers_clickable">False</property>
                         <property name="search_column">9</property>
                         <child>
                           <object class="GtkTreeViewColumn" id="proy_casos_column">
                             <property name="title">Casos de prueba</property>
+                            <child>
+                              <object class="GtkCellRendererToggle" id="proy_casos_coumn_conmutar"/>
+                              <attributes>
+                                <attribute name="activatable">0</attribute>
+                                <attribute name="active">0</attribute>
+                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkCellRendererPixbuf" id="proy_casos_column_pixbuf_render"/>
+                              <attributes>
+                                <attribute name="stock-id">1</attribute>
+                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkCellRendererText" id="proy_casos_column_texto_render"/>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -632,7 +648,7 @@
                         <property name="height_request">300</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="model">treestore1</property>
+                        <property name="model">proy_casos_tree</property>
                         <property name="headers_clickable">False</property>
                         <property name="search_column">9</property>
                         <child>
@@ -806,7 +822,7 @@
                   <object class="GtkTreeView" id="treeview3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="model">treestore1</property>
+                    <property name="model">proy_casos_tree</property>
                     <property name="headers_clickable">False</property>
                     <property name="search_column">0</property>
                     <child>
@@ -1055,7 +1071,7 @@
                               <object class="GtkTreeView" id="treeview4">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="model">treestore1</property>
+                                <property name="model">proy_casos_tree</property>
                                 <property name="headers_clickable">False</property>
                                 <property name="search_column">0</property>
                                 <child>

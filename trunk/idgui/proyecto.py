@@ -72,6 +72,20 @@ class ProyectoUI:
 
         idgui.estado(_("Proyecto iniciado correctamente."))
 
+    def error(self,msg):
+        self.error_label.set_markup('<span color="red">'+msg+'</span>')
+
+    def mensaje(self,msg):
+        self.error_label.set_markup('<span color="black">'+msg+'</span>')
+
+    ## @name Callbacks
+    ## @{
+
+    def proy_notebook_next(self,widget=None):
+        """@brief Callback de pulsar el botón siguiente en el proyecto."""
+        self.proyecto_notebook.next_page()
+    ## @}
+
     ## @name Config
     ## @{
 
@@ -190,8 +204,15 @@ class ProyectoUI:
         """@brief Inicializar la pantalla de casos de prueba."""
         # Configurar el filtro de ficheros btps
         self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
-        # Selector de fichero
+        ## Selector de ficheros bpts
         self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
+        ## TreeStore de los casos de prueba
+        self.bpts_tree = self.gtk.get_object("proy_casos_tree")
+
+    def add_bpts_tree(self):
+        """@brief Cargar ficheros btps al treeview."""
+        # Map fichero [caso1, caso2 ... ]
+
     ## @}
 
     ## @name Callbacks Casos
@@ -199,6 +220,7 @@ class ProyectoUI:
 
     def on_proy_casos_bpts_fichero(self,widget):
         """@brief Callback de seleccionar un fichero bpts."""
+        self.idgui.estado(_("Añadiendo fichero de casos de prueba"))
         bpts = self.bpts_fichero.get_filename()
         try:
             self.proy.add_bpts(bpts)
@@ -210,16 +232,4 @@ class ProyectoUI:
             self.bpts_fichero.unselect_all()
     ##@}
 
-    def error(self,msg):
-        self.error_label.set_markup('<span color="red">'+msg+'</span>')
 
-    def mensaje(self,msg):
-        self.error_label.set_markup('<span color="black">'+msg+'</span>')
-
-    ## @name Callbacks
-    ## @{
-
-    def proy_notebook_next(self,widget=None):
-        """@brief Callback de pulsar el botón siguiente en el proyecto."""
-        self.proyecto_notebook.next_page()
-    ## @}

@@ -130,7 +130,7 @@ class Idgui(object):
         @param msg Mensaje a añadir.
         @param dsc Descripción del mensaje en la statusbar."""
         id = self.barra_estado.get_context_id(dsc)
-        self.barra_estado.push(id,msg)
+        self.barra_estado.push(id,str(msg))
     ## @}
 
     ## @name Callbacks 
