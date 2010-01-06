@@ -282,6 +282,9 @@ class Proyecto(object):
             # Buscar los imports en el fichero
             # empleando los distintos namespaces
             imps = xml.getElementsByTagName('import')
+            imps += xml.getElementsByTagNameNS(self.bpel_url,'import')
+            imps += xml.getElementsByTagNameNS(self.wsdl_url,'import')
+            imps += xml.getElementsByTagNameNS(self.xsd_url,'import')
 
             # Modificar los import a rutas al mismo directorio
             # Obtener las rutas absolutas  meterlas en deps
