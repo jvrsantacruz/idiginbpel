@@ -7,7 +7,9 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
-from idg.proyecto import *
+from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
+ProyectoIrrecuperable
+from instrum import Comprobador
 import lang
 
 class ProyectoUI:
@@ -70,7 +72,12 @@ class ProyectoUI:
         self.proyecto_base.reparent(self.principal)
         self.proyecto_base.show()
 
+        self.mensaje("")
         idgui.estado(_("Proyecto iniciado correctamente."))
+
+    def __del__(self):
+        """@brief Destructor del Proyecto"""
+        self.dep_list.clear()
 
     def error(self,msg):
         self.error_label.set_markup('<span color="red">'+msg+'</span>')
@@ -164,11 +171,11 @@ class ProyectoUI:
         try:
             from idg.proyecto import ProyectoError
             self.proy.instrumentar()
+            c = Comprobador(self.proy,self,2)
+            c.start()
         except ProyectoError:
             self.error(_("Error al instrumentar."))
             self.idgui.estado(_("Error al instrumentar."))
-        else:
-            self.idgui.estado(_("Instrumentación correcta."))
             #self.mensaje(_("Instrumentación correcta."))
 
     def on_proy_config_dep_buscar_boton(self,widget):
@@ -211,6 +218,7 @@ class ProyectoUI:
 
     def add_bpts_tree(self):
         """@brief Cargar ficheros btps al treeview."""
+        pass
         # Map fichero [caso1, caso2 ... ]
 
     ## @}
