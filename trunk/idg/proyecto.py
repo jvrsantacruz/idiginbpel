@@ -6,7 +6,8 @@ import os.path as path
 import commands 
 import shutil 
 import sys
-
+from threading import Lock
+from instrum import Instrumentador
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
 
@@ -154,6 +155,7 @@ class Proyecto(object):
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
 
+        
         # Urls generales de proyecto
         self.home       =   self.idg.home
         self.share      =   self.idg.share
@@ -200,8 +202,15 @@ class Proyecto(object):
         self.dep_miss = []
         ## Lista con los casos de prueba disponibles "fichero:nom_caso"
         self.casos = {}
-        # Map fichero de casos : [caso1, caso2 ... ]
-        self.fich_casos = {}
+        ## @}
+
+        ## @name Threading
+        ## @{
+
+        ## Lock del instrumentador
+        self.inst_lock = Lock()
+        ## Thread instrumentador
+        self.inst_thread = None
         ## @}
 
     ## @}
@@ -217,7 +226,7 @@ class Proyecto(object):
            Eleva excepciones ProyectoError.
         """
 
-        # Comprobar el bpel externo
+        # Comprobar el bpel que nos pasan
         if not path.exists( bpel ):
             print _("Error no se pudo abrir ") + bpel
             raise ProyectoError( _("Error no se pudo abrir ") + bpel)
@@ -244,6 +253,10 @@ class Proyecto(object):
         encontradas y rotas.
         """
 
+        if first:
+            deps = set()
+            miss = set()
+
         # Caso de parada de la función
         if len(files) == 0 :
             return []
@@ -253,14 +266,9 @@ class Proyecto(object):
         # Buscamos en todas las rutas de ficheros que recibamos
         for f in files:
 
-            # Si es la primera vez, añadimos a deps
-            if first:
-                deps.add(f)
-
             nom = path.basename(f) # Nombre del fichero
             dir = path.dirname(f)  # Directorio del fichero
             proy = path.join(self.dep_dir, nom) # Ruta dentro del proyecto
-
             if path.exists(proy):   # Si ya existe en el proyecto
                 miss.discard(dir)  # Quitamos de las dependencias rotas 
 
@@ -281,10 +289,11 @@ class Proyecto(object):
 
             # Buscar los imports en el fichero
             # empleando los distintos namespaces
-            imps = xml.getElementsByTagName('import')
-            imps += xml.getElementsByTagNameNS(self.bpel_url,'import')
-            imps += xml.getElementsByTagNameNS(self.wsdl_url,'import')
-            imps += xml.getElementsByTagNameNS(self.xsd_url,'import')
+            imps_l = xml.getElementsByTagName('import')
+            imps_l += xml.getElementsByTagNameNS(self.bpel_url,'import')
+            imps_l += xml.getElementsByTagNameNS(self.wsdl_url,'import')
+            imps_l += xml.getElementsByTagNameNS(self.xsd_url,'import')
+            imps = set(imps_l)
 
             # Modificar los import a rutas al mismo directorio
             # Obtener las rutas absolutas  meterlas en deps
@@ -352,28 +361,14 @@ class Proyecto(object):
 
     def instrumentar(self):
         """@brief Instrumenta el proyecto o lanza una excepción.""" 
-
-        # Comenzar la instrumentación mandando a consola el comando
-        cmd = "ant -f %s build-bpr" % self.build
-        print _("Ejecutando: ") + cmd
-        out = commands.getoutput(cmd)
-
-        # Comprobar que se ha instrumentado correctamente
-        if not path.exists( self.bpr ) or \
-           out.rfind('BUILD SUCCESSFUL') == -1 :
-            # Si ha sido por la falta de un fichero, volvemos a buscar
-            # dependencias e intentamos instrumentar de nuevo.
-            if( not self.inst is None  
-               and out.rfind('java.io.FileNotFoundException') != -1):
-                self.inst = None
-                bpel = self.bpel_o if path.exists(self.bpel_o) else self.bpel
-                self.buscar_dependencias(bpel)
-                self.instrumentar()
-            else:
-                self.inst = False
-                raise ProyectoRecuperable(_("No se pudo instrumentar") + out )
-        else:
+        # No queremos dos thread para hacer lo mismo
+        if self.inst_thread is None or not self.inst_thread.isAlive():
+            self.inst = False
+            # Comenzar la instrumentación
+            self.inst_thread = Instrumentador(self)
+            self.inst_thread.start()
             self.inst = True
+
     ## @}
 
     ## @name Casos de prueba
@@ -594,8 +589,9 @@ class Proyecto(object):
         if len(self.dep_miss) != 0:
             msg = _("Hay dependencias rotas en el proyecto, solucione la \
             situación y realice una búsqueda o cree de nuevo el proyecto")
-            self.idgui.estado(msg)
-            self.error(msg)
+            #self.idgui.estado(msg)
+            #self.error(msg)
+            print msg
         else:
             # Instrumentar si hace falta
             if self.inst == False :
