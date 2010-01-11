@@ -2,12 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkTreeStore" id="proy_casos_tree">
-    <columns>
-      <!-- column-name Caso -->
-      <column type="gint"/>
-    </columns>
-  </object>
   <object class="GtkListStore" id="proy_config_dep_list">
     <columns>
       <!-- column-name Estado -->
@@ -16,6 +10,16 @@
       <column type="gchararray"/>
       <!-- column-name Ruta -->
       <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkTreeStore" id="proy_casos_tree">
+    <columns>
+      <!-- column-name Caso -->
+      <column type="gchararray"/>
+      <!-- column-name Icono -->
+      <column type="gchararray"/>
+      <!-- column-name Activado -->
+      <column type="gboolean"/>
     </columns>
   </object>
   <object class="GtkWindow" id="proy_fake_window">
@@ -409,10 +413,11 @@
                           <object class="GtkTreeViewColumn" id="proy_casos_column">
                             <property name="title">Casos de prueba</property>
                             <child>
-                              <object class="GtkCellRendererToggle" id="proy_casos_coumn_conmutar"/>
+                              <object class="GtkCellRendererToggle" id="proy_casos_coumn_conmutar">
+                                <signal name="toggled" handler="on_bpts_view_check_toggle"/>
+                              </object>
                               <attributes>
-                                <attribute name="activatable">0</attribute>
-                                <attribute name="active">0</attribute>
+                                <attribute name="active">2</attribute>
                               </attributes>
                             </child>
                             <child>
@@ -423,6 +428,9 @@
                             </child>
                             <child>
                               <object class="GtkCellRendererText" id="proy_casos_column_texto_render"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
                             </child>
                           </object>
                         </child>

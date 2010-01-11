@@ -31,6 +31,9 @@ class ProyectoUI:
         ## Objeto gtkbuilder de idgui
         self.gtk = idgui.builder
 
+        print "Hola Holita"
+        print self.gtk
+
         idgui.estado(_("Iniciando el proyecto"))
         # Crear el proyecto
         try:
@@ -215,12 +218,32 @@ class ProyectoUI:
         self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
         ## TreeStore de los casos de prueba
         self.bpts_tree = self.gtk.get_object("proy_casos_tree")
+        ## TreeView de los casos de prueba
+        self.bpts_view = self.gtk.get_object("proy_casos_view")
 
-    def add_bpts_tree(self):
-        """@brief Cargar ficheros btps al treeview."""
-        pass
+        # Actualizar los casos en la vista
+        self.actualizar_bpts_tree()
+
+    def actualizar_bpts_tree(self):
+        """@brief Actualiza los ficheros btps en el treeview."""
+        # Iconos de fichero y de caso
+        #imgfich = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
+        #imgcaso = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
         # Map fichero [caso1, caso2 ... ]
+        # Desconectar la vista
+        self.bpts_view.set_model(None)
 
+        # Limpiar el modelo
+        self.bpts_tree.clear()
+        for fich,casos in self.proy.casos.iteritems() :
+            print 'Fichero bpts: ' + fich
+            iter = self.bpts_tree.append(None, [ fich, gtk.STOCK_OPEN, True])
+            for c in casos :
+                print '\tCaso: ' + c
+                self.bpts_tree.append(iter, [ c , gtk.STOCK_FILE, True])
+
+        # Conectar la vista de nuevo
+        self.bpts_view.set_model(self.bpts_tree)
     ## @}
 
     ## @name Callbacks Casos
@@ -237,7 +260,26 @@ class ProyectoUI:
             print sys.exc_type, sys.exc_value
         else:
             self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
-            self.bpts_fichero.unselect_all()
+            self.bpts_fichero.set_filename("")
+            self.actualizar_bpts_tree()
+
+    def on_bpts_view_check_toggle(self,render,path):
+        # Obtenemos el modelo y el iterador
+        #model, it = self.bpts_view.get_selection().get_selected()
+        model = self.bpts_tree
+        it = model.get_iter_from_string(path)
+
+        # Cambiar el valor booleano
+        if not it is None:
+            val = not (model.get_value(it, 2))
+            model.set_value(it, 2, val)
+            # Si es un fichero, cambiar también sus hijos
+            if model.get_value(it, 1) == gtk.STOCK_OPEN :
+                child = model.iter_children(it)
+                while not child is None:
+                    model.set_value(child, 2, val)
+                    child = model.iter_next(child)
+
     ##@}
 
 
