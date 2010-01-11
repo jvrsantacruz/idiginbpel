@@ -121,7 +121,7 @@ class Proyecto(object):
         # Si se indica la ruta del bpel, debemos crear el proyecto 
         # Si ya está creado, leemos su configuración
         if not bpel :
-            self.leer_proy()
+            self.cargar_proy()
         else:
             self.crear()
             self.guardar()
@@ -428,7 +428,7 @@ class Proyecto(object):
         # Buscamos todos los casos de prueba y los añadimos a self.casos
         self.casos[pnom] = [c.get('name') for c in tCases.findall(ns + 'testCase')]
         # Escribir los casos de prueba en el proy
-        self.actualizar_casos_prueba()
+        self.sinc_casos()
 
         # Si es el primer btps, incorporamos la información a test.bpts 
         if not self.hay_casos :
@@ -597,7 +597,27 @@ class Proyecto(object):
             if self.inst == False :
                 self.instrumentar()
 
-    def leer_proy(self):
+    def cargar_deps(self,dom):
+        """@brief Carga las dependencias del proyecto leyendo el fichero de
+        configuración."""
+
+        root = dom.getroot()
+
+        try:
+            # dependencias
+            deps = root.findall('.//dependencia')
+            for d in deps:
+                r = d.get('ruta')
+                # Si no estaba la añadimos
+                if r not in (self.deps + self.dep_miss):
+                    self.deps.append(r) if d.get('rota') == 'False' \
+                                        else self.dep_miss.append(r)
+
+        except:
+            raise ProyectoError(_("Error en el fichero de configuración: ") + \
+                                self.proy + " " + str(sys.exc_value))
+
+    def cargar_proy(self):
         """@brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
 
@@ -625,17 +645,8 @@ class Proyecto(object):
             self.svr = e.get('url')
             self.port = e.get('port')
 
-            # dependencias
-            deps = root.findall('.//dependencia')
-            for d in deps:
-                r = d.get('ruta')
-                # Si no estaba la añadimos
-                if r not in (self.deps + self.dep_miss):
-                    self.deps.append(r) if d.get('rota') == 'False' \
-                                        else self.dep_miss.append(r)
-
-            # Añadir las dependencias 
-            self.actualizar_casos_prueba(tree)
+            self.cargar_deps(tree)
+            self.sinc_casos(tree)
 
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
@@ -645,22 +656,13 @@ class Proyecto(object):
     ## @name Guardar y Configurar
     ## @{
 
-    def guardar(self):
-        """@brief Guarda todas las propiedades del proyecto en el fichero de
-        configuración."""
+    def guardar_datos(self,dom):
+        """@brief Guarda los datos propios del proyecto en el fichero de
+        configuración.
+        @param dom ElementTree del proyecto abierto.
+        """
 
-        # Abrir self.proy para escribir la info del proyecto
-        # Si falla elevamos una excepción
-        tree = et.ElementTree()
-        try:
-            print _("Escribiendo fichero de configuración : "), self.proy
-            root = tree.parse(self.proy)
-        except:
-            err = _("No se puede abrir el fichero de configuración \
-                                 del proyecto") 
-            print err
-            raise ProyectoError(err)
-
+        root = dom.getroot()
         # Escribir info en self.proy
         try:
             # Fechas
@@ -693,7 +695,15 @@ class Proyecto(object):
 
             # bpel proyecto
             e = root.find('bpel')
+        except:
+            raise ProyectoError(_("Error al guardar los datos del proyecto."))
 
+    def guardar_deps(self,dom):
+        """@brief Guarda las dependencias en el fichero de configuración.
+        @param dom ElementTree del proyecto abierto."""
+
+        root = dom.getroot()
+        try:
             # dependencias
             e = root.find('dependencias')
             echilds = e.getchildren()
@@ -719,7 +729,27 @@ class Proyecto(object):
                     sub.attrib['ruta'] =  d
                     sub.attrib['rota'] =  str(d in self.dep_miss)
         except:
-            raise ProyectoError(_("Error al configurar"))
+            raise ProyectoError(_("Error al guardar las dependencias"))
+
+    def guardar(self):
+        """@brief Guarda todas las propiedades del proyecto en el fichero de
+        configuración."""
+
+        # Abrir self.proy para escribir la info del proyecto
+        # Si falla elevamos una excepción
+        tree = et.ElementTree()
+        try:
+            print _("Escribiendo fichero de configuración : "), self.proy
+            root = tree.parse(self.proy)
+        except:
+            err = _("No se puede abrir el fichero de configuración \
+                                 del proyecto") 
+            print err
+            raise ProyectoError(err)
+
+        self.guardar_datos(tree)
+        self.guardar_deps(tree)
+        self.sinc_casos(tree)
 
         try:
             tree.write(self.proy)
@@ -738,7 +768,7 @@ class Proyecto(object):
         pass
         return self.mod
 
-    def actualizar_casos_prueba(self,tree=None):
+    def sinc_casos(self,tree=None):
         """@brief Actualiza la información de los casos de prueba a partir de
         proyecto.xml. Añade al xml los que no estén. 
         @param (Opcional) El dom ElementTree de proy.xml abierto
@@ -798,7 +828,7 @@ class Proyecto(object):
             for c in casos:
                 cnom = c.get('nombre')
                 if cnom not in self.casos[fnom]:
-                    self.casos[f].append(cnom)
+                    self.casos[fnom].append(cnom)
 
         # Escribir solo si es necesario
         # y si no se nos ha pasado el dom abierto
