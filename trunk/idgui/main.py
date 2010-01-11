@@ -7,6 +7,7 @@ import sys
 import pygtk
 pygtk.require("2.0")
 import gtk
+import gobject
 
 import lang
 from proyecto import ProyectoUI
@@ -48,6 +49,9 @@ class Idgui(object):
 
         # Mostrar la ventana
         self.main_ventana.show()
+
+        # Thread safe
+        gobject.threads_init()
 
         # Bucle principal
         gtk.main()
