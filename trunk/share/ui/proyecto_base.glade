@@ -384,8 +384,8 @@
                       <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
                         <property name="events">GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
-                        <property name="create_folders">False</property>
                         <property name="filter">proy_casos_bpts_filtro</property>
+                        <property name="create_folders">False</property>
                         <signal name="file_set" handler="on_proy_casos_bpts_fichero"/>
                       </object>
                       <packing>
@@ -402,35 +402,43 @@
                   <object class="GtkHBox" id="proy_casos_abajo_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkTreeView" id="proy_casos_view">
-                        <property name="height_request">300</property>
+                      <object class="GtkScrolledWindow" id="proy_casos_vista_barras">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="model">proy_casos_tree</property>
-                        <property name="headers_clickable">False</property>
-                        <property name="search_column">9</property>
+                        <property name="hscrollbar_policy">automatic</property>
+                        <property name="vscrollbar_policy">automatic</property>
                         <child>
-                          <object class="GtkTreeViewColumn" id="proy_casos_column">
-                            <property name="title">Casos de prueba</property>
+                          <object class="GtkTreeView" id="proy_casos_view">
+                            <property name="height_request">300</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="model">proy_casos_tree</property>
+                            <property name="headers_clickable">False</property>
+                            <property name="search_column">9</property>
                             <child>
-                              <object class="GtkCellRendererToggle" id="proy_casos_coumn_conmutar">
-                                <signal name="toggled" handler="on_bpts_view_check_toggle"/>
+                              <object class="GtkTreeViewColumn" id="proy_casos_column">
+                                <property name="title">Casos de prueba</property>
+                                <child>
+                                  <object class="GtkCellRendererToggle" id="proy_casos_coumn_conmutar">
+                                    <signal name="toggled" handler="on_bpts_view_check_toggle"/>
+                                  </object>
+                                  <attributes>
+                                    <attribute name="active">2</attribute>
+                                  </attributes>
+                                </child>
+                                <child>
+                                  <object class="GtkCellRendererPixbuf" id="proy_casos_column_pixbuf_render"/>
+                                  <attributes>
+                                    <attribute name="stock-id">1</attribute>
+                                  </attributes>
+                                </child>
+                                <child>
+                                  <object class="GtkCellRendererText" id="proy_casos_column_texto_render"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
                               </object>
-                              <attributes>
-                                <attribute name="active">2</attribute>
-                              </attributes>
-                            </child>
-                            <child>
-                              <object class="GtkCellRendererPixbuf" id="proy_casos_column_pixbuf_render"/>
-                              <attributes>
-                                <attribute name="stock-id">1</attribute>
-                              </attributes>
-                            </child>
-                            <child>
-                              <object class="GtkCellRendererText" id="proy_casos_column_texto_render"/>
-                              <attributes>
-                                <attribute name="text">0</attribute>
-                              </attributes>
                             </child>
                           </object>
                         </child>
@@ -455,67 +463,80 @@
                                 <child>
                                   <object class="GtkTable" id="proy_casos_table">
                                     <property name="visible">True</property>
+                                    <property name="tooltip_text" translatable="yes">Datos sobre el fichero de casos de prueba.</property>
                                     <property name="n_rows">3</property>
                                     <property name="n_columns">2</property>
-                                    <property name="row_spacing">25</property>
+                                    <property name="row_spacing">9</property>
                                     <child>
                                       <object class="GtkLabel" id="proy_casos_info_nombre_titulo_label">
                                         <property name="visible">True</property>
+                                        <property name="xalign">0</property>
                                         <property name="label" translatable="yes">Nombre de fichero:</property>
                                       </object>
+                                      <packing>
+                                        <property name="x_options">GTK_EXPAND</property>
+                                        <property name="y_options">GTK_EXPAND</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkLabel" id="proy_casos_info_nombre_label">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">nombre_fichero_bpts1</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
                                         <property name="right_attach">2</property>
+                                        <property name="x_options">GTK_EXPAND</property>
                                       </packing>
                                     </child>
                                     <child>
                                       <object class="GtkLabel" id="proy_casos_info_n_titulo_label">
                                         <property name="visible">True</property>
+                                        <property name="xalign">0</property>
                                         <property name="label" translatable="yes">N&#xBA; de casos de prueba:</property>
                                       </object>
                                       <packing>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
+                                        <property name="x_options">GTK_EXPAND</property>
+                                        <property name="y_options">GTK_EXPAND</property>
                                       </packing>
                                     </child>
                                     <child>
                                       <object class="GtkLabel" id="proy_casos_info_n_label">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">5</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
                                         <property name="right_attach">2</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
+                                        <property name="x_options">GTK_EXPAND</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="proy_casos_info_tmp_titulo_label">
+                                      <object class="GtkLabel" id="proy_casos_info_nsel_titulo_label">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">&#xDA;ltima modificaci&#xF3;n</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Casos Seleccionados:</property>
                                       </object>
                                       <packing>
                                         <property name="top_attach">2</property>
                                         <property name="bottom_attach">3</property>
+                                        <property name="x_options">GTK_EXPAND</property>
+                                        <property name="y_options">GTK_EXPAND</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="proy_casos_info_tmp_label">
+                                      <object class="GtkLabel" id="proy_casos_info_nsel_label">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">timestamp</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
                                         <property name="right_attach">2</property>
                                         <property name="top_attach">2</property>
                                         <property name="bottom_attach">3</property>
+                                        <property name="x_options">GTK_EXPAND</property>
+                                        <property name="y_options">GTK_EXPAND</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -571,6 +592,8 @@
                         </child>
                       </object>
                       <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>

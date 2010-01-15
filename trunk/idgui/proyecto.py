@@ -31,10 +31,9 @@ class ProyectoUI:
         ## Objeto gtkbuilder de idgui
         self.gtk = idgui.builder
 
-        print "Hola Holita"
-        print self.gtk
-
+        # Estado de la barra inferior
         idgui.estado(_("Iniciando el proyecto"))
+
         # Crear el proyecto
         try:
             error = ""
@@ -224,6 +223,11 @@ class ProyectoUI:
         # Actualizar los casos en la vista
         self.actualizar_bpts_tree()
 
+        # Información sobre el caso
+        self.bpts_nombre_label = self.gtk.get_object("proy_casos_info_nombre_label")
+        self.bpts_n_label = self.gtk.get_object("proy_casos_info_n_label")
+        self.bpts_nsel_label = self.gtk.get_object("proy_casos_info_nsel_label")
+
     def actualizar_bpts_tree(self):
         """@brief Actualiza los ficheros btps en el treeview."""
         # Iconos de fichero y de caso
@@ -244,6 +248,17 @@ class ProyectoUI:
 
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
+
+    def info_bpts_fichero(self,fichero):
+        """@brief Establece la información sobre un fichero de casos de prueba
+        seleccionado.
+        @param fichero Nombre del fichero de prueba"""
+        if fichero not in self.proy.casos :
+            self.error(_("No existe el fichero en el proyecto"))
+        else:
+            self.bpts_nombre_label.set_text(fichero)
+            self.bpts_n_label.set_text(str(len(self.proy.casos[fichero])))
+            self.bpts_nsel_label.set_text(str(""))
     ## @}
 
     ## @name Callbacks Casos
@@ -265,16 +280,19 @@ class ProyectoUI:
 
     def on_bpts_view_check_toggle(self,render,path):
         # Obtenemos el modelo y el iterador
-        #model, it = self.bpts_view.get_selection().get_selected()
         model = self.bpts_tree
         it = model.get_iter_from_string(path)
 
         # Cambiar el valor booleano
         if not it is None:
+            # Cambiamos el valor que tiene ahora mismo
             val = not (model.get_value(it, 2))
             model.set_value(it, 2, val)
+
             # Si es un fichero, cambiar también sus hijos
+            # Y mostrar su información
             if model.get_value(it, 1) == gtk.STOCK_OPEN :
+                self.info_bpts_fichero(model.get_value(it,0))
                 child = model.iter_children(it)
                 while not child is None:
                     model.set_value(child, 2, val)
