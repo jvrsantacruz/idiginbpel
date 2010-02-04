@@ -443,13 +443,13 @@ class Proyecto(object):
         # Raiz del bpts
         bproot = bpts.getroot()
 
-        # Encontramos el put con el wsdl,el property y los partners
+        # Encontramos el put con el wsdl,el property y los partners en el .bpts
         deploy = bproot.find(ns + 'deployment')
         partners = deploy.findall(ns + 'partner') 
         put = deploy.find(ns + 'put')
         wsdl = put.find(ns + 'wsdl')  
 
-        # Abrimos el fichero general de casos de prueba
+        # Abrimos el fichero general .bpts de casos de prueba
         try:
             test = et.ElementTree()
             troot = test.parse(self.test)
@@ -463,11 +463,12 @@ class Proyecto(object):
         twsdl = tput.find(ns + 'wsdl')
 
         # Copiar el wsdl y los partner
-        twsdl.text = wsdl.text
+        # Hay que añadirles el dependencias/ para la ruta.
+        twsdl.text = path.join(self.dep_nom, wsdl.text)
         for p in partners:
-            sub = et.SubElement(tdeploy,ns + 'partner')
-            sub.attrib['name'] = p.attrib['name']
-            sub.attrib['wsdl'] = p.attrib['wsdl']
+            sub = et.SubElement(tdeploy, ns + 'partner')
+            sub.attrib['name'] =  p.attrib['name']
+            sub.attrib['wsdl'] = path.join(self.dep_nom, p.attrib['wsdl'])
 
         try:
             test.write(self.test)
