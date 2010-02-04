@@ -645,7 +645,10 @@ class Proyecto(object):
             self.svr = e.get('url')
             self.port = e.get('port')
 
+            # Dependencias
             self.cargar_deps(tree)
+            
+            # Sincroniza casos de prueba
             self.sinc_casos(tree)
 
         except:
@@ -747,8 +750,11 @@ class Proyecto(object):
             print err
             raise ProyectoError(err)
 
+        # Guarda los datos generales
         self.guardar_datos(tree)
+        # Guarda las dependencias
         self.guardar_deps(tree)
+        # Sincroniza los casos de prueba
         self.sinc_casos(tree)
 
         try:
@@ -818,7 +824,7 @@ class Proyecto(object):
             # Número de casos que tiene el fichero
             fnode.attrib['ncasos'] = str(len(self.casos[f]))
 
-        # Añadir al proyecto los que están en el xml
+        # Añadir al proyecto los que solo están en el xml 
         fpruebas = proot.getchildren()
         for f in fpruebas:
             fnom = f.get('nombre')

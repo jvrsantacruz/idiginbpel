@@ -21,7 +21,7 @@ class Idg(object):
     home = "./home"
     ## Ruta al directorio de datos por defecto
     share = "./share"
-    ## Ruta al directorio de instalación de takuan
+    ## Ruta al directorio de instalación de takuan por defecto
     takuan = "~/takuan"
 
     ## Referencia al objeto Proyecto abierto actualmente
@@ -85,6 +85,7 @@ class Idg(object):
             except:
                 print _("Se usará el valor por defecto para: ") + nom 
 
+        # Imprimir los directorios usados
         print "Home: ", self.home
         print "Share: ",self.share
         print "Takuan: ",self.takuan
