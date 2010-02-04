@@ -150,7 +150,7 @@ class Proyecto(object):
         ## @}
 
         # Número de casos
-        self.hay_casos = len(self.fcasos) > 0
+        self.hay_casos = len(self.casos) > 0
 
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
@@ -430,9 +430,8 @@ class Proyecto(object):
         # Escribir los casos de prueba en el proy
         self.sinc_casos()
 
-        # Si es el primer btps, incorporamos la información a test.bpts 
-        if not self.hay_casos :
-            add_bpts_info(bpts)
+        # Actualizamos la información de test.bpts con la del proyecto
+        self.add_bpts_info(bpts)
 
     def add_bpts_info(self,bpts):
         """@brief Añade al bpts general del proyecto la información necesaria
@@ -459,14 +458,14 @@ class Proyecto(object):
             tests") + self.test )
 
         # Buscamos el put con el wsdl
-        tdeploy = troot.find(nstest('deployment'))
-        tput = tdeploy.find(nstest('put'))
-        twsdl = tput.find(nstest('wsdl'))
+        tdeploy = troot.find(ns + 'deployment')
+        tput = tdeploy.find(ns + 'put')
+        twsdl = tput.find(ns + 'wsdl')
 
         # Copiar el wsdl y los partner
         twsdl.text = wsdl.text
         for p in partners:
-            sub = et.SubElement(tdeploy,nstest('partner'))
+            sub = et.SubElement(tdeploy,ns + 'partner')
             sub.attrib['name'] = p.attrib['name']
             sub.attrib['wsdl'] = p.attrib['wsdl']
 
