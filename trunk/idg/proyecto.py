@@ -479,11 +479,7 @@ class Proyecto(object):
 
         self.hay_casos = True
 
-    def comprobar_casos(self):
-        """@brief Comprueba los ficheros de casos a partir de los casos
-        cargados en el proyecto."""
-        
-            ## @}
+    ## @}
 
     ## @name Cargar y Crear
     ## @{
