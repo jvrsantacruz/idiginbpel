@@ -451,28 +451,35 @@ class Proyecto(object):
         wsdl = put.find(ns + 'wsdl')  
 
         # Abrimos el fichero general .bpts de casos de prueba
+        # Lo abrimos con minidom para conservar namespaces.
         try:
-            test = et.ElementTree()
-            troot = test.parse(self.test)
+            test = md.parse(self.test)
+            troot = test.firstChild
         except:
             ProyectoRecuperable(_("No se ha podido cargar el fichero de \
             tests") + self.test )
 
         # Buscamos el put con el wsdl
-        tdeploy = troot.find(ns + 'deployment')
-        tput = tdeploy.find(ns + 'put')
-        twsdl = tput.find(ns + 'wsdl')
+        try:
+            tdeploy = troot.getElementsByTagNameNS(ns, 'deployment')
+            tput = tdeploy[0].getElementsByTagNameNS(ns, 'put')
+            twsdl = tput[0].getElementsByTagNameNS(ns, 'wsdl')
+            twsdl = twsdl[0]
+            # Le ponemos al wsdl el valor del que hemos abierto wsdl
+            twsdl.nodeValue = path.join(self.dep_nom, wsdl.text)
+        except:
+            ProyectoRecuperable(_("El fichero test.bpts está roto"))
 
         # Copiar el wsdl y los partner
         # Hay que añadirles el dependencias/ para la ruta.
-        twsdl.text = path.join(self.dep_nom, wsdl.text)
         for p in partners:
-            sub = et.SubElement(tdeploy, ns + 'partner')
-            sub.attrib['name'] =  p.attrib['name']
-            sub.attrib['wsdl'] = path.join(self.dep_nom, p.attrib['wsdl'])
+            sub = test.createElementNS(ns, 'partner')
+            sub.setAttribute('name', p.attrib['name'])
+            sub.setAttribute('wsdl', path.join(self.dep_nom, p.attrib['wsdl']))
 
         try:
-            test.write(self.test)
+            file = open(self.test,'w')
+            file.write(xml.toxml('utf-8'))
         except:
             ProyectoRecuperable(_("No se ha podido escribir el fichero de \
             tests") + self.test)
