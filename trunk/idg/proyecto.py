@@ -427,6 +427,7 @@ class Proyecto(object):
 
         # Buscamos todos los casos de prueba y los añadimos a self.casos
         self.casos[pnom] = [c.get('name') for c in tCases.findall(ns + 'testCase')]
+
         # Escribir los casos de prueba en el proy
         self.sinc_casos()
 
@@ -478,7 +479,11 @@ class Proyecto(object):
 
         self.hay_casos = True
 
-    ## @}
+    def comprobar_casos(self):
+        """@brief Comprueba los ficheros de casos a partir de los casos
+        cargados en el proyecto."""
+        
+            ## @}
 
     ## @name Cargar y Crear
     ## @{
@@ -835,6 +840,19 @@ class Proyecto(object):
                 cnom = c.get('nombre')
                 if cnom not in self.casos[fnom]:
                     self.casos[fnom].append(cnom)
+
+        # Comprobar ficheros de casos
+        # Miramos los que tenemos cargados y comprobamos que exista el fichero.
+        casos = self.casos.keys()
+        for f in casos :
+            fpath = path.join(self.casos_dir, f)
+            print "Comprobando fichero %s" % fpath
+            if path.exists(fpath) :
+                   print "%s existe " % fpath
+            else :
+                   print "%s no existe " % fpath
+                   # Eliminarlo de casos
+                   del self.casos[f]
 
         # Escribir solo si es necesario
         # y si no se nos ha pasado el dom abierto
