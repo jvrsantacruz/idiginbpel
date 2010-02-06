@@ -454,35 +454,33 @@ class Proyecto(object):
         # Lo abrimos con minidom para conservar namespaces.
         try:
             test = md.parse(self.test)
-            troot = test.firstChild
         except:
-            ProyectoRecuperable(_("No se ha podido cargar el fichero de \
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de \
             tests") + self.test )
 
         # Buscamos el put con el wsdl
         try:
-            tdeploy = troot.getElementsByTagNameNS(ns, 'deployment')
-            tput = tdeploy[0].getElementsByTagNameNS(ns, 'put')
-            twsdl = tput[0].getElementsByTagNameNS(ns, 'wsdl')
+            tdeploy = test.getElementsByTagNameNS(self.test_url, 'deployment')
+            tput = tdeploy[0].getElementsByTagNameNS(self.test_url, 'put')
+            twsdl = tput[0].getElementsByTagNameNS(self.test_url, 'wsdl')
             twsdl = twsdl[0]
             # Le ponemos al wsdl el valor del que hemos abierto wsdl
             twsdl.nodeValue = path.join(self.dep_nom, wsdl.text)
         except:
-            ProyectoRecuperable(_("El fichero test.bpts está roto"))
+            raise ProyectoRecuperable(_("El fichero test.bpts está roto"))
 
         # Copiar el wsdl y los partner
         # Hay que añadirles el dependencias/ para la ruta.
         for p in partners:
-            sub = test.createElementNS(ns, 'partner')
+            sub = test.createElementNS(self.test_url, 'partner')
             sub.setAttribute('name', p.attrib['name'])
             sub.setAttribute('wsdl', path.join(self.dep_nom, p.attrib['wsdl']))
 
         try:
             file = open(self.test,'w')
-            file.write(xml.toxml('utf-8'))
+            file.write(test.toxml('utf-8'))
         except:
-            ProyectoRecuperable(_("No se ha podido escribir el fichero de \
-            tests") + self.test)
+            raise ProyectoRecuperable(_("No se ha podido escribir el fichero de tests") + self.test)
 
         self.hay_casos = True
 
@@ -570,25 +568,25 @@ class Proyecto(object):
             except:
                 raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
-        # Abrir el test.bpts y comprobar la configuración del servidor 
         try:
-            bpts = et.ElementTree()
-            bproot = bpts.parse(self.test)
+            # Abrir el test.bpts y comprobar la configuración del servidor 
+            bpts = md.parse(self.test)
         except:
-            raise ProyectoRecuperable(_("No se pudo abrir el fichero de casos\
-            de prueba general"))
+            raise ProyectoRecuperable(_("No se pudo abrir el fichero de casos de prueba general"))
+
         # Buscar y establecer el nombre del proyecto
-        ns = "{%s}" % self.test_url
-        bpname = bproot.find(ns + 'name')
-        bpname.text = self.nombre
+        bproot = bpts.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
+        bpname = bproot.getElementsByTagNameNS(self.test_url, 'name')[0]
+        bpname.nodeValue = self.nombre
 
         # Buscar y establecer la dirección correctamente
-        bpbaseURL = bproot.find(ns + 'baseURL')
-        bpbaseURL.text = "http://%s:%s/ws" % (self.svr, self.port)
+        bpbaseURL = bproot.getElementsByTagNameNS(self.test_url, 'baseURL')[0]
+        bpbaseURL.nodeValue = "http://%s:%s/ws" % (self.svr, self.port)
 
         # Guardarlo
         try:
-            bpts.write(self.test)
+            file = open(self.test, 'w')
+            file.write(bpts.toxml('utf-8'))
         except:
             raise ProyectoRecuperable(_("No se pudo escribir el fichero de \
                                         casos de prueba"))
