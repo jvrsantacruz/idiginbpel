@@ -64,9 +64,10 @@ class Instrumentador(Thread):
             self.instrumentar()
         elif c is False:
            # raise ProyectoRecuperable(_("No se pudo instrumentar") + out )
-           print self.out
            pass
 
+        # Establecemos en la clase proyecto si se ha instrumentado bien o no.
+        self.proy.inst = c
         print self.out
         print _("Instrumentación terminada")
 

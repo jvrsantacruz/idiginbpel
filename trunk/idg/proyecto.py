@@ -367,7 +367,6 @@ class Proyecto(object):
             # Comenzar la instrumentación
             self.inst_thread = Instrumentador(self)
             self.inst_thread.start()
-            self.inst = True
 
     ## @}
 
