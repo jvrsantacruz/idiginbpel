@@ -32,7 +32,7 @@ class Instrumentador(Thread):
         self.out"""
         # Comenzar la instrumentación mandando a consola el comando
         cmd = "ant -f %s build-bpr" % self.proy.build
-        #print _("Ejecutando: ") + cmd
+        print _("Ejecutando: ") + cmd
         self.out = commands.getoutput(cmd)
         self.cont = self.cont + 1
 
@@ -59,14 +59,14 @@ class Instrumentador(Thread):
         if self.cont > 1 : c = False
 
         if c is None:
-            bpel = self.proy.bpel_o if path.exists(self.proy.bpel_o) else\
-                    self.proy.bpel
+            bpel = self.proy.bpel_o if path.exists(self.proy.bpel_o) else self.proy.bpel 
             self.proy.buscar_dependencias(bpel)
             self.instrumentar()
         elif c is False:
            # raise ProyectoRecuperable(_("No se pudo instrumentar") + out )
-           #print self.out
+           print self.out
            pass
 
+        print self.out
         print _("Instrumentación terminada")
 
