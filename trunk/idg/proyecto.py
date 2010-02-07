@@ -11,6 +11,11 @@ from instrum import Instrumentador
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idg.proyecto')
+
+
 import lang
 
 class ProyectoError(Exception):
@@ -134,7 +139,7 @@ class Proyecto(object):
         try:
             self.check()
         except (ProyectoRecuperable) as e:
-            print _("El proyecto se ha creado con errores: " + str(e))
+            log.error(_("El proyecto se ha creado con errores: " + str(e)))
 
         ## @name Listas
         ## @{
@@ -228,16 +233,15 @@ class Proyecto(object):
 
         # Comprobar el bpel que nos pasan
         if not path.exists( bpel ):
-            print _("Error no se pudo abrir ") + bpel
+            log.error(_("Error no se pudo abrir ") + bpel)
             raise ProyectoError( _("Error no se pudo abrir ") + bpel)
 
         # Buscar las dependencias del bpel recursivamente
         ## Lista de rutas con las dependencias del bpel
         self.deps, self.dep_miss = self.__buscar_dependencias([bpel])
 
-        print "%i dependencias encontradas, %i dependencias rotas, %i \
-        dependencias totales" % \
-        (len(self.deps),len(self.dep_miss),len(self.dep_miss)+len(self.deps))
+        log.info("%i dependencias encontradas, %i dependencias rotas, %i dependencias totales" % \
+        (len(self.deps),len(self.dep_miss),len(self.dep_miss)+len(self.deps)) )
 
         return True
 
@@ -272,7 +276,7 @@ class Proyecto(object):
             if path.exists(proy):   # Si ya existe en el proyecto
                 miss.discard(dir)  # Quitamos de las dependencias rotas 
 
-            print _("Dependencia: "), nom
+            log.debug(_("Dependencia: ") + nom)
 
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
@@ -283,7 +287,7 @@ class Proyecto(object):
             except:
                 # Mostramos un error y añadimos 
                 # a las dependencias rotas
-                print _("Error al parsear "),f
+                log.error(_("Error al parsear ") + f)
                 miss.add(f)
                 continue
 
@@ -311,7 +315,7 @@ class Proyecto(object):
                 local_deps.add(dep)
                 deps.add(dep)
 
-                print nom , " --> " , path.basename(ruta)
+                log.debug(nom + " --> " + path.basename(ruta))
 
                 # Si es el bpel original (first) la dependencia apuntará al
                 # directorio de dependencias (self.dep_nom)
@@ -337,7 +341,7 @@ class Proyecto(object):
             except:
                 # Si no se ha podido escribir la versión modificada del
                 # fichero, añadirlo a las dependencias rotas 
-                print _("Error al escribir en el proyecto"), nom
+                log.error(_("Error al escribir en el proyecto") + nom)
                 miss.add(ruta)
             finally:
                 file.close()
@@ -398,7 +402,7 @@ class Proyecto(object):
             pnom = "%s-%d" % (nom,i)
             pruta = path.join(self.casos_dir,pnom)
             i = i + 1
-            print pruta
+            log.debug(pruta)
 
         try:
             # Copiar de ruta a pruta (en el proyecto)
@@ -501,7 +505,7 @@ class Proyecto(object):
 
         # Crear el directorio nuevo en data
         # Copiar los ficheros básicos de skel
-        print _("Inicializando proyecto")
+        log.info(_("Inicializando proyecto"))
         try:
             shutil.copytree( path.join(self.share ,'skel') , self.dir )
         except:
@@ -512,16 +516,16 @@ class Proyecto(object):
         # Si falla borramos el intento de proyecto 
         # y elevamos de nuevo la excepción
         try:
-            print _("Buscando dependencias")
+            log.info(_("Buscando dependencias"))
             self.buscar_dependencias(self.bpel_o ) 
         except ProyectoError, error:                    
             shutil.rmtree(self.dir)
-            print _("Crear Proyecto: Error al crear ficheros de proyecto")
+            log.error(_("Crear Proyecto: Error al crear ficheros de proyecto"))
             raise error
 
         # Imprimir directorios del proyecto
-        print _("Proyecto creado correctamente")
-        print os.listdir(self.dir)
+        log.info(_("Proyecto creado correctamente"))
+        log.info(str(os.listdir(self.dir)))
         return True
 
     def check(self):
@@ -538,7 +542,7 @@ class Proyecto(object):
         for f in required:
             if not path.exists( f ):
                 e =  _("No existe el fichero: ") + f
-                print e
+                log.error(e)
                 raise ProyectoIrrecuperable(e)
 
         # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
@@ -557,9 +561,9 @@ class Proyecto(object):
         # Si es distinto del que tenemos en memoria, modificarlo.
         if dnms[0].get('location') != self.takuan:
             if len(dnms) == 0 :
-                print _("No se ha podido configurar base-build.xml")
+                log.error(_("No se ha podido configurar base-build.xml"))
             else:
-                print _("Modificando fichero base-build.xml")
+                log.info(_("Modificando fichero base-build.xml"))
                 dnms[0].attrib['location'] =  self.takuan
 
             try:
@@ -596,7 +600,7 @@ class Proyecto(object):
             situación y realice una búsqueda o cree de nuevo el proyecto")
             #self.idgui.estado(msg)
             #self.error(msg)
-            print msg
+            log.warning(msg)
         else:
             # Instrumentar si hace falta
             if self.inst == False :
@@ -747,12 +751,11 @@ class Proyecto(object):
         # Si falla elevamos una excepción
         tree = et.ElementTree()
         try:
-            print _("Escribiendo fichero de configuración : "), self.proy
+            log.info(_("Escribiendo fichero de configuración : ") + self.proy)
             root = tree.parse(self.proy)
         except:
-            err = _("No se puede abrir el fichero de configuración \
-                                 del proyecto") 
-            print err
+            err = _("No se puede abrir el fichero de configuración  del proyecto") 
+            log.error(err)
             raise ProyectoError(err)
 
         # Guarda los datos generales
@@ -846,11 +849,11 @@ class Proyecto(object):
         casos = self.casos.keys()
         for f in casos :
             fpath = path.join(self.casos_dir, f)
-            print "Comprobando fichero %s" % fpath
+            log.debug("Comprobando fichero %s" % fpath)
             if path.exists(fpath) :
-                   print "%s existe " % fpath
+                   log.debug("%s existe " % fpath)
             else :
-                   print "%s no existe " % fpath
+                   log.warning("%s no existe " % fpath)
                    # Eliminarlo de casos
                    del self.casos[f]
 
@@ -862,5 +865,5 @@ class Proyecto(object):
             except:
                 raise
 
-        print self.casos
+        log.info(str(self.casos))
     ## @}

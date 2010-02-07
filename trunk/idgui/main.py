@@ -9,6 +9,10 @@ pygtk.require("2.0")
 import gtk
 import gobject
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idgui.main')
+
 import lang
 from proyecto import ProyectoUI
 
@@ -114,7 +118,7 @@ class Idgui(object):
         #  no es el mismo que pretendemos cargar.
         if not self.idg.proyecto is None \
            and self.idg.proyecto.nombre == nombre :
-            print _("Proyecto ya cargado, no se vuelve a cargar.")
+            log.info(_("Proyecto ya cargado, no se vuelve a cargar."))
             # Mostrarlo en la interfaz
             self.proyecto.proyecto_base.reparent(self.proyecto.principal)
             self.proyecto.proyecto_base.show()
@@ -125,7 +129,7 @@ class Idgui(object):
             ## Referencia a la instancia de ProyectoUI abierta en el momento
             self.proyecto = ProyectoUI(self.idg,self,nombre,bpel)
         except:
-            print "Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value)
+            log.error("Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value))
             self.estado("Error al cargar el proyecto")
             self.cargar_portada()
 
@@ -150,7 +154,7 @@ class Idgui(object):
         # Obtener la selección
         model, sel = treeview.get_selection().get_selected()
         nombre = model.get_value(sel,0)
-        print _("Seleccionado el proyecto: "), nombre;
+        log.info(_("Seleccionado el proyecto: ") + nombre)
         # Cargar el proyecto en la gui
         self.cargar_proyecto(nombre)
 
@@ -202,14 +206,14 @@ class Idgui(object):
             self.errores_label.set_text(error_str)
             return error_str
 
-        print _("Creando proyecto con el fichero bpel: "), bpel
+        log.info(_("Creando proyecto con el fichero bpel: ") + bpel)
 
         # Creamos el proyecto
         # False si todo va bien
         try:
             self.cargar_proyecto(nombre,bpel)
         except:
-            print _("Excepción al crear proyecto ") 
+            log.error(_("Excepción al crear proyecto "))
             #errores.set_text(e)
 
         # Si el proyecto ha sido creado correctamente

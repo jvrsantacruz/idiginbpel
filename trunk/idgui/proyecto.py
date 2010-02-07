@@ -7,6 +7,10 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idgui.proyecto')
+
 from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable
 from instrum import Comprobador
@@ -42,10 +46,10 @@ class ProyectoUI:
             self.idg.proyecto = self.proy
         except (ProyectoRecuperable) as e:
             # Mostrar las recuperables en los errores en la interfaz.
-            print e
+            log.error(str(e))
             idgui.estado(e)
         except:
-            print _("Excepción irrecuperable al crear el proyecto")
+            log.error(_("Excepción irrecuperable al crear el proyecto"))
             raise
 
         # Cargar el glade del proyecto
@@ -134,8 +138,8 @@ class ProyectoUI:
         ldep = len(self.proy.deps)
         ldep_miss = len(self.proy.dep_miss)
 
-        print ldep
-        print ldep_miss
+        log.debug("Dependencias " + str(ldep))
+        log.debug("Dependencias no encontradas " + str(ldep_miss))
 
         # Mostrar error si hay dependencias rotas
         if len(self.proy.dep_miss) > 0 :
@@ -185,7 +189,7 @@ class ProyectoUI:
         @param widget Botón"""
         try:
             from idg.proyecto import ProyectoError
-            print self.proy.bpel_o
+            log.info("Bpel original: " + self.proy.bpel_o)
             self.proy.buscar_dependencias(self.proy.bpel_o)
         except ProyectoError:
             self.error(_("Se ha producido un error durante la búsqueda."))
@@ -240,10 +244,10 @@ class ProyectoUI:
         # Limpiar el modelo
         self.bpts_tree.clear()
         for fich,casos in self.proy.casos.iteritems() :
-            print 'Fichero bpts: ' + fich
+            log.info('Fichero bpts seleccionado: ' + fich)
             iter = self.bpts_tree.append(None, [ fich, gtk.STOCK_OPEN, True])
             for c in casos :
-                print '\tCaso: ' + c
+                log.info('\tCaso: ' + c)
                 self.bpts_tree.append(iter, [ c , gtk.STOCK_FILE, True])
 
         # Conectar la vista de nuevo
@@ -272,7 +276,7 @@ class ProyectoUI:
             self.proy.add_bpts(bpts)
         except(ProyectoRecuperable):
             self.idgui.estado(_("Error al añadir fichero de casos de prueba"))
-            print sys.exc_type, sys.exc_value
+            log.error(str(sys.exc_type) + str(sys.exc_value))
         else:
             self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
             self.bpts_fichero.set_filename("")

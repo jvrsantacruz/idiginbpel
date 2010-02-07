@@ -7,6 +7,10 @@ import commands
 import shutil
 from xml.dom import minidom as md
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idg.main')
+
 #from proyecto import Proyecto,ProyectoError
 from idgui.main import Idgui
 import lang
@@ -55,7 +59,7 @@ class Idg(object):
         self.lista_proyectos = os.listdir(os.path.join(self.home,"proy"))
         self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
         self.lista_proyectos.sort()
-        print self.lista_proyectos
+        log.info(_("Proyectos disponibles: ") + str(self.lista_proyectos))
 
     def comprobar_proyectos(self):
         """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
@@ -66,9 +70,9 @@ class Idg(object):
         try: 
             xml = md.parse(self.config)
         except:
-            print _("No se pudo leer el fichero de configuración ") + self.config
+            log.error(_("No se pudo leer el fichero de configuración ") + self.config) 
         else:
-            print _("Usando fichero de configuración: ") + self.config
+            log.info(_("Usando fichero de configuración: ") + self.config)
 
         # Leer valores individuales y establecerlos en el objeto
         # Nombre del elemento y atributo a leer
@@ -80,15 +84,15 @@ class Idg(object):
                 if path.exists(val):
                     setattr(self, nom , val)
                 else:
-                    print _("No se encuentra el directorio: ") + val
+                    log.error(_("No se encuentra el directorio: ") + val)
                     raise Exception()
             except:
-                print _("Se usará el valor por defecto para: ") + nom 
+                log.warning(_("Se usará el valor por defecto para: ") + nom)
 
         # Imprimir los directorios usados
-        print "Home: ", self.home
-        print "Share: ",self.share
-        print "Takuan: ",self.takuan
+        log.info("Home: " + self.home)
+        log.info("Share: " + self.share)
+        log.info("Takuan: " + self.takuan)
 
     def exportar(self,nombre,ruta):
         """@brief Realiza un paquete tar en bz2 del directorio del proyecto.
