@@ -109,10 +109,10 @@
 	<!-- Movemos los ficheros temporales generados en el directorio
 	     de trabajo al directorio de proyecto desde el cual se
 	     importó este ant  -->
-        <move file="${user.dir}/catalog.xml" todir="${proy}"/>
+	<!-- <move file="${user.dir}/catalog.xml" todir="${proy}"/> -->
         <move file="${user.dir}/tiposReunidos.xml" todir="${proy}"/>
         <move file="${user.dir}/procesoInspeccionado.decls" todir="${proy}"/>
-        <move file="${user.dir}/proceso.pdd" todir="${proy}"/>
+	<!-- <move file="${user.dir}/proceso.pdd" todir="${proy}"/> -->
         <move file="${user.dir}/procesoInspeccionado.bpel" todir="${proy}"/>
     </target>
 
