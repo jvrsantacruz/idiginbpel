@@ -4,10 +4,12 @@
 import os
 import os.path as path
 import sys
+
 import pygtk
 pygtk.require("2.0")
 import gtk
 import gobject
+import webkit
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -33,6 +35,9 @@ class Idgui(object):
         ## Instancia de la clase idg
         self.idg = idg;
 
+        # Thread safe
+        gobject.threads_init()
+
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
         ## Objeto ventana
@@ -43,6 +48,13 @@ class Idgui(object):
         self.barra_estado = self.builder.get_object("main_estado")
 
         # Cargar portada en principal
+
+        # Cargar el glade de la portada
+        self.builder.add_from_file(path.join(self.idg.share,"ui/portada.glade"))
+        ## Portada de la aplicación con el dibujo de bienvenida
+        self.html = webkit.WebView()
+        self.html.load_html_string("<p>HoHoHo</p>", "file:///")
+        self.portada = self.builder.get_object("portada")
         self.cargar_portada()
 
         # Cargar la lista de proyectos
@@ -53,9 +65,6 @@ class Idgui(object):
 
         # Mostrar la ventana
         self.main_ventana.show()
-
-        # Thread safe
-        gobject.threads_init()
 
         # Bucle principal
         gtk.main()
@@ -257,19 +266,15 @@ class Idgui(object):
             @param widget El widget desde donde se llama.
         """
 
-        # Comprobar si portada está inicializada
-        # y cargarla en ese caso
-        self.builder.add_from_file(path.join(self.idg.share,"ui/portada.glade"))
-        ## Portada de la aplicación con el dibujo de bienvenida
-        self.portada = self.builder.get_object("portada")
-
         # Ocultar lo que hay en principal ahora mismo
         children = self.principal.get_children()
         for child in children:
             child.hide()
 
+        self.portada.add(self.html)
+        self.portada.reorder_child(self.html, 2)
         self.portada.reparent( self.principal )
-        self.portada.show()
+        self.portada.show_all()
 
     def on_main_ventana_destroy(self,widget):
         gtk.main_quit()
