@@ -28,6 +28,9 @@
           </packing>
         </child>
         <child>
+          <placeholder/>
+        </child>
+        <child>
           <object class="GtkLabel" id="pie">
             <property name="visible">True</property>
             <property name="label" translatable="yes">idiginBPEL</property>
