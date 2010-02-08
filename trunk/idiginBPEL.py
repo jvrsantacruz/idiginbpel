@@ -8,6 +8,7 @@ Establece la ruta de ejecución y crea el sistema.
 import sys
 import os.path as path
 from idg.main import Idg
+from idgui.main import Idgui
 
 # Establecer el log
 import util.logger
@@ -37,5 +38,7 @@ for c in configs:
 
 # Iniciar la aplicacion
 if __name__ == "__main__":
-	global idgbpel 
-	idgbpel = Idg(ruta,config)
+        ## Clase principal de la aplicación con la lógica
+	idg = Idg(ruta,config)
+        ## Clase controladora de la interfaz
+        idgui = Idgui(idg)

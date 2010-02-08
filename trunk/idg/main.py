@@ -14,11 +14,8 @@ import util.logger
 log = util.logger.getlog('idg.main')
 
 # Traducciones mediante gettext
-log.warning('Usando locale en directorio local. ./locale No instaladas las locales.')
 gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
-
-#from proyecto import Proyecto,ProyectoError
-from idgui.main import Idgui
+log.warning(_('Usando locale en directorio local. ./locale No instaladas las locales.'))
 
 class Idg(object):
     """@brief Objeto principal, maneja el programa completo."""
@@ -52,9 +49,6 @@ class Idg(object):
 
         # Leer la lista de proyectos
         self.obtener_lista_proyectos()
-        # Iniciar gui
-        ## Referencia al objeto con la GUI
-        idgui = Idgui(self)
 
     def obtener_lista_proyectos(self):
         """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
