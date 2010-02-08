@@ -23,7 +23,7 @@ class Comprobador(Thread):
         while self.proy.inst_thread.isAlive() :
             # Actualizar barra
             # Mandar a dormir para esperar
-            print "Comprobando instrumentación"
+            log.debug("Comprobando instrumentación")
        # self.proy.inst_thread.join()
             time.sleep(self.t)
 

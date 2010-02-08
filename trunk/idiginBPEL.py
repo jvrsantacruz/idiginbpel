@@ -8,10 +8,15 @@ Establece la ruta de ejecución y crea el sistema.
 import sys
 import os.path as path
 from idg.main import Idg
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idiginBPEL')
 
 # Ruta completa del programa 
 abspath = path.realpath(__file__)
 ruta = path.dirname(abspath)
+log.debug(_('Ejecutable en ') + ruta) # DEBUG
 
 # Añadir este directorio al path para poder importar los módulos
 sys.path.insert(0,ruta)
@@ -23,6 +28,7 @@ configs = ('~/.idiginbpel', './home', '/usr/share/idiginbpel')
 config = ""
 for c in configs:
     c = path.abspath(path.expanduser(path.join(c,'config.xml')))
+    log.debug(_('Buscando config en: ') + c) # DEBUG
     if path.exists(c):
         config = c
         break

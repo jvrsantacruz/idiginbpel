@@ -6,6 +6,10 @@ import re
 import os.path as path
 from threading import Thread
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('idg.instrum')
+
 class Instrumentador(Thread):
     """@brief Esta clase realiza la instrumentación mediante threading para no
     dejar la gui congelada esperando el resultado. """
@@ -32,7 +36,7 @@ class Instrumentador(Thread):
         self.out"""
         # Comenzar la instrumentación mandando a consola el comando
         cmd = "ant -f %s build-bpr" % self.proy.build
-        print _("Ejecutando: ") + cmd
+        log.info(_("Ejecutando: ") + cmd)
         self.out = commands.getoutput(cmd)
         self.cont = self.cont + 1
 
@@ -68,6 +72,6 @@ class Instrumentador(Thread):
 
         # Establecemos en la clase proyecto si se ha instrumentado bien o no.
         self.proy.inst = c
-        print self.out
-        print _("Instrumentación terminada")
+        log.debug(self.out)
+        log.info(_("Instrumentación terminada"))
 
