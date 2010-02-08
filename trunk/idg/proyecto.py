@@ -11,9 +11,8 @@ from instrum import Instrumentador
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idg.proyecto')
+import util.logger
+log = util.logger.getlog('idg.proyecto')
 
 class ProyectoError(Exception):
     """@brief Clase excepción para la clase Proyecto"""

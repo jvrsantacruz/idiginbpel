@@ -11,9 +11,8 @@ import gtk
 import gobject
 import webkit
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idgui.main')
+import util.logger
+log = util.logger.getlog('idgui.main')
 
 from proyecto import ProyectoUI
 

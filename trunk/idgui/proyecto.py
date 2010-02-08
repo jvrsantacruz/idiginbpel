@@ -7,9 +7,8 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idgui.proyecto')
+import util.logger
+log = util.logger.getlog('idgui.proyecto')
 
 from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable

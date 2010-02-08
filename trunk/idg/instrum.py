@@ -6,9 +6,8 @@ import re
 import os.path as path
 from threading import Thread
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idg.instrum')
+import util.logger
+log = util.logger.getlog('idg.instrum')
 
 class Instrumentador(Thread):
     """@brief Esta clase realiza la instrumentación mediante threading para no

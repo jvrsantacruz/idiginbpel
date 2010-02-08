@@ -5,9 +5,8 @@ from threading import Thread
 import gtk
 import time
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idgui.instrum')
+import util.logger
+log = util.logger.getlog('idgui.instrum')
 
 class Comprobador(Thread):
     """@brief Comprueba periódicamente, una vez lanzada la instrumentación, si esta se ha

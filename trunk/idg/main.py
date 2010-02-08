@@ -3,15 +3,16 @@
 
 import os 
 import os.path as path
+
 import commands
 import shutil
+import gettext
 from xml.dom import minidom as md
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idg.main')
+# Establecer el log
+import util.logger
+log = util.logger.getlog('idg.main')
 
-import gettext
 # Traducciones mediante gettext
 log.warning('Usando locale en directorio local. ./locale No instaladas las locales.')
 gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
