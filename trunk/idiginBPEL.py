@@ -8,10 +8,10 @@ Establece la ruta de ejecución y crea el sistema.
 import sys
 import os.path as path
 from idg.main import Idg
-import logging
 
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('idiginBPEL')
+# Establecer el log
+import util.logger
+log = util.logger.getlog('idiginBPEL')
 
 # Ruta completa del programa 
 abspath = path.realpath(__file__)
