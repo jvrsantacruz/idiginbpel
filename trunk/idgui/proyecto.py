@@ -14,7 +14,6 @@ log = logging.getLogger('idgui.proyecto')
 from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable
 from instrum import Comprobador
-import lang
 
 class ProyectoUI:
     """@brief Manejo de la interfaz de usuario del proyecto."""

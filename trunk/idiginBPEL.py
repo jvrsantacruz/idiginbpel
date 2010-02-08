@@ -33,6 +33,8 @@ for c in configs:
         config = c
         break
 
+
+
 # Iniciar la aplicacion
 if __name__ == "__main__":
 	global idgbpel 

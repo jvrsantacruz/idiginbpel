@@ -15,9 +15,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('idg.proyecto')
 
-
-import lang
-
 class ProyectoError(Exception):
     """@brief Clase excepción para la clase Proyecto"""
 

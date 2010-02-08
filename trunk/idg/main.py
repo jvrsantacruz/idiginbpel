@@ -11,9 +11,13 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('idg.main')
 
+import gettext
+# Traducciones mediante gettext
+log.warning('Usando locale en directorio local. ./locale No instaladas las locales.')
+gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
+
 #from proyecto import Proyecto,ProyectoError
 from idgui.main import Idgui
-import lang
 
 class Idg(object):
     """@brief Objeto principal, maneja el programa completo."""

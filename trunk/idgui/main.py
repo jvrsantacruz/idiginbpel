@@ -15,9 +15,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('idgui.main')
 
-import lang
 from proyecto import ProyectoUI
-
 
 class Idgui(object):
     """@brief Objeto principal de la gui."""
