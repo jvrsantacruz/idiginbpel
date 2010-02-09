@@ -429,16 +429,13 @@ class Proyecto(object):
             # Copiar de ruta a pruta (en el proyecto)
             shutil.copy(ruta,pruta)
         except:
-            raise ProyectoRecuperable(_("No se pudo copiar al proyecto el\
-                                        fichero de casos de prueba: ") + ruta)
+            raise ProyectoRecuperable(_("No se pudo copiar al proyecto el fichero de casos de prueba: ") + ruta)
+
         # Añadimos el fichero a fcasos
         self.fcasos.append(pnom)
 
         # Añadimos los casos de uso 
         self.casos[pnom] = self.list_bpts(pruta)
-
-        # Escribir los casos de prueba en el proy
-        self.sinc_casos()
 
         # Actualizamos la información de test.bpts con la del proyecto
         self.add_bpts_info(pruta)
@@ -618,6 +615,18 @@ class Proyecto(object):
             if self.inst == False :
                 self.instrumentar()
 
+    def cargar_casos(self):
+        """@brief Carga los casos de prueba que hay disponibles.
+        """
+        # self.casos es un diccionario del tipo 'fichero' : ['caso', 'caso']
+
+        # Recorremos todos los ficheros bpts que tenemos y los parseamos.
+        for f in os.listdir(self.casos_dir):
+            if f[0] != '.' :  # No queremos ocultos
+                self.casos[f] = self.list_bpts( path.join(self.casos_dir, f) )
+
+        log.debug(str(self.casos))
+
     def cargar_deps(self,dom):
         """@brief Carga las dependencias del proyecto leyendo el fichero de
         configuración."""
@@ -668,9 +677,8 @@ class Proyecto(object):
 
             # Dependencias
             self.cargar_deps(tree)
-            
-            # Sincroniza casos de prueba
-            self.sinc_casos(tree)
+            # Casos
+            self.cargar_casos()
 
         except:
             raise ProyectoError(_("Error en el fichero de configuración: ") + \
@@ -774,8 +782,6 @@ class Proyecto(object):
         self.guardar_datos(tree)
         # Guarda las dependencias
         self.guardar_deps(tree)
-        # Sincroniza los casos de prueba
-        self.sinc_casos(tree)
 
         try:
             tree.write(self.proy)
@@ -794,88 +800,4 @@ class Proyecto(object):
         pass
         return self.mod
 
-    def sinc_casos(self,tree=None):
-        """@brief Actualiza la información de los casos de prueba a partir de
-        proyecto.xml. Añade al xml los que no estén. 
-        @param (Opcional) El dom ElementTree de proy.xml abierto
-        """
-
-        itree = tree
-        if itree is None:
-            # Si no se pasa ya abierto, abrir proy
-            try:
-                itree = et.ElementTree()
-                itree.parse(self.proy)
-            except:
-                raise ProyectoRecuperable(_("Error al abrir proyecto.xml"))
-
-        # self.casos es un diccionario del tipo 'fichero' : ['caso', 'caso']
-        # No se pueden emplear expresiones xpath tan molonas como las
-        # siguientes debido a que se añadirán a ElementTree en la versión 1.3. 
-        # La versión actual de Python 2.6 trae ElementTree 1.2.6
-        #fnode = proot.find("./fprueba[@nombre='%s']" % f) 
-        #cnode = fnode.find("./prueba[@nombre='%s']" % c)
-        root = itree.getroot()
-        proot = root.find('pruebas')
-        fpruebas = proot.getchildren()
-        nuevos = False
-
-        # Ahora añadir al xml los que están 
-        # en el proyecto y no en el xml
-        for f in self.casos:
-            # Buscarlo entre los nodos prueba
-            try:
-                fnode = [fp for fp in fpruebas if fp.get('nombre') == f][0]
-            except:
-                fnode = et.SubElement(proot, 'fprueba')
-                fnode.attrib['nombre'] =  f
-                nuevos = True
-
-            fchild = fnode.getchildren()
-            # Buscamos sus casos
-            for c in self.casos[f]:
-                # Buscarlo entre los casos de f
-                try:
-                    cnode = [fc for fc in fchild if fc.get('nombre') == c][0]
-                except:
-                    cnode = et.SubElement(fnode, 'prueba')
-                    cnode.attrib['nombre'] =  c
-                    nuevos = True
-            # Número de casos que tiene el fichero
-            fnode.attrib['ncasos'] = str(len(self.casos[f]))
-
-        # Añadir al proyecto los que solo están en el xml 
-        fpruebas = proot.getchildren()
-        for f in fpruebas:
-            fnom = f.get('nombre')
-            casos = f.getchildren()
-            if fnom not in self.casos:
-                self.casos[fnom] = []
-            for c in casos:
-                cnom = c.get('nombre')
-                if cnom not in self.casos[fnom]:
-                    self.casos[fnom].append(cnom)
-
-        # Comprobar ficheros de casos
-        # Miramos los que tenemos cargados y comprobamos que exista el fichero.
-        casos = self.casos.keys()
-        for f in casos :
-            fpath = path.join(self.casos_dir, f)
-            log.debug("Comprobando fichero %s" % fpath)
-            if path.exists(fpath) :
-                   log.debug("%s existe " % fpath)
-            else :
-                   log.warning("%s no existe " % fpath)
-                   # Eliminarlo de casos
-                   del self.casos[f]
-
-        # Escribir solo si es necesario
-        # y si no se nos ha pasado el dom abierto
-        if nuevos and not tree is None:
-            try:
-                tree.write(self.proy)
-            except:
-                raise
-
-        log.info(str(self.casos))
     ## @}
