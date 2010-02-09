@@ -373,6 +373,31 @@ class Proyecto(object):
     ## @name Casos de prueba
     ## @{
 
+    def list_bpts(self,path):
+        """@brief Lista los casos de prueba que hay en un bpts.
+           @param path Ruta del fichero
+           @param etree (opcional) dom abierto del documento.
+           @returns Una lista con los nombres de los casos."""
+
+        # Lo parseamos con ElementTree 
+        # Abrirlo
+        try:
+            bpts = et.ElementTree()
+            bproot = bpts.parse(path)
+        except:
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba"))
+
+        # Construir los nombres con la uri es un peñazo
+        ns = "{%s}" % self.test_url
+
+        # Encontramos elementos básicos
+        testSuite = bproot
+        tCases = bproot.find(ns + 'testCases')
+
+        # Buscamos todos los casos de prueba y los devolvemos.
+        return [c.get('name') for c in tCases.findall(ns + 'testCase')]
+
+
     def add_bpts(self,ruta):
         """@brief Añade un fichero con casos de prueba al proyecto.
         @param ruta Ruta al fichero .bpts.
@@ -409,34 +434,26 @@ class Proyecto(object):
         # Añadimos el fichero a fcasos
         self.fcasos.append(pnom)
 
-        # Lo parseamos con ElementTree
-        # Abrirlo
-        try:
-            bpts = et.ElementTree()
-            bproot = bpts.parse(pruta)
-        except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba"))
-
-        # Construir los nombres con la uri es un peñazo
-        ns = "{%s}" % self.test_url
-
-        # Encontramos elementos básicos
-        testSuite = bproot
-        tCases = bproot.find(ns + 'testCases')
-
-        # Buscamos todos los casos de prueba y los añadimos a self.casos
-        self.casos[pnom] = [c.get('name') for c in tCases.findall(ns + 'testCase')]
+        # Añadimos los casos de uso 
+        self.casos[pnom] = self.list_bpts(pruta)
 
         # Escribir los casos de prueba en el proy
         self.sinc_casos()
 
         # Actualizamos la información de test.bpts con la del proyecto
-        self.add_bpts_info(bpts)
+        self.add_bpts_info(pruta)
 
-    def add_bpts_info(self,bpts):
+    def add_bpts_info(self,bpts_path):
         """@brief Añade al bpts general del proyecto la información necesaria
         para la ejecución. Esto sucede la primera vez que se añade un bpts.
-        @param bpts ElementTree con el bpts parseado."""
+        @param path Ruta al bpts."""
+
+        # Abrirlo
+        try:
+            bpts = et.ElementTree()
+            bproot = bpts.parse(bpts_path)
+        except:
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba ") + bpts_path)
 
         # Namespace
         ns = "{%s}" % self.test_url
@@ -454,11 +471,10 @@ class Proyecto(object):
         try:
             test = md.parse(self.test)
         except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de \
-            tests") + self.test )
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de tests") + self.test )
 
-        # Buscamos el put con el wsdl
         try:
+            # Buscamos el put con el wsdl
             tdeploy = test.getElementsByTagNameNS(self.test_url, 'deployment')
             tput = tdeploy[0].getElementsByTagNameNS(self.test_url, 'put')
             twsdl = tput[0].getElementsByTagNameNS(self.test_url, 'wsdl')
