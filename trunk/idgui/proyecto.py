@@ -264,8 +264,11 @@ class ProyectoUI:
 
     def add_casos(self):
         """@brief Añade los ficheros seleccionados para ser ejecutados""" 
+        # Vaciar los casos seleccionados anteriormente
+        self.proy.vaciar_bpts(self.proy.test)
+
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
-        m = self.bpts_tree # Acortar el nombre
+        m = self.bpts_tree # Acortar el nombre al tree
 
         f = m.get_iter_root()   # El primer fichero
         # Recorremos todos los ficheros 
@@ -276,17 +279,20 @@ class ProyectoUI:
                 c = m.iter_children(f)      # El primer hijo
                 log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
 
-                # Recorremos todos los casos hijos de fichero 
-                while not c is None:
+                casos = []
 
+                # Recorremos todos los casos hijos de fichero 
+                # y los metemos en casos
+                while not c is None:
                     # Añadimos el nombre del fichero y del caso si este está activo
                     if m.get_value(c,2) :
-                        cnom = m.get_value(c, 0) # Nombre del caso
-                        self.proy.add_caso(fnom, cnom) 
-                        log.debug(_("\t y el caso: ") + cnom)
-
+                        cnom = m.get_value(c, 0)
+                        casos.append(cnom) # Nombre del caso
+                        log.debug(_("\t add el caso: ") + cnom)
                     # Siguiente caso
                     c = m.iter_next(c)
+
+                self.proy.add_casos(fnom,casos)
 
             # Siguiente fichero
             f = m.iter_next(f)
