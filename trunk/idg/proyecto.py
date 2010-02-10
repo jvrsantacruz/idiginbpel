@@ -378,7 +378,6 @@ class Proyecto(object):
     def list_bpts(self,path):
         """@brief Lista los casos de prueba que hay en un bpts.
            @param path Ruta del fichero
-           @param etree (opcional) dom abierto del documento.
            @returns Una lista con los nombres de los casos."""
 
         # Lo parseamos con ElementTree 
@@ -448,21 +447,16 @@ class Proyecto(object):
 
         # Abrirlo
         try:
-            bpts = et.ElementTree()
-            bproot = bpts.parse(bpts_path)
+            bpts = md.parse(bpts_path)
         except:
             raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba ") + bpts_path)
 
-        # Namespace
-        ns = "{%s}" % self.test_url
-        # Raiz del bpts
-        bproot = bpts.getroot()
-
-        # Encontramos el put con el wsdl,el property y los partners en el .bpts
-        deploy = bproot.find(ns + 'deployment')
-        partners = deploy.findall(ns + 'partner') 
-        put = deploy.find(ns + 'put')
-        wsdl = put.find(ns + 'wsdl')  
+        # Elementos del fichero nuevo que añadimos
+        testSuite = bpts.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
+        deploy = bpts.getElementsByTagNameNS(self.test_url, 'deployment')[0]
+        partners = deploy.getElementsByTagNameNS(self.test_url, 'partner')
+        put = deploy.getElementsByTagNameNS(self.test_url, 'put')[0]
+        wsdl = deploy.getElementsByTagNameNS(self.test_url, 'wsdl')[0]
 
         # Abrimos el fichero general .bpts de casos de prueba
         # Lo abrimos con minidom para conservar namespaces.
@@ -471,29 +465,51 @@ class Proyecto(object):
         except:
             raise ProyectoRecuperable(_("No se ha podido cargar el fichero de tests") + self.test )
 
+        # Buscamos los elementos en el test.bpts
+        ttestSuite = test.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
+        tdeploy = test.getElementsByTagNameNS(self.test_url, 'deployment')[0]
+        tput = tdeploy.getElementsByTagNameNS(self.test_url, 'put')[0]
+        twsdl = tput.getElementsByTagNameNS(self.test_url, 'wsdl')[0]
+
+        # Añadimos al testSuite de test.bpts las declaraciones 
+        # de espacios de nombres del .bpts nuevo
+        for prefix, uri in testSuite.attributes.items() :
+            if not ttestSuite.hasAttribute(prefix) :
+                ttestSuite.setAttribute(prefix, uri)
+
+        # Le ponemos al wsdl el valor del que hemos abierto wsdl
         try:
-            # Buscamos el put con el wsdl
-            tdeploy = test.getElementsByTagNameNS(self.test_url, 'deployment')
-            tput = tdeploy[0].getElementsByTagNameNS(self.test_url, 'put')
-            twsdl = tput[0].getElementsByTagNameNS(self.test_url, 'wsdl')
-            twsdl = twsdl[0]
-            # Le ponemos al wsdl el valor del que hemos abierto wsdl
-            twsdl.nodeValue = path.join(self.dep_nom, wsdl.text)
+            if wsdl.hasChildNodes :
+                log.debug(wsdl.firstChild.data)
+                if twsdl.firstChild :
+                    twsdl.removeChild(twsdl.firstChild) # Eliminar el nodo texto
+                # Añadir nuevo
+                twsdl.appendChild(test.createTextNode(path.join(self.dep_nom, 
+                                                                wsdl.firstChild.data))) 
         except:
             raise ProyectoRecuperable(_("El fichero test.bpts está roto"))
 
+        log.debug(_("Add informacion al bpts a partir del bpts nuevo"))
+
         # Copiar el wsdl y los partner
         # Hay que añadirles el dependencias/ para la ruta.
-        for p in partners:
-            sub = test.createElementNS(self.test_url, 'partner')
-            sub.setAttribute('name', p.attrib['name'])
-            sub.setAttribute('wsdl', path.join(self.dep_nom, p.attrib['wsdl']))
+        # Solo lo hacemos la primera vez
+        if not self.hay_casos :
+            for p in partners:
+                sub = test.createElementNS(self.test_url, 'tes:partner')
+                # Se le añade el prefijo manualmente ------^^^
+                sub.setAttributeNS(self.test_url, 'name', p.getAttribute('name'))
+                sub.setAttributeNS(self.test_url, 'wsdl', path.join(self.dep_nom, p.getAttribute('wsdl')))
+                tdeploy.appendChild(sub)
+                log.debug(sub)
 
         try:
             file = open(self.test,'w')
             file.write(test.toxml('utf-8'))
         except:
             raise ProyectoRecuperable(_("No se ha podido escribir el fichero de tests") + self.test)
+
+        log.debug(tdeploy.toxml('utf-8'))
 
         self.hay_casos = True
 
