@@ -525,6 +525,7 @@ class Proyecto(object):
             e =  _("No se ha podido cargar el fichero de tests ") + self.test
             log.error(e)
             raise ProyectoRecuperable(e)
+
         # Encontrar el caso en el bpts
         caso_dom = [f for f in bpts_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == caso]
         if len(caso_dom) == 0 :
@@ -532,13 +533,14 @@ class Proyecto(object):
             return
         caso_dom  = caso_dom[0]
 
-        # Encontrar el testCases de test.bpts
-        test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
         # Ponerle el nuevo nombre fichero:caso
-        test_cases.setAttribute('name', nombre)
+        caso_dom.setAttribute('name', nombre)
 
         # Declarar inline los namespaces huerfanitos 
         util.xml.minidom_namespaces(caso_dom)
+
+        # Encontrar el testCases de test.bpts
+        test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
 
         # Clonar el caso y sus hijos, y añadirlo al test
         test_cases.appendChild( caso_dom.cloneNode(True) ) 
