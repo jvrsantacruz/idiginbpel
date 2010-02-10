@@ -12,6 +12,7 @@ from xml.dom import minidom as md
 from xml.etree import ElementTree as et
 
 import util.logger
+
 log = util.logger.getlog('idg.proyecto')
 
 class ProyectoError(Exception):
@@ -156,7 +157,7 @@ class Proyecto(object):
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
 
-        
+
         # Urls generales de proyecto
         self.home       =   self.idg.home
         self.share      =   self.idg.share
@@ -385,7 +386,7 @@ class Proyecto(object):
             bpts = et.ElementTree()
             bproot = bpts.parse(path)
         except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba"))
+            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba ") + path)
 
         # Construir los nombres con la uri es un peñazo
         ns = "{%s}" % self.test_url
@@ -396,7 +397,6 @@ class Proyecto(object):
 
         # Buscamos todos los casos de prueba y los devolvemos.
         return [c.get('name') for c in tCases.findall(ns + 'testCase')]
-
 
     def add_bpts(self,ruta):
         """@brief Añade un fichero con casos de prueba al proyecto.
@@ -495,6 +495,58 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("No se ha podido escribir el fichero de tests") + self.test)
 
         self.hay_casos = True
+
+    def add_caso(self, bpts, caso):
+        """@brief Añade un caso de prueba en un bpts al test.bpts.
+           @param bpts Nombre del fichero bpts a listar.
+           @param caso Lista de nombres del caso en el fichero bpts a añadir."""
+
+        # Formamos el nombre completo del caso fichero:caso
+        nombre = "%s:%s" % (bpts, caso)
+
+        # Comprobamos que el caso no esté en el test
+        if nombre in self.list_bpts(self.test):
+            log.warning(_("Intentando add un caso que ya estaba en el test.bpts"))
+            return
+
+        # Abrir el fichero bpts, el test y añadir todo el caso
+        # Con minidom para no perder los namespaces.
+        try:
+            bpts_dom = md.parse(path.join(self.casos_dir, bpts))
+        except:
+            e = _("No se ha podido cargar el fichero bpts ") + bpts 
+            log.error(e)
+            raise ProyectoRecuperable(e)
+
+        try:
+            test_dom = md.parse(self.test)
+        except:
+            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            log.error(e)
+            raise ProyectoRecuperable(e)
+        # Encontrar el caso en el bpts
+        caso_dom = [f for f in bpts_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == caso]
+        if len(caso_dom) == 0 :
+            log.warning(_("Al add un caso al test.bpts, no se ha encontrado el caso en su fichero original"))
+            return
+        caso_dom  = caso_dom[0]
+
+        # Encontrar el testCases de test.bpts
+        test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
+        # Ponerle el nuevo nombre fichero:caso
+        test_cases.setAttribute('name', nombre)
+
+        # Clonar el caso y sus hijos, y añadirlo al test
+        test_cases.appendChild( caso_dom.cloneNode(True) ) 
+
+        # Escribir el fichero test
+        try:
+            file = open(self.test,'w')
+            file.write(test_dom.toxml('utf-8'))
+        except:
+            e = _("No se ha podido escribir el fichero bpts ") + bpts
+            log.error(e)
+            raise ProyectoRecuperable(e)
 
     ## @}
 
