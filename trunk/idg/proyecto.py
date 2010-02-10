@@ -501,19 +501,26 @@ class Proyecto(object):
         """@brief Elimina todos los casos de un bpts
         @param ruta La ruta al bpts a vaciar."""
 
+        log.debug(_("Vaciando de casos de prueba el fichero: ") + ruta)
+
         try:
-            test_dom = md.parse(self.test)
+            test_dom = md.parse(ruta)
         except:
-            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            e =  _("No se ha podido cargar el fichero bpts ") + ruta
             log.error(e)
             raise ProyectoRecuperable(e)
 
         for caso in test_dom.getElementsByTagNameNS(self.test_url, 'testCase'):
-            test_dom.removeChild(caso)
+            caso.parentNode.removeChild(caso)
 
         try:
             file = open(self.test, 'w')
             file.write(test_dom.toxml('utf-8'))
+        except:
+            e =  _("No se ha podido escribir el fichero bpts ") + ruta
+            log.error(e)
+            raise ProyectoRecuperable(e)
+
 
     def rm_caso(self, btps, caso):
         """@brief Elimina un caso de prueba del test.bpts.
