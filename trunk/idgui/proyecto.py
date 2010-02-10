@@ -261,6 +261,35 @@ class ProyectoUI:
             self.bpts_nombre_label.set_text(fichero)
             self.bpts_n_label.set_text(str(len(self.proy.casos[fichero])))
             self.bpts_nsel_label.set_text(str(""))
+
+    def add_casos(self):
+        """@brief Añade los ficheros seleccionados para ser ejecutados""" 
+        # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
+        m = self.bpts_tree # Acortar el nombre
+
+        f = m.get_iter_root()   # El primer fichero
+        # Recorremos todos los ficheros 
+        while not f is None:
+            # Si está marcado, miramos los casos hijos
+            if m.get_value(f, 2) :
+                fnom = m.get_value(f, 0)    # Nombre del fichero
+                c = m.iter_children(f)      # El primer hijo
+                log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
+
+                # Recorremos todos los casos hijos de fichero 
+                while not c is None:
+
+                    # Añadimos el nombre del fichero y del caso si este está activo
+                    if m.get_value(c,2) :
+                        cnom = m.get_value(c, 0) # Nombre del caso
+                        self.proy.add_caso(fnom, cnom) 
+                        log.debug(_("\t y el caso: ") + cnom)
+
+                    # Siguiente caso
+                    c = m.iter_next(c)
+
+            # Siguiente fichero
+            f = m.iter_next(f)
     ## @}
 
     ## @name Callbacks Casos
@@ -300,6 +329,11 @@ class ProyectoUI:
                     model.set_value(child, 2, val)
                     child = model.iter_next(child)
 
+    def on_proy_casos_ejec_ana_boton(self, widget):
+        self.add_casos()
+
+    def on_proy_casos_ejec_boton(self, widget):
+        self.add_casos()
     ##@}
 
 
