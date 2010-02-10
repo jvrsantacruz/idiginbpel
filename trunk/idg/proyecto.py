@@ -497,6 +497,46 @@ class Proyecto(object):
 
         self.hay_casos = True
 
+    def vaciar_bpts(self, ruta):
+        """@brief Elimina todos los casos de un bpts
+        @param ruta La ruta al bpts a vaciar."""
+
+        try:
+            test_dom = md.parse(self.test)
+        except:
+            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            log.error(e)
+            raise ProyectoRecuperable(e)
+
+        for caso in test_dom.getElementsByTagNameNS(self.test_url, 'testCase'):
+            test_dom.removeChild(caso)
+
+        try:
+            file = open(self.test, 'w')
+            file.write(test_dom.toxml('utf-8'))
+
+    def rm_caso(self, btps, caso):
+        """@brief Elimina un caso de prueba del test.bpts.
+        @param bpts Nombre del fichero bpts del caso.
+        @param caso Nombre del caso dentro del bpts a borrar."""
+
+        nombre = "%s:%s" % (bpts,caso)
+
+        try:
+            test_dom = md.parse(self.test)
+        except:
+            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            log.error(e)
+            raise ProyectoRecuperable(e)
+
+        caso_dom = [f for f in test_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == nombre]
+        if len(caso_dom) == 0 :
+            log.warning(_("Al eliminar un caso del test.bpts no se ha encontrado el caso en test.bpts ") + nombre)
+            return
+        caso_dom  = caso_dom[0]
+
+        test_dom.removeChild( caso_dom )
+
     def add_caso(self, bpts, caso):
         """@brief Añade un caso de prueba en un bpts al test.bpts.
            @param bpts Nombre del fichero bpts a listar.
