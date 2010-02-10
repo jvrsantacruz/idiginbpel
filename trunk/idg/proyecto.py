@@ -11,6 +11,7 @@ from instrum import Instrumentador
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
 
+import util.xml
 import util.logger
 
 log = util.logger.getlog('idg.proyecto')
@@ -535,6 +536,9 @@ class Proyecto(object):
         test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
         # Ponerle el nuevo nombre fichero:caso
         test_cases.setAttribute('name', nombre)
+
+        # Declarar inline los namespaces huerfanitos 
+        util.xml.minidom_namespaces(caso_dom)
 
         # Clonar el caso y sus hijos, y añadirlo al test
         test_cases.appendChild( caso_dom.cloneNode(True) ) 
