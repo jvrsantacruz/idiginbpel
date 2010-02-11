@@ -223,7 +223,7 @@ class ProyectoUI:
         self.bpts_view = self.gtk.get_object("proy_casos_view")
 
         # Actualizar los casos en la vista
-        self.actualizar_bpts_tree()
+        self.cargar_bpts_tree()
         # Marcar los casos que estén en el test.bpts 
         self.marcar_bpts_tree()
 
@@ -266,12 +266,9 @@ class ProyectoUI:
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
 
-    def actualizar_bpts_tree(self):
-        """@brief Actualiza los ficheros btps en el treeview."""
-        # Iconos de fichero y de caso
-        #imgfich = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
-        #imgcaso = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
-        # Map fichero [caso1, caso2 ... ]
+    def cargar_bpts_tree(self):
+        """@brief Carga el contenido del diccionario de casos  en el tree store
+        de casos"""
         # Desconectar la vista
         self.bpts_view.set_model(None)
 
@@ -286,6 +283,46 @@ class ProyectoUI:
 
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
+
+    def actualizar_bpts_tree(self):
+        """@brief Actualiza los ficheros de casos en el tree store de casos con
+        respecto al diccionario de casos."""
+        # Iconos de fichero y de caso
+        #imgfich = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
+        #imgcaso = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
+        # Map fichero [caso1, caso2 ... ]
+
+        self.bpts_view.set_model(None) # Desconectar la vista del modelo
+
+        casos = self.proy.casos  # Acortar el nombre del diccionario de casos
+        ficheros = casos.keys()  # Lista de los ficheros que hay en casos
+
+        m = self.bpts_tree       # Acortar el nombre al modelo tree store
+        f = m.get_iter_root()    # Primer fichero en el tree store
+
+        # Recorremos todos los ficheros
+        while not f is None :
+            fnom = m.get_value(f, 0)  # Nombre del fichero
+            try:
+                ficheros.remove(fnom) # Lo tachamos de la lista
+            except:
+                # Si no estaba en la lista, es que es viejo y se ha borrado
+                # lo eliminamos del tree. 
+                fnext = m.iter_next(f)
+                m.remove(f)
+                f = fnext
+            else:
+                f = m.iter_next(f)
+
+        # Ahora recorremos lo que queda en la lista
+        # los que no se hayan tachado, son los añadidos nuevos
+        for fnom in ficheros :
+            it = m.append(None, [fnom, gtk.STOCK_OPEN, True]) # Añadir fichero
+            # Añadir los casos para ese fichero
+            for c in casos[fnom] :  
+                m.append(it, [c, gtk.STOCK_FILE, True])       # Añadir caso
+
+        self.bpts_view.set_model(self.bpts_tree) # Conectar la vista de nuevo
 
     def info_bpts_fichero(self,fichero):
         """@brief Establece la información sobre un fichero de casos de prueba
