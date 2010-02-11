@@ -224,11 +224,47 @@ class ProyectoUI:
 
         # Actualizar los casos en la vista
         self.actualizar_bpts_tree()
+        # Marcar los casos que estén en el test.bpts 
+        self.marcar_bpts_tree()
 
         # Información sobre el caso
         self.bpts_nombre_label = self.gtk.get_object("proy_casos_info_nombre_label")
         self.bpts_n_label = self.gtk.get_object("proy_casos_info_n_label")
         self.bpts_nsel_label = self.gtk.get_object("proy_casos_info_nsel_label")
+
+    def marcar_bpts_tree(self):
+        """@brief Marca o desmarca la selección con respecto a los casos metidos en test.bpts"""
+        casos = self.proy.list_bpts(self.proy.test)
+
+        # Desconectar la vista
+        self.bpts_view.set_model(None)
+
+        m = self.bpts_tree # Acortar el nombre al tree
+
+        f = m.get_iter_root() # El primer fichero
+        # Recorrer todos los ficheros
+        while not f is None :
+            fnom = m.get_value(f, 0) # Nombre del fichero
+            m.set_value(f, 2, False) # Marcarlo como falso
+            c = m.iter_children(f)   # Primer hijo
+
+            # Recorrer todos los hijos
+            while not c is None :
+                cnom = m.get_value(c, 0) # Nombre del caso
+                nombre = "%s:%s" % (fnom, cnom) # Nombre en el test.bpts
+
+                # Marcarlo si está en el test.bpts 
+                esta = nombre in casos
+                m.set_value(c, 2, esta )
+                # Marcar el padre si está alguno de sus hijos
+                if esta :
+                    m.set_value(f, 2, esta )
+                c = m.iter_next(c)
+
+            f = m.iter_next(f)
+
+        # Conectar la vista de nuevo
+        self.bpts_view.set_model(self.bpts_tree)
 
     def actualizar_bpts_tree(self):
         """@brief Actualiza los ficheros btps en el treeview."""
