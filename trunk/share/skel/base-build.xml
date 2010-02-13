@@ -57,9 +57,14 @@
         <fail message="Este fichero Ant no se usa directamente, sino que ha de ser importado por otro"/>
     </target>
 
-    <target name="test-and-analyze" depends="test,analyze"
-        description="Runs all tests and analyses the results with Daikon"/>
+<!-- Antiguo, le eliminamos la dependencia de test -->
+    <!-- <target name="test-and-analyze" depends="test,analyze"
+	description="Runs all tests and analyses the results with Daikon"/> -->
+    <target name="test-and-analyze" depends="analyze"
+	description="Runs all tests and analyses the results with Daikon"/> 
 
+    <!-- Antiguo, le eliminamos la dependencia de build-bpr-->
+    <!-- <target name="test" depends="" description="Runs all tests with BPELUnit"> -->
     <target name="test" depends="build-bpr" description="Runs all tests with BPELUnit">
         <!-- Ejecutamos BPELUnit -->
         <bpelunit testsuite="${bptsfile}" bpelunitdir="${env.BPELUNIT_HOME}">      
