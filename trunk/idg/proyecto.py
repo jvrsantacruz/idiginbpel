@@ -3,14 +3,16 @@
 
 import os
 import os.path as path
-import commands 
-import shutil 
 import sys
-from threading import Lock
-from instrum import Instrumentador
-from xml.dom import minidom as md
-from xml.etree import ElementTree as et
 
+import subprocess as subproc
+import xml.dom.minidom as md
+import xml.etree.ElementTree as et
+import urllib
+import shutil 
+import re
+
+from instrum import Instrumentador
 import util.xml
 import util.logger
 
@@ -207,11 +209,11 @@ class Proyecto(object):
         self.casos = {}
         ## @}
 
-        ## @name Threading
+        ## @name Ejecución
         ## @{
 
-        ## Lock del instrumentador
-        self.inst_lock = Lock()
+        ## Subproceso de la ejecución
+        self.ejec_subproc = None
         ## Thread instrumentador
         self.inst_thread = None
         ## @}
@@ -361,14 +363,65 @@ class Proyecto(object):
         else:
             return files
 
+    ## @}
+
+    ## @name Ejecuciones
+    ## @{
+
     def instrumentar(self):
-        """@brief Instrumenta el proyecto o lanza una excepción.""" 
+        """@brief Instrumenta el proyecto mediante dos subprocesos.""" 
         # No queremos dos thread para hacer lo mismo
         if self.inst_thread is None or not self.inst_thread.isAlive():
             self.inst = False
             # Comenzar la instrumentación
             self.inst_thread = Instrumentador(self)
             self.inst_thread.start()
+
+    def ejecutar(self):
+        """@brief Ejecuta lost casos de prueba del proyecto en el servidor ABpel. """
+
+        # Ejecutar el ant en un subproceso aparte
+        cmd = ("ant", "-f", self.build, "test")
+        log.info(_("Ejecutando tests: ") + str(cmd) )
+        # Escribimos en una tubería desde la cual podremos leer el log
+        self.ejec_subproc = subproc.Popen(cmd, shell=False, stdout=subproc.PIPE)
+
+    def comprobar_abpel(self):
+        """@brief Comprueba el estado del servidor ActiveBpel.
+           @returns True si está corriendo, False si no lo está, None si no se
+           pudo conectar.
+           """
+
+        # Abrir la url del servidor en el puerto predeterminado de tomcat
+        url = "http://%s:%s/BpelAdmin/home.jsp"  % (self.svr, '8080')
+
+        # Realizar la conexión
+        try:
+            f = urllib.urlopen(url)
+            log.info(_("Comprobando servidor ActiveBPEL en: ") + url)
+        except IOError:
+            log.error(_("No se pudo realizar la conexión con ActiveBPEL en: ") +
+                        url)
+        else:
+            # Comprobar el código http 
+            code = f.getcode()
+            log.debug(_("Código de la conexión al servidor ActiveBPEL: ") + \
+                      str(code))
+
+            # Expresión regular para saber si está activo
+            patron = re.compile('.*Running.*')
+
+            activo = False
+            # leer el resultado
+            for line in f :
+                if patron.match(line) :
+                    activo = True
+                    break
+            log.info(_("Servidor ActiveBPEL : " ) + 'Running' if activo else 'Stopped' )
+
+            return activo
+
+        return None
 
     ## @}
 
@@ -536,7 +589,6 @@ class Proyecto(object):
             e =  _("No se ha podido escribir el fichero bpts ") + ruta
             log.error(e)
             raise ProyectoRecuperable(e)
-
 
     def rm_caso(self, btps, caso):
         """@brief Elimina un caso de prueba del test.bpts.
