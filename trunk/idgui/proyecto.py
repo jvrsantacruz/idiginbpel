@@ -13,6 +13,7 @@ log = util.logger.getlog('idgui.proyecto')
 from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable
 from instrum import Comprobador
+from ejecucion import Ejecucion
 
 class ProyectoUI:
     """@brief Manejo de la interfaz de usuario del proyecto."""
@@ -68,6 +69,7 @@ class ProyectoUI:
 
         self.__init_config()
         self.__init_casos()
+        self.__init_ejec()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -410,9 +412,46 @@ class ProyectoUI:
 
     def on_proy_casos_ejec_ana_boton(self, widget):
         self.add_casos()
+        self.proy.ejecutar()
 
     def on_proy_casos_ejec_boton(self, widget):
+        # Añadimos los casos seleccionados
         self.add_casos()
+        # Pasamos a la página de la ejecución
+        self.proyecto_notebook.next_page()
+        # Poner el estado del servidor
+        self.comprobar_servidor_abpel()
+        # Ejecutar los tests
+        self.proy.ejecutar()
+        # Cada segundo, comprobarlo
+        e = Ejecucion(self.proy,self,1)
+        e.start()
+
+
     ##@}
+
+    ## @name Ejecución
+    ## @{
+
+    def __init_ejec(self):
+        """@brief Inicializa la parte de ejecución. """
+
+        self.ejec_log_buffer = self.gtk.get_object('proy_ejec_log_buffer')
+        self.ejec_log_text = self.gtk.get_object('proy_ejec_log_text')
+        self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
+
+        #comprobar_servidor_abpel()
+
+    def comprobar_servidor_abpel(self, widget=None):
+        # Label de estado del servidor
+        status = ""
+        if self.proy.comprobar_abpel() :
+            status = "Online"
+        else:
+            status = "Offline"
+
+        self.ejec_estado_label.set_text(status)
+
+    ## @}
 
 
