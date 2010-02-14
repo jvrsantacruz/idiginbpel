@@ -391,24 +391,55 @@ class ProyectoUI:
             self.actualizar_bpts_tree()
 
     def on_bpts_view_check_toggle(self,render,path):
-        # Obtenemos el modelo y el iterador
+        """@brief Callback de marcar un caso para ejecución en el tree de la
+        parte de casos.
+        """
+        # Obtenemos el modelo y el iterador del tree
         model = self.bpts_tree
         it = model.get_iter_from_string(path)
 
-        # Cambiar el valor booleano
+        # El comportamiento es:
+        # Si se marca/desmarca un fichero, marcar/desmarcar todos sus casos
+        # Si se marca un caso de un fichero sin ninguno, marcar el fichero
+        # Si se desmarca un caso de un fichero y se queda vacio, desmarcar el
+        # fichero
         if not it is None:
             # Cambiamos el valor que tiene ahora mismo
             val = not (model.get_value(it, 2))
             model.set_value(it, 2, val)
+            parent = model.iter_parent(it) # Padre
 
             # Si es un fichero, cambiar también sus hijos
-            # Y mostrar su información
-            if model.get_value(it, 1) == gtk.STOCK_OPEN :
+            # Sabemos que es un fichero si su padre es None
+            # Mostrar su información en la gui, del fichero
+            if parent is None :
                 self.info_bpts_fichero(model.get_value(it,0))
                 child = model.iter_children(it)
+                # Recorrer los casos y marcarlos igualmente
                 while not child is None:
                     model.set_value(child, 2, val)
                     child = model.iter_next(child)
+
+            # Si lo que estamos marcando/desmarcando es un caso
+            else :
+                # Si lo marcamos y el padre estaba desmarcado, marcarlo
+                if val == True :
+                    model.set_value(parent, 2, val)
+                # Si lo desmarcamos, y el fichero queda vacio, desmarcar padre 
+                else :
+                    vacio = True
+                    # Recorremos los hijos de parent mirando si hay alguno marcado
+                    child = model.iter_children(parent)
+                    while not child is None:
+                        # Si hay al menos 1 marcado, terminamos
+                        if model.get_value(child, 2) == True :
+                            vacio = False
+                            break
+                        child = model.iter_next(child) # Siguiente
+
+                    # Si el fichero se ha quedado vacio, lo desmarcamos
+                    if vacio :
+                        model.set_value(parent, 2, False)
 
     def on_proy_casos_ejec_ana_boton(self, widget):
         self.add_casos()
