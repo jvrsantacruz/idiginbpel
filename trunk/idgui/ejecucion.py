@@ -17,12 +17,12 @@ class Ejecucion(Thread):
     ## Expresión regular para filtrar el log
     ## Filtra cadenas como esta:
     ## [clase] 1 [caso] INFO paquete.paquetito - Mensaje: puede poner de todo
-    ##  \[[^]]*\]  Es \[.*\] pero con ojo
+    ##  \[[^]]*\]  Es \[.*\] pero con cuidado
     ##  Los campos están separados por un solo espacio
     ## \d+ es el número
-    ## (\w+) es para pillar el INFO
+    ## (\w+) es para pillar el INFO/WARNING/ERROR
     ## (\w|\W) es para pillar el paquete
-    ## Las backreferencias son: 
+    ## Las backreferences son: 
     ## 1: paquete 2: clase 3: dummy 4: mensaje
     re_str = " *\[[^]]*\] \d+ (\[[^]]*\]) (\w+) (\w|\W)+ - (.*)$" 
 
@@ -43,13 +43,12 @@ class Ejecucion(Thread):
         self.relog = re.compile(self.re_str)
 
     def run(self):
-        textview = self.ui.ejec_log_text
         buffer = self.ui.ejec_log_buffer
         subproc = self.proy.ejec_subproc
-        log.debug(str(subproc))
 
         # Control para el término del proceso
-        end = not subproc.poll() is None
+        # poll es None si el proceso no ha terminado aún.
+        end = not subproc is None and not subproc.poll() is None
 
         # El subproceso debe existir y no haber terminado
         while not subproc is None and not end:
@@ -76,15 +75,17 @@ class Ejecucion(Thread):
 
                     # Filtrar las lineas del log
                     m = self.relog.match(line)
-                    # Si es una linea de log, eliminar los campos que no
+                    # Si es una linea de log, nos quedamos con los campos que
                     # queremos
                     if m : 
                         line = m.expand('\g<1> \g<2> \g<4>\n')
 
+                    # Lo añadimos al final del buffer de texto
                     bf_end = buffer.get_end_iter()
                     buffer.insert(bf_end, line) 
-            #except:
-            #    log.debug("Error al monitorizar el proceso")
+            except:
+                log.debug("Error al monitorizar el proceso")
+
             finally:
                 gtk.gdk.threads_leave()
 
