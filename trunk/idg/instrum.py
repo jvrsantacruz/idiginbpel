@@ -1,7 +1,7 @@
 # Clase Instrumentadora
 # -*- coding: utf-8 -*-
 
-import commands
+import subprocess
 import re
 import os.path as path
 from threading import Thread
@@ -36,7 +36,8 @@ class Instrumentador(Thread):
         # Comenzar la instrumentación mandando a consola el comando
         cmd = "ant -f %s build-bpr" % self.proy.build
         log.info(_("Ejecutando: ") + cmd)
-        self.out = commands.getoutput(cmd)
+        proc =  subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        self.out = proc.communicate()[0]
         self.cont = self.cont + 1
 
     def comprobar(self):
@@ -72,5 +73,5 @@ class Instrumentador(Thread):
         # Establecemos en la clase proyecto si se ha instrumentado bien o no.
         self.proy.inst = c
         log.debug(self.out)
-        log.info(_("Instrumentación terminada"))
+        log.info(_("Instrumentación terminada ") + str(c))
 
