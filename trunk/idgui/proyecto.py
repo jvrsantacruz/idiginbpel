@@ -442,22 +442,20 @@ class ProyectoUI:
                         model.set_value(parent, 2, False)
 
     def on_proy_casos_ejec_ana_boton(self, widget):
+        # Añadimos los casos seleccionados
         self.add_casos()
-        self.proy.ejecutar()
+        # Pasamos a la página de la ejecución
+        self.proyecto_notebook.next_page()
+        # Y comenzamos la ejecución
+        self.ejecutar()
 
     def on_proy_casos_ejec_boton(self, widget):
         # Añadimos los casos seleccionados
         self.add_casos()
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
-        # Poner el estado del servidor
-        self.comprobar_servidor_abpel()
-        # Ejecutar los tests
-        self.proy.ejecutar()
-        # Cada segundo, comprobarlo
-        e = Ejecucion(self.proy,self,1)
-        e.start()
-
+        # Y comenzamos la ejecución
+        self.ejecutar()
 
     ##@}
 
@@ -467,11 +465,74 @@ class ProyectoUI:
     def __init_ejec(self):
         """@brief Inicializa la parte de ejecución. """
 
+        # Obtenemos los objetos que empleamos
         self.ejec_log_buffer = self.gtk.get_object('proy_ejec_log_buffer')
         self.ejec_log_text = self.gtk.get_object('proy_ejec_log_text')
         self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
+        self.ejec_tree = self.gtk.get_object('proy_ejec_tree')
+        self.ejec_view = self.gtk.get_object('proy_ejec_view')
 
-        #comprobar_servidor_abpel()
+        # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
+        self.comprobar_servidor_abpel()
+
+    def cargar_ejec_tree(self):
+        """@brief Actualiza el tree de la parte de ejecución con los casos que
+        entran para ejecutarse."""
+
+        # Obtenemos los casos que están en el test.bpts para ejecutarse
+        lcasos = self.proy.list_bpts(self.proy.test)
+        casos = {}
+        # Los ponemos de la forma casos[fichero] = [caso1, caso2 ..]
+        for caso in lcasos :
+            fnom, cnom = caso.split(':') # nombrefichero:nombrecaso
+            if not fnom in casos : 
+                casos[fnom] = []
+            casos[fnom].append(cnom) 
+
+        # Desconectamos el modelo treestore del treeview
+        self.ejec_view.set_model( None )
+
+        # Acortar el nombre del modelo
+        m = self.ejec_tree
+
+        # Los introducimos en el tree_store de la parte de ejecución
+        # Mantendremos un map con paths para acceder a los ficheros 
+        # fácilmente en self.ejec_path_casos[fnom:cnom] = path
+        self.ejec_path_casos = {}
+        for caso in lcasos:
+            fnom, cnom = caso.split(':')
+            parent = m.append( None, [fnom, gtk.STOCK_OPEN, 0] )
+            # Añadir sus casos hijos
+            for cnom in casos[fnom]:
+                child = self.ejec_tree.append(parent, [cnom, gtk.STOCK_FILE, 0] )
+                # Almacenar el path
+                self.ejec_path_casos["%s:%s" % (fnom, cnom)] = m.get_path(child) 
+
+        # Conectamos de nuevo el treeview con el treestore
+        self.ejec_view.set_model( self.ejec_tree )
+
+        # Expandirlo todo todo
+        self.ejec_view.expand_all()
+
+    def ejecutar(self):
+        # Actualizamos el tree de la parte de ejecución
+        self.cargar_ejec_tree()
+        # Poner el estado del servidor
+        self.comprobar_servidor_abpel()
+        # Cambiar el botón de ejecutar por el de cancelar
+        self.ejec_control_boton.set_label(_("Detener"))
+        # Colapsar todos los casos
+
+        # Ejecutar los tests
+        self.proy.ejecutar()
+        # Thread de comprobación, lo hará cada segundo.
+        e = Ejecucion(self.proy,self,1)
+        e.start()
+
+    ## @}
+
+    ## @name Ejecución Callbacks
+    ## @{
 
     def comprobar_servidor_abpel(self, widget=None):
         # Label de estado del servidor
@@ -481,8 +542,9 @@ class ProyectoUI:
         else:
             status = "Offline"
 
+        # Ponemos el mensaje en el label con el status
         self.ejec_estado_label.set_text(status)
 
-    ## @}
 
+    ## @}
 
