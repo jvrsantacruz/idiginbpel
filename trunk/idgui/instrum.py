@@ -25,12 +25,6 @@ class Comprobador(Thread):
     def run(self):
         thread = self.proy.inst_thread
         thread.join()
-        #while not thread is None and thread.isAlive() : 
-            # Actualizar barra
-            # Mandar a dormir para esperar
-            # log.debug("Comprobando instrumentación")
-            # self.proy.inst_thread.join()
-            # time.sleep(self.t)
         try:
             gtk.gdk.threads_enter()
             if self.proy.inst:
