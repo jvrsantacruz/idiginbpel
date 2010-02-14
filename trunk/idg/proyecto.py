@@ -384,7 +384,12 @@ class Proyecto(object):
         cmd = ("ant", "-f", self.build, "test")
         log.info(_("Ejecutando tests: ") + str(cmd) )
         # Escribimos en una tubería desde la cual podremos leer el log
-        self.ejec_subproc = subproc.Popen(cmd, shell=False, stdout=subproc.PIPE)
+        # Sin expansión de argumentos por shell
+        # El resultado va todo a stdout, el de stderr también.
+        self.ejec_subproc = subproc.Popen(cmd, 
+                                          shell=False,
+                                          stdout=subproc.PIPE,
+                                          stderr=subproc.STDOUT)
 
     def comprobar_abpel(self):
         """@brief Comprueba el estado del servidor ActiveBpel.
