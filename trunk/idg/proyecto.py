@@ -428,6 +428,15 @@ class Proyecto(object):
 
         return None
 
+    def cancelar_ejecucion(self):
+        """@brief Termina la ejecución matando el proceso relacionado."""
+        subproc = self.ejec_subproc
+        if subproc is not None and subproc.poll() is not None :
+            subproc.kill()
+            return True
+        else :
+            return False
+
     ## @}
 
     ## @name Casos de prueba

@@ -453,16 +453,12 @@ class ProyectoUI:
     def on_proy_casos_ejec_ana_boton(self, widget):
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
-        # Añadimos los casos seleccionados
-        self.add_casos()
         # Y comenzamos la ejecución
         self.ejecutar()
 
     def on_proy_casos_ejec_boton(self, widget):
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
-        # Añadimos los casos seleccionados
-        self.add_casos()
         # Y comenzamos la ejecución
         self.ejecutar()
 
@@ -676,11 +672,22 @@ class ProyectoUI:
         self.ejec_control_boton.set_label(_("Ejecutar"))
 
     def ejec_terminar(self):
-        """@brief Pone los mensajes de éxito en la gui al terminar
-        correctamente la ejecución.
+        """@brief Termina la ejecución y establece los mensajes
+        correspondientes.
         """
+        # Si la ejecución está en curso, se cancelará
+        # Devuelve true si ha matado abruptamente el subproceso
+        kill = self.proy.cancelar_ejecucion()
+
+        # Poner el estado en ejecución terminada
+        if kill :
+            self.idgui.estado(_("Ejecucion cancelada"))
+        else:
+            self.idgui.estado(_("Ejecucion terminada"))
 
     def ejecutar(self):
+        # Añadimos los casos seleccionados
+        self.add_casos()
         # Actualizamos el tree de la parte de ejecución
         self.cargar_ejec_tree()
 
@@ -724,6 +731,14 @@ class ProyectoUI:
         self.idgui.estado( _("Conexión con el servidor Abpel: ") + status)
 
         return status == "Online"
+
+    def on_proy_ejec_control_boton(self, widget):
+        if widget.get_label() == _("Detener") :
+            self.ejec_terminar()
+            widget.set_label(_("Ejecutar"))
+        else:
+            self.ejecutar()
+            widget.set_label(_("Detener"))
 
     ## @}
 
