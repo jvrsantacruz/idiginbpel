@@ -34,6 +34,7 @@ class Idgui(object):
 
         # Thread safe
         gobject.threads_init()
+        gtk.gdk.threads_init()
 
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))

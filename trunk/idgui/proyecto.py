@@ -471,13 +471,27 @@ class ProyectoUI:
         self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
         self.ejec_tree = self.gtk.get_object('proy_ejec_tree')
         self.ejec_view = self.gtk.get_object('proy_ejec_view')
+        self.ejec_control_boton = \
+        self.gtk.get_object('proy_ejec_control_boton')
+        self.ejec_log_scroll = self.gtk.get_object('proy_ejec_log_scroll')
 
         # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
         self.comprobar_servidor_abpel()
 
+        ## Diccionario con los casos listados y sus rutas
+        ## de la forma ejec_path_casos[fichero:caso] = path
+        self.ejec_path_casos = {}
+
+        ## Lista con los iconos para los diferentes niveles
+        self.ejec_iconos = [ gtk.STOCK_OPEN, 
+                            gtk.STOCK_REFRESH,
+                            gtk.STOCK_EXECUTE,
+                            gtk.STOCK_YES,
+                            gtk.STOCK_CANCEL ]
+
     def cargar_ejec_tree(self):
-        """@brief Actualiza el tree de la parte de ejecución con los casos que
-        entran para ejecutarse."""
+        """@brief Lee los casos que van a entrar en ejecución y actualiza el
+        tree de la parte de ejecución con ellos."""
 
         # Obtenemos los casos que están en el test.bpts para ejecutarse
         lcasos = self.proy.list_bpts(self.proy.test)
@@ -495,12 +509,14 @@ class ProyectoUI:
         # Acortar el nombre del modelo
         m = self.ejec_tree
 
+        # Limpiamos lo que hay en el store (modelo)
+        m.clear()
+
         # Los introducimos en el tree_store de la parte de ejecución
         # Mantendremos un map con paths para acceder a los ficheros 
         # fácilmente en self.ejec_path_casos[fnom:cnom] = path
         self.ejec_path_casos = {}
-        for caso in lcasos:
-            fnom, cnom = caso.split(':')
+        for fnom in casos :
             parent = m.append( None, [fnom, gtk.STOCK_OPEN, 0] )
             # Añadir sus casos hijos
             for cnom in casos[fnom]:
@@ -514,20 +530,148 @@ class ProyectoUI:
         # Expandirlo todo todo
         self.ejec_view.expand_all()
 
+    def activar_ejec_caso(self, caso, nivel):
+        """@brief Actualiza el estado de un caso en el treeview.
+        Pone los iconos correspondientes y el estado de un caso en el TreStore.
+        Expande y colapsa los ficheros según vayan ejecutándose.
+        @param caso El nombre del caso de la forma fichero:caso.
+        @param nivel El nivel al que se va a poner el caso.
+            0 Normal
+            1 En espera
+            2 En ejecución
+            3 OK
+            4 Error
+        """
+        # Comprobar que tenemos la ruta del caso
+        if caso not in self.ejec_path_casos :
+            log.warning(_("El caso no está en el treeview: ") + caso)
+            return
+
+        # Comprobar que el nivel es el adecuado
+        if nivel < 0 or  nivel >= len(self.ejec_iconos) :
+            log.warning(_("No existe icono para el nivel: ") + str(nivel))
+            return 
+
+        # Acortar el nombre del treeStore (modelo)
+        m = self.ejec_tree
+        # Acortar el nombre del TreeView (vista)
+        v = self.ejec_view
+        # Icono correspondiente al nivel actual
+        icono = self.ejec_iconos[nivel]
+        # Iterador del caso en el TreeView a partir de la ruta
+        path = self.ejec_path_casos[caso]
+        iter = m.get_iter(path)
+
+        # Actualizar el valor del nivel
+        m.set_value(iter, 2, nivel)
+        # Icono para el nivel 
+        m.set_value(iter, 1, icono)
+
+
+        # Obtenemos el padre del caso 
+        padre = m.iter_parent(iter)
+        # Expandimos al padre en el view
+        v.expand_to_path(path)
+
+        # Actualizar los iconos y el nivel de los ficheros y casos
+
+        # Si nivel es 0, actualizar al padre con gtk.STOCK_OPEN
+        # Si nivel es 2 o 3 actualizar al padre con nivel y su icono
+        if 0 <= nivel and nivel <= 2 :
+            m.set_value(padre, 1, icono if nivel != 0 else gtk.STOCK_OPEN)
+            m.set_value(padre, 2, nivel)
+
+        # Si nivel es 3 o 4 y todos los casos tienen nivel 3 o 4
+        #  actualizar a padre con 3 si todos son 3, o con 4 si hay algún 4
+        elif 3 <= nivel and nivel <= 4 :
+            # Flags para la búsqueda
+            have4 = False
+            have_other = False
+            all3 = True
+            # Recorremos los hijos
+            child = m.iter_children(padre)
+            while not child is None :
+                child_nv = m.get_value(child, 2)
+                # ¿Hay alguno distinto de 3 o 4? Entonces fuera
+                have_other = child_nv != 3 and child_nv != 4
+                if have_other :
+                    break
+                else :
+                    # Realizar las comprobaciones
+                    have4 = child_nv == 4 or have4  # ¿Hay algún 4?
+                    all3 = child_nv == 3 and all3   # ¿Todos son 3?
+                    child = m.iter_next(child) # Siguiente
+
+            # Ahora ponemos el estado del padre mirando los flags
+            # Si todos son 3-4
+            if not have_other :
+                # Si todos son 3, ponemos el padre a 3
+                if all3 :
+                    m.set_value(padre, 1, icono)
+                    m.set_value(padre, 2, 3)
+                # Si alguno es 4 ponemos el padre a 4
+                elif have4 :
+                    m.set_value(padre, 1, self.ejec_iconos[4])
+                    m.set_value(padre, 2, 4)
+
+                # Colapsamos el fichero (todos), pues se ha terminado la ejecución
+                #  de todos sus casos
+                v.collapse_all()
+
+    def actualizar_ejec_iconos(self, nivel, path="", recursivo=True):
+        """@brief Actualiza el estado de los iconos del treeview de la parte de
+        ejecución.
+        @param nivel Nivel al que se pone el caso: 
+             0 Normal
+             1 En espera
+             2 En ejecución
+             3 OK
+             4 Error
+        @param path (Opcional) Ruta a cambiar. (Por defecto todo el view)
+        @param recursivo (Opcional) Si es un fichero, sus casos también.
+        """
+        # Acortar el nombre del modelo treeStore
+        m  = self.ejec_tree 
+        # Iterador al elemento que vamos a cambiar
+        iter = m.get_iter(path) if path else m.get_iter_root()
+        # Icono a colocar
+        icono = self.ejec_iconos[nivel] 
+
+        # Comprobar el valor del nivel
+        if 4 < nivel or 0 > nivel :
+            log.warning(_("Nivel para actualizar_ejec_iconos fuera de rango"))
+            return
+
+        # Cambiar los iconos y los estados
+        hijo = False  # Primer nivel, no es un hijo
+        while not iter is None:
+            m.set_value(iter, 1, icono)
+            m.set_value(iter, 2, nivel)
+
+            # Si recursivo, seguir con sus hijos
+            if recursivo :
+                iter = m.iter_next(iter) if hijo else m.iter_children(iter) 
+                hijo = True
+
     def ejecutar(self):
         # Actualizamos el tree de la parte de ejecución
         self.cargar_ejec_tree()
-        # Poner el estado del servidor
-        self.comprobar_servidor_abpel()
         # Cambiar el botón de ejecutar por el de cancelar
         self.ejec_control_boton.set_label(_("Detener"))
         # Colapsar todos los casos
-
-        # Ejecutar los tests
-        self.proy.ejecutar()
-        # Thread de comprobación, lo hará cada segundo.
-        e = Ejecucion(self.proy,self,1)
-        e.start()
+        self.ejec_view.collapse_all()
+        # Ponerles a todos los casos y ficheros el icono de esperando
+        self.actualizar_ejec_iconos(1)
+        # Poner el estado del servidor
+        if self.comprobar_servidor_abpel() :
+            # Ejecutar los tests
+            self.proy.ejecutar()
+            # Thread de comprobación, lo hará cada segundo.
+            e = Ejecucion(self.proy,self,1)
+            e.start()
+        else:
+            pass
+            # self.ejec_conexion_error()
 
     ## @}
 
@@ -535,7 +679,11 @@ class ProyectoUI:
     ## @{
 
     def comprobar_servidor_abpel(self, widget=None):
+        """@brief Comprueba el servidor abpel y actualiza la gui con el
+        resultado.
+        @returns True si está activo, False si no lo está.
         # Label de estado del servidor
+        """
         status = ""
         if self.proy.comprobar_abpel() :
             status = "Online"
@@ -544,6 +692,8 @@ class ProyectoUI:
 
         # Ponemos el mensaje en el label con el status
         self.ejec_estado_label.set_text(status)
+
+        return status == "Online"
 
 
     ## @}

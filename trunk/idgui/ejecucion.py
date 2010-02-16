@@ -41,6 +41,9 @@ class Ejecucion(Thread):
     ## Expresión regular para capturar la parada de los casos
     re_stopcaso_str = "Stopping testCase Test Case (.*)$"
 
+    ## Expresión regular para capturar error de conexión
+    re_cnerror_str = ""
+
     def __init__(self,proy,proyUI,tiempo):
         """@brief Inicializa el Thread
         @param proy Instancia del proyecto
@@ -66,10 +69,11 @@ class Ejecucion(Thread):
         """
          @brief Filtra una línea del log, aplicando las expresiones regulares
          correspondientes y calculando el progreso de la ejecución.
+         @param line Línea obtenida del log.
          """
 
         # Filtrar las lineas del log
-        # Aplicamos expresiones hasta que una acierte
+        # Aplicamos todas las expresiones hasta que una acierte
         exps = ((self.re_log, "log") , (self.re_OK, "ok"), (self.re_KO, "ko"))
         m = name = None
         for rexp, nm in exps :
@@ -82,6 +86,7 @@ class Ejecucion(Thread):
         # queremos
         if name == "log" : 
             # Modificamos la línea para que quede bonita en el log
+            # Dejamos los campos de la clase, el nivel y el mensaje
             line = m.expand('\g<2> \g<3> \g<5>\n')
 
             if m.group(2) == 'main' and  \
@@ -105,6 +110,9 @@ class Ejecucion(Thread):
                 if name == "ini"  :
                     caso = e.group(1)
                     log.info(_("Iniciando caso: ") + caso)
+                    gtk.gdk.threads_enter()
+                    self.ui.activar_ejec_caso(caso, 2)
+                    gtk.gdk.threads_leave()
 
                 # Mensaje Test case passed.
                 # main INFO  Test case passed.
@@ -116,6 +124,9 @@ class Ejecucion(Thread):
                 elif name == "stop" :
                     caso = e.group(1)
                     log.info(_("Parado el caso: ") + caso)
+                    gtk.gdk.threads_enter()
+                    self.ui.activar_ejec_caso(caso, 3)
+                    gtk.gdk.threads_leave()
 
         elif name == "ok"  :
             log.info(_("Ejecución terminada correctamente"))
@@ -123,16 +134,21 @@ class Ejecucion(Thread):
         elif name == "ko" :
             log.info(_("Error al ejecutar"))
 
+        return line
+
     def run(self):
         """
         @brief Consulta el proceso de ejecución de los testcases y obtiene
         el log, actualizando la gui con el progreso de la misma.
         """
+        # Obtenemos el buffer de la interfaz
         buffer = self.ui.ejec_log_buffer
-        subproc = self.proy.ejec_subproc
+        view = self.ui.ejec_log_text
+        # self.ui.ejec_log_text.set_buffer(buffer) 
+        #buffer = gtk.TextBuffer()
 
-        # Limpiar el buffer de una anterior ejecución
-        buffer.set_text("")
+        # Obtenemos el subproceso instanciado en el proyecto
+        subproc = self.proy.ejec_subproc
 
         # Control para el término del proceso
         # poll es None si el proceso no ha terminado aún.
@@ -145,33 +161,27 @@ class Ejecucion(Thread):
             time.sleep(self.t)
             log.debug("Comprobando Tests")
 
-            try:
-                gtk.gdk.threads_enter()
+            # Saber si el proceso ha terminado
+            end = not subproc.poll() is None
+            # Leer lo que haya en la tubería
+            while 1 :
+                line = subproc.stdout.readline()
+                if not line:
+                    break
 
-                # Saber si el proceso ha terminado
-                end = not subproc.poll() is None
-                # Obtenemos un iterable sobre el que realizar un bucle
-                # El fichero de la tubería o una función iterable
-                # Tomar 5 líneas o todo el fichero si el proceso ha terminado
-                it_end = subproc.stdout if end else range(5)
+                # Filtramos la linea y la procesamos
+                line = self.filtrar(line)
 
-                # Leer 5 líneas del log o lo que queda de la tubería
-                # Y ponerlas en la gui en el buffer
-                #  filtrándolas y procesándolas antes
-                for line in it_end:
-                    # Si el proceso no ha terminado, line será un nº
-                    if not end:
-                        line = subproc.stdout.readline()
-
-                    # Filtramos la linea y la procesamos
-                    self.filtrar(line)
-
-                    # La añadimos al final del buffer de texto
-                    bf_end = buffer.get_end_iter()
-                    buffer.insert(bf_end, line) 
-            #except:
-            #    log.debug("Error al monitorizar el proceso")
-
-            finally:
-                gtk.gdk.threads_leave()
-
+                # La añadimos al final del buffer de texto
+                #bf_end = buffer.get_end_iter()
+                #buffer.place_cursor(bf_end)
+                #buffer.insert(bf_end, line) 
+                try:
+                    gtk.gdk.threads_enter()
+                    iter = buffer.get_end_iter()
+                    buffer.place_cursor(iter)
+                    buffer.insert(iter, line)
+                    view.scroll_to_mark(buffer.get_insert(), 0.1)
+                    #buffer.insert_at_cursor(line)
+                finally:
+                    gtk.gdk.threads_leave()
