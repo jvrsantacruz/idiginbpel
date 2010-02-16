@@ -9,6 +9,58 @@ from threading import Thread
 import util.logger
 log = util.logger.getlog('idgui.ejecucion')
 
+class Timer(Thread):
+        """@brief Calcula el tiempo de ejecución y lo establece en la gui
+          Muere cuando muere el thread de ejecución."""
+
+        def __init__(self, padre, ui):
+            """@brief Constructor del thread
+            @param padre Thread padre.
+            """
+            Thread.__init__(self)
+            self.tstart = time.time()
+            self.tnow = self.tstart - 1
+            self.padre = padre
+            self.ui = ui
+
+        def run(self):
+
+            while self.padre.is_alive() :
+                # Actualizar la hora si ha pasado un segundo
+                ttemp = time.time()
+                tstart = self.tstart
+
+                tnow = ttemp
+                diff = tnow - tstart
+                # Obtener dia, horas, minutos, segundos de la diferencia
+                date = time.gmtime(diff)
+                # Ajustar 01 días y 01 horas a 0 
+                days = date[2] - 1 
+                hours = date[3] - 1
+                min = date[4]
+                sec = date[5]
+
+                # No mostrar dias, horas o mins si no valen nada
+                strfmt = "%i %s" % (sec, _("segundos"))
+                if diff > 60 :
+                    strfmt += "%i %s " % (min, _("minutos"))
+                if diff > 3600 :
+                    strfmt += "%i %s " % (hours, _("horas"))
+                if diff > 86400 :
+                    strfmt += "%i %s " % (days, _("dias"))
+
+                # Obtener cadena con el tiempo formateado
+                strtm = time.strftime(strfmt, date)
+                # Actualizar la hora
+                try:
+                    gtk.gdk.threads_enter()
+                    self.ui.ejec_control_tiempo_label.set_text(strtm)
+                finally:
+                    gtk.gdk.threads_leave()
+
+                # Dormir el thread un segundo
+                time.sleep(1)
+
 class Ejecucion(Thread):
     """@brief Comprueba periódicamente, el estado de la ejecución de los
     tests leyendo de su log.
@@ -154,6 +206,11 @@ class Ejecucion(Thread):
         # poll es None si el proceso no ha terminado aún.
         end = not subproc is None and not subproc.poll() is None
 
+        # Tiempo desde el comienzo de ejecución
+        # Ejecuta cada segundo la función time en un thread aparte
+        thread_timer = Timer(self, self.ui)
+        thread_timer.start()
+
         # El subproceso debe existir y no haber terminado
         while not subproc is None and not end:
 
@@ -172,12 +229,9 @@ class Ejecucion(Thread):
                 # Filtramos la linea y la procesamos
                 line = self.filtrar(line)
 
-                # La añadimos al final del buffer de texto
-                #bf_end = buffer.get_end_iter()
-                #buffer.place_cursor(bf_end)
-                #buffer.insert(bf_end, line) 
                 try:
                     gtk.gdk.threads_enter()
+                    # La añadimos al final del buffer de texto
                     iter = buffer.get_end_iter()
                     buffer.place_cursor(iter)
                     buffer.insert(iter, line)
