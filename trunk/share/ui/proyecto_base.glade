@@ -32,6 +32,7 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="liststore1"/>
   <object class="GtkWindow" id="proy_fake_window">
     <child>
       <object class="GtkVBox" id="proy_base_contenedor">
@@ -842,6 +843,7 @@
                                       <object class="GtkTextView" id="proy_ejec_log_text">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="editable">False</property>
                                         <property name="buffer">proy_ejec_log_buffer</property>
                                       </object>
                                     </child>
@@ -1142,7 +1144,7 @@
                               <object class="GtkTreeView" id="treeview4">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="model">proy_casos_tree</property>
+                                <property name="model">liststore1</property>
                                 <property name="headers_clickable">False</property>
                                 <property name="search_column">0</property>
                                 <child>
@@ -1198,7 +1200,6 @@
       </object>
     </child>
   </object>
-  <object class="GtkAction" id="action1"/>
   <object class="GtkTextBuffer" id="proy_ejec_log_buffer"/>
   <object class="GtkTextBuffer" id="textbuffer2">
     <property name="text" translatable="yes">Fichero_prueba.Caso_prueba:::ENTER
