@@ -46,13 +46,13 @@ class Timer(Thread):
                 sec = date[5]
 
                 # No mostrar dias, horas o mins si no valen nada
-                strfmt = "%i %s" % (sec, _("segundos"))
+                strfmt = "%i s" % sec
                 if diff > 60 :
-                    strfmt += "%i %s " % (min, _("minutos"))
+                    strfmt = "%i m " % min + strmft
                 if diff > 3600 :
-                    strfmt += "%i %s " % (hours, _("horas"))
+                    strfmt = "%i h " % hours + strfmt
                 if diff > 86400 :
-                    strfmt += "%i %s " % (days, _("dias"))
+                    strfmt = "%i d " % days + strfmt
 
                 # Obtener cadena con el tiempo formateado
                 strtm = time.strftime(strfmt, date)
