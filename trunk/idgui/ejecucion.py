@@ -22,10 +22,15 @@ class Timer(Thread):
             self.tnow = self.tstart - 1
             self.padre = padre
             self.ui = ui
+            self.end = False
+
+        def cancel(self):
+            """@brief mata el thread."""
+            self.end = True
 
         def run(self):
 
-            while self.padre.is_alive() :
+            while self.padre.is_alive() and not self.end:
                 # Actualizar la hora si ha pasado un segundo
                 ttemp = time.time()
                 tstart = self.tstart
@@ -108,8 +113,17 @@ class Ejecucion(Thread):
         self.ui = proyUI
         ## Frecuencia de comprobación
         self.t = tiempo
+        ## Número de casos a ejecutar
+        self.ncasos = len(self.ui.ejec_path_casos)
+        ## Contador de los casos que llevamos
+        self.i_case = 0
+        ## Barra de progreso
+        self.barra = self.ui.ejec_barra
+        self.barra.set_text( _("Conectando...") )
+        ## Pulso de la barra de progreso
+        self.pulse = 0.95 / self.ncasos
 
-        # Expresiones para filtrar el log
+        # Compilar expresiones para filtrar el log
         self.re_log = re.compile(self.re_str)
         self.re_OK = re.compile(self.re_OK_str)
         self.re_KO = re.compile(self.re_KO_str)
@@ -162,9 +176,18 @@ class Ejecucion(Thread):
                 if name == "ini"  :
                     caso = e.group(1)
                     log.info(_("Iniciando caso: ") + caso)
+
                     gtk.gdk.threads_enter()
+                    # Flag de primer caso, ponemos 0.06 representando el
+                    # trabajo realizado por la conexión.
+                    if self.i_case == 0:
+                        self.barra.set_fraction(0.06)
+                    self.i_case = self.i_case + 1
+                    self.barra.set_text("%i %s %i" % (self.i_case, _("de"),
+                                                    self.ncasos))
                     self.ui.activar_ejec_caso(caso, 2)
                     gtk.gdk.threads_leave()
+
 
                 # Mensaje Test case passed.
                 # main INFO  Test case passed.
@@ -177,6 +200,8 @@ class Ejecucion(Thread):
                     caso = e.group(1)
                     log.info(_("Parado el caso: ") + caso)
                     gtk.gdk.threads_enter()
+                    self.barra.set_fraction( self.barra.get_fraction() +
+                                            self.pulse )
                     self.ui.activar_ejec_caso(caso, 3)
                     gtk.gdk.threads_leave()
 
@@ -239,3 +264,5 @@ class Ejecucion(Thread):
                     #buffer.insert_at_cursor(line)
                 finally:
                     gtk.gdk.threads_leave()
+
+        thread_timer.cancel()

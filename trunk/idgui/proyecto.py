@@ -480,6 +480,8 @@ class ProyectoUI:
         # Label del tiempo de ejecución
         self.ejec_control_tiempo_label = \
         self.gtk.get_object('proy_ejec_control_tiempo_label')
+        # Barra de progreso
+        self.ejec_barra = self.gtk.get_object('proy_ejec_control_bar')
 
         # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
         self.comprobar_servidor_abpel()
