@@ -338,9 +338,11 @@ class ProyectoUI:
             self.bpts_nsel_label.set_text(str(""))
 
     def add_casos(self):
-        """@brief Añade los ficheros seleccionados para ser ejecutados""" 
-        # Vaciar los casos seleccionados anteriormente
-        # self.proy.vaciar_bpts(self.proy.test) # Haremos la diferencia
+        """@brief Toma del treeview los ficheros seleccionados para ejecución y
+        los introduce en el proyecto para su procesado. 
+        """ 
+        # Los metemos todos en un diccionario tipo casos[fichero] = [caso1,
+        # caso2, ..] y se lo pasamos al proyecto.
 
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
         m = self.bpts_tree # Acortar el nombre al tree
@@ -376,7 +378,7 @@ class ProyectoUI:
             f = m.iter_next(f)
 
         # Añadimos todos los ficheros y casos a la vez
-        self.proy.add_casos(fnom,casos)
+        self.proy.add_casos(casos)
 
     ## @}
 
