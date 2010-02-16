@@ -277,10 +277,10 @@ class ProyectoUI:
         # Limpiar el modelo
         self.bpts_tree.clear()
         for fich,casos in self.proy.casos.iteritems() :
-            log.info('Fichero bpts seleccionado: ' + fich)
+            #log.info('Fichero bpts seleccionado: ' + fich)
             iter = self.bpts_tree.append(None, [ fich, gtk.STOCK_OPEN, True])
             for c in casos :
-                log.info('\tCaso: ' + c)
+                #log.info('\tCaso: ' + c)
                 self.bpts_tree.append(iter, [ c , gtk.STOCK_FILE, True])
 
         # Conectar la vista de nuevo
@@ -442,18 +442,18 @@ class ProyectoUI:
                         model.set_value(parent, 2, False)
 
     def on_proy_casos_ejec_ana_boton(self, widget):
-        # Añadimos los casos seleccionados
-        self.add_casos()
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
+        # Añadimos los casos seleccionados
+        self.add_casos()
         # Y comenzamos la ejecución
         self.ejecutar()
 
     def on_proy_casos_ejec_boton(self, widget):
-        # Añadimos los casos seleccionados
-        self.add_casos()
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
+        # Añadimos los casos seleccionados
+        self.add_casos()
         # Y comenzamos la ejecución
         self.ejecutar()
 
@@ -466,14 +466,20 @@ class ProyectoUI:
         """@brief Inicializa la parte de ejecución. """
 
         # Obtenemos los objetos que empleamos
+        # Texto del log
         self.ejec_log_buffer = self.gtk.get_object('proy_ejec_log_buffer')
         self.ejec_log_text = self.gtk.get_object('proy_ejec_log_text')
+        # Label de estado
         self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
+        # TreeView de casos
         self.ejec_tree = self.gtk.get_object('proy_ejec_tree')
         self.ejec_view = self.gtk.get_object('proy_ejec_view')
+        # Botón de empezar y detener
         self.ejec_control_boton = \
         self.gtk.get_object('proy_ejec_control_boton')
-        self.ejec_log_scroll = self.gtk.get_object('proy_ejec_log_scroll')
+        # Label del tiempo de ejecución
+        self.ejec_control_tiempo_label = \
+        self.gtk.get_object('proy_ejec_control_tiempo_label')
 
         # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
         self.comprobar_servidor_abpel()
@@ -653,9 +659,25 @@ class ProyectoUI:
                 iter = m.iter_next(iter) if hijo else m.iter_children(iter) 
                 hijo = True
 
+    def ejec_conexion_error(self):
+        """@brief Indica un error de conexión al intentar la ejecución."""
+        self.idgui.estado(_("No se puede ejecutar si el servidor no está activo"))
+        self.ejec_control_boton.set_label(_("Ejecutar"))
+
+    def ejec_terminar(self):
+        """@brief Pone los mensajes de éxito en la gui al terminar
+        correctamente la ejecución.
+        """
+
     def ejecutar(self):
         # Actualizamos el tree de la parte de ejecución
         self.cargar_ejec_tree()
+
+        # Comprobar que el servidor Abpel esté en condiciones
+        if not self.comprobar_servidor_abpel() :
+            self.ejec_conexion_error()
+            return
+
         # Cambiar el botón de ejecutar por el de cancelar
         self.ejec_control_boton.set_label(_("Detener"))
         # Colapsar todos los casos
@@ -663,15 +685,11 @@ class ProyectoUI:
         # Ponerles a todos los casos y ficheros el icono de esperando
         self.actualizar_ejec_iconos(1)
         # Poner el estado del servidor
-        if self.comprobar_servidor_abpel() :
-            # Ejecutar los tests
-            self.proy.ejecutar()
-            # Thread de comprobación, lo hará cada segundo.
-            e = Ejecucion(self.proy,self,1)
-            e.start()
-        else:
-            pass
-            # self.ejec_conexion_error()
+        # Ejecutar los tests
+        self.proy.ejecutar()
+        # Thread de comprobación, lo hará cada segundo.
+        e = Ejecucion(self.proy,self,1)
+        e.start()
 
     ## @}
 
@@ -692,9 +710,9 @@ class ProyectoUI:
 
         # Ponemos el mensaje en el label con el status
         self.ejec_estado_label.set_text(status)
+        self.idgui.estado( _("Conexión con el servidor Abpel: ") + status)
 
         return status == "Online"
-
 
     ## @}
 
