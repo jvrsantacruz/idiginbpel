@@ -340,37 +340,44 @@ class ProyectoUI:
     def add_casos(self):
         """@brief Añade los ficheros seleccionados para ser ejecutados""" 
         # Vaciar los casos seleccionados anteriormente
-        self.proy.vaciar_bpts(self.proy.test)
+        # self.proy.vaciar_bpts(self.proy.test) # Haremos la diferencia
 
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
         m = self.bpts_tree # Acortar el nombre al tree
 
+        # Metermos los casos en un diccionario casos[fnom] = cnom
+        casos = {}
+
         f = m.get_iter_root()   # El primer fichero
         # Recorremos todos los ficheros 
-        while not f is None:
+        while f is not None:
             # Si está marcado, miramos los casos hijos
             if m.get_value(f, 2) :
                 fnom = m.get_value(f, 0)    # Nombre del fichero
+                # Lo añadimos al diccionario de casos
+                if fnom not in casos :
+                    casos[fnom] = []
                 c = m.iter_children(f)      # El primer hijo
                 log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
 
-                casos = []
-
                 # Recorremos todos los casos hijos de fichero 
                 # y los metemos en casos
-                while not c is None:
-                    # Añadimos el nombre del fichero y del caso si este está activo
+                while c is not None:
+                    # Añadimos el nombre del fichero y del caso si este está
+                    # marcado
                     if m.get_value(c,2) :
                         cnom = m.get_value(c, 0)
-                        casos.append(cnom) # Nombre del caso
+                        casos[fnom].append(cnom) # Añadirlo al diccionario
                         log.debug(_("\t add el caso: ") + cnom)
                     # Siguiente caso
                     c = m.iter_next(c)
 
-                self.proy.add_casos(fnom,casos)
-
             # Siguiente fichero
             f = m.iter_next(f)
+
+        # Añadimos todos los ficheros y casos a la vez
+        self.proy.add_casos(fnom,casos)
+
     ## @}
 
     ## @name Callbacks Casos
@@ -381,6 +388,8 @@ class ProyectoUI:
         self.idgui.estado(_("Añadiendo fichero de casos de prueba"))
         bpts = self.bpts_fichero.get_filename()
         try:
+            # Vaciamos primero el test.bpts general para evitar casos repetidos
+            self.proy.vaciar_bpts(self.proy.test)
             self.proy.add_bpts(bpts)
         except(ProyectoRecuperable):
             self.idgui.estado(_("Error al añadir fichero de casos de prueba"))

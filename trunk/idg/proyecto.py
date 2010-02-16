@@ -422,7 +422,7 @@ class Proyecto(object):
                 if patron.match(line) :
                     activo = True
                     break
-            log.info(_("Servidor ActiveBPEL : " ) + 'Running' if activo else 'Stopped' )
+            log.info(_("Estado del servidor ActiveBPEL : " ) + 'Running' if activo else 'Stopped' )
 
             return activo
 
@@ -620,17 +620,14 @@ class Proyecto(object):
     def add_casos(self, bpts, casos):
         """@brief Añade un caso de prueba en un bpts al test.bpts.
            @param bpts Nombre del fichero bpts a listar.
-           @param casos Lista de nombres del caso en el fichero bpts a añadir."""
+           @param casos Diccionario de tipo casos[fichero] = [caso1, caso2 ..]
+        """
 
-        # Abrir el fichero bpts, el test y añadir todo el caso
+        # Listamos los casos presentes en el test
+        casos_test = self.list_bpts(self.test)
+
+        # Abrir el fichero de test general 
         # Con minidom para no perder los namespaces.
-        try:
-            bpts_dom = md.parse(path.join(self.casos_dir, bpts))
-        except:
-            e = _("No se ha podido cargar el fichero bpts ") + bpts 
-            log.error(e)
-            raise ProyectoRecuperable(e)
-
         try:
             test_dom = md.parse(self.test)
         except:
@@ -638,34 +635,50 @@ class Proyecto(object):
             log.error(e)
             raise ProyectoRecuperable(e)
 
-        for caso in casos :
+        # Encontrar el testCases de test.bpts
+        test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
 
-            # Formamos el nombre completo del caso fichero:caso
-            nombre = "%s:%s" % (bpts, caso)
+        # Añadir los ficheros pasados
+        for fnom in casos :
+            # Abrir el fichero de casos
+            try:
+                bpts_dom = md.parse(path.join(self.casos_dir, fnom))
+            except:
+                e = _("No se ha podido cargar el fichero bpts ") + fnom
+                log.error(e)
+                raise ProyectoRecuperable(e)
 
-            # Comprobamos que el caso no esté en el test
-            if nombre in self.list_bpts(self.test):
-                log.warning(_("Intentando add un caso que ya estaba en el test.bpts"))
-                continue
+            # Añadir los casos de ese fichero
+            for caso in casos[fnom] :
 
-            # Encontrar el caso en el bpts
-            caso_dom = [f for f in bpts_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == caso]
-            if len(caso_dom) == 0 :
-                log.warning(_("Al add un caso al test.bpts, no se ha encontrado el caso en su fichero original ") + caso)
-                return
-            caso_dom  = caso_dom[0]
+                # Formamos el nombre completo del caso fichero:caso
+                nombre = "%s:%s" % (bpts, caso)
 
-            # Ponerle el nuevo nombre fichero:caso
-            caso_dom.setAttribute('name', nombre)
+                # Comprobamos que el caso no esté en el test
+                if nombre in casos_test :
+                    log.warning(_("Intentando add un caso que ya estaba en el test.bpts"))
+                    continue
 
-            # Declarar inline los namespaces huerfanitos 
-            util.xml.minidom_namespaces(caso_dom)
+                # Acortar el nombre de la función
+                bytag = bpts_dom.getElementsByTagNameNS  
 
-            # Encontrar el testCases de test.bpts
-            test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
+                # Encontrar el caso en el bpts
+                caso_dom = [f for f in bytag(self.test_url, 'testCase') 
+                            if f.getAttribute('name') == caso]
 
-            # Clonar el caso y sus hijos, y añadirlo al test
-            test_cases.appendChild( caso_dom.cloneNode(True) ) 
+                if len(caso_dom) == 0 :
+                    log.warning(_("Al add un caso al test.bpts, no se ha encontrado el caso en su fichero original ") + caso)
+                    continue 
+                caso_dom  = caso_dom[0]
+
+                # Ponerle el nuevo nombre fichero:caso
+                caso_dom.setAttribute('name', nombre)
+
+                # Declarar inline los namespaces huerfanitos 
+                util.xml.minidom_namespaces(caso_dom)
+
+                # Clonar el caso y sus hijos, y añadirlo al test
+                test_cases.appendChild( caso_dom.cloneNode(True) ) 
 
         # Escribir el fichero test
         try:
