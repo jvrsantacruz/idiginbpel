@@ -48,11 +48,11 @@ class Timer(Thread):
                 # No mostrar dias, horas o mins si no valen nada
                 strfmt = "%i s" % sec
                 if diff > 60 :
-                    strfmt = "%i m " % min + strmft
+                    strfmt = ("%i m " % min) + strmft
                 if diff > 3600 :
-                    strfmt = "%i h " % hours + strfmt
+                    strfmt = ("%i h " % hours) + strfmt
                 if diff > 86400 :
-                    strfmt = "%i d " % days + strfmt
+                    strfmt = ("%i d " % days) + strfmt
 
                 # Obtener cadena con el tiempo formateado
                 strtm = time.strftime(strfmt, date)
@@ -265,4 +265,10 @@ class Ejecucion(Thread):
                 finally:
                     gtk.gdk.threads_leave()
 
+        # Parar el reloj
         thread_timer.cancel()
+        # Asegurarnos de que se termina la ejecución 
+        #  y actualizar la gui en consecuencia.
+        gtk.gdk.threads_enter()
+        self.ui.ejec_terminar()
+        gtk.gdk.threads_leave()
