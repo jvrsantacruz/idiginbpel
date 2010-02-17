@@ -380,6 +380,11 @@ class Proyecto(object):
     def ejecutar(self):
         """@brief Ejecuta lost casos de prueba del proyecto en el servidor ABpel. """
 
+        # No crear otro subproceso si ya se está ejecutando uno.
+        if self.ejec_subproc is not None and self.ejec_subproc.poll() is None :
+            log.warning(_("El proyecto ya se esta ejecutando"))
+            return
+
         # Ejecutar el ant en un subproceso aparte
         cmd = ("ant", "-f", self.build, "test")
         log.info(_("Ejecutando tests: ") + str(cmd) )
@@ -702,6 +707,7 @@ class Proyecto(object):
                     log.warning(_("Intentando add un caso que ya estaba en el test.bpts ") 
                                 + nombre )
                     test_cases.appendChild( casos_test[nombre] )
+                    continue
 
                 # Acortar el nombre de la función
                 bytag = bpts_dom.getElementsByTagNameNS  

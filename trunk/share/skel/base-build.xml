@@ -64,8 +64,8 @@
 	description="Runs all tests and analyses the results with Daikon"/> 
 
     <!-- Antiguo, le eliminamos la dependencia de build-bpr-->
-    <!-- <target name="test" depends="" description="Runs all tests with BPELUnit"> -->
-    <target name="test" depends="build-bpr" description="Runs all tests with BPELUnit">
+    <!-- <target name="test" depends="build-bpr" description="Runs all tests with BPELUnit"> -->
+    <target name="test" depends="" description="Runs all tests with BPELUnit">
         <!-- Ejecutamos BPELUnit -->
         <bpelunit testsuite="${bptsfile}" bpelunitdir="${env.BPELUNIT_HOME}">      
             <logging level="INFO"/>

@@ -48,7 +48,7 @@ class Timer(Thread):
                 # No mostrar dias, horas o mins si no valen nada
                 strfmt = "%i s" % sec
                 if diff > 60 :
-                    strfmt = ("%i m " % min) + strmft
+                    strfmt = ("%i m " % min) + strfmt
                 if diff > 3600 :
                     strfmt = ("%i h " % hours) + strfmt
                 if diff > 86400 :

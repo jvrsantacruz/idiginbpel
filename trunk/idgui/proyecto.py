@@ -84,6 +84,8 @@ class ProyectoUI:
     def __del__(self):
         """@brief Destructor del Proyecto"""
         self.dep_list.clear()
+        # Cancelamos la ejecución si hay alguna activa.
+        self.proy.cancelar_ejecucion()
 
     def error(self,msg):
         self.error_label.set_markup('<span color="red">'+msg+'</span>')
