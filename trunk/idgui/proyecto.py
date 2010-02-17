@@ -229,6 +229,9 @@ class ProyectoUI:
         # Marcar los casos que estén en el test.bpts 
         self.marcar_bpts_tree()
 
+        ## Última ruta de bpts añadida
+        self.last_path = ""
+
         # Información sobre el caso
         self.bpts_nombre_label = self.gtk.get_object("proy_casos_info_nombre_label")
         self.bpts_n_label = self.gtk.get_object("proy_casos_info_n_label")
@@ -388,7 +391,12 @@ class ProyectoUI:
     def on_proy_casos_bpts_fichero(self,widget):
         """@brief Callback de seleccionar un fichero bpts."""
         self.idgui.estado(_("Añadiendo fichero de casos de prueba"))
+        if self.last_path :
+            log.debug("Setting Last Path: " + self.last_path)
+            self.bpts_fichero.set_current_folder(self.last_path)
         bpts = self.bpts_fichero.get_filename()
+        self.last_path = path.dirname(bpts)
+        log.debug("Last Path: " + self.last_path)
         try:
             # Vaciamos primero el test.bpts general para evitar casos repetidos
             self.proy.vaciar_bpts(self.proy.test)
@@ -687,6 +695,9 @@ class ProyectoUI:
         else:
             self.idgui.estado(_("Ejecucion terminada"))
 
+        # Pone el botón de Detener en Ejecutar
+        self.ejec_control_boton.set_label(_("Ejecutar"))
+
     def ejecutar(self):
         # Añadimos los casos seleccionados
         self.add_casos()
@@ -737,10 +748,8 @@ class ProyectoUI:
     def on_proy_ejec_control_boton(self, widget):
         if widget.get_label() == _("Detener") :
             self.ejec_terminar()
-            widget.set_label(_("Ejecutar"))
         else:
             self.ejecutar()
-            widget.set_label(_("Detener"))
 
     ## @}
 

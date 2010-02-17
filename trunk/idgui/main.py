@@ -55,6 +55,9 @@ class Idgui(object):
         self.portada = self.builder.get_object("portada")
         self.cargar_portada()
 
+        # Ruta por defecto para abrir los selectores de fichero
+        self.last_path = ""
+
         # Cargar la lista de proyectos
         self.__init_lista_proyectos()
 
@@ -179,7 +182,12 @@ class Idgui(object):
         nombre = self.builder.get_object("proyecto_nombre").get_text().strip()
 
         # Obtenemos la ruta del bpel.
-        bpel = self.builder.get_object("proyecto_selector_bpel").get_filename()
+        file_chooser = self.builder.get_object("proyecto_selector_bpel")
+        # Poner como ruta la última usada
+        if self.last_path :
+            file_chooser.set_current_folder(self.last_path)
+        bpel = file_chooser.get_filename()
+        self.last_path = path.dirname(bpel)
 
         # Cadena con los errores
         error_str = ""
