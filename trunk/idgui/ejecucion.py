@@ -119,6 +119,7 @@ class Ejecucion(Thread):
         self.i_case = 0
         ## Barra de progreso
         self.barra = self.ui.ejec_barra
+        self.barra.set_fraction( 0.0 )
         self.barra.set_text( _("Conectando...") )
         ## Pulso de la barra de progreso
         self.pulse = 0.95 / self.ncasos
@@ -183,8 +184,7 @@ class Ejecucion(Thread):
                     if self.i_case == 0:
                         self.barra.set_fraction(0.06)
                     self.i_case = self.i_case + 1
-                    self.barra.set_text("%i %s %i" % (self.i_case, _("de"),
-                                                    self.ncasos))
+                    self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
                     self.ui.activar_ejec_caso(caso, 2)
                     gtk.gdk.threads_leave()
 
@@ -200,8 +200,9 @@ class Ejecucion(Thread):
                     caso = e.group(1)
                     log.info(_("Parado el caso: ") + caso)
                     gtk.gdk.threads_enter()
-                    self.barra.set_fraction( self.barra.get_fraction() +
-                                            self.pulse )
+                    frac = self.barra.get_fraction() + self.pulse
+                    self.barra.set_fraction( frac if frac <= 1 else 1 )
+                    # Ponerle el icono correspondiente
                     self.ui.activar_ejec_caso(caso, 3)
                     gtk.gdk.threads_leave()
 
