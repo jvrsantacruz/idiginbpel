@@ -149,6 +149,7 @@ class Idgui(object):
         @param dsc Descripción del mensaje en la statusbar."""
         id = self.barra_estado.get_context_id(dsc)
         self.barra_estado.push(id,str(msg))
+
     ## @}
 
     ## @name Callbacks 
@@ -283,7 +284,15 @@ class Idgui(object):
         self.portada.show_all()
 
     def on_main_ventana_destroy(self,widget):
+        """@brief Callback de pulsar el cierre de la ventana."""
         gtk.main_quit()
 
+    def on_main_exportar(self, widget):
+        """@brief Callback de pulsar la opción de exportar"""
+        pass
+
+    def on_main_importar(self, widget):
+        """@brief Callback de pulsar la opción de importar"""
+        pass
     ## @}
 
