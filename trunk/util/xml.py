@@ -13,6 +13,8 @@ def minidom_namespaces(elto):
         e = eltos.pop(0) 
         # Les añadimos la declaración del namespace si tienen
         if e.namespaceURI :
+            if not e.prefix :
+                e.prefix = 'ns0' # Evitar prefijos vacios
             e.setAttribute('xmlns:' + e.prefix, e.namespaceURI)
         # Metemos sus hijos en la cola
         eltos.extend(e.childNodes)
