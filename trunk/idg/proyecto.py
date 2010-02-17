@@ -431,7 +431,7 @@ class Proyecto(object):
     def cancelar_ejecucion(self):
         """@brief Termina la ejecución matando el proceso relacionado."""
         subproc = self.ejec_subproc
-        if subproc is not None and subproc.poll() is not None :
+        if subproc is not None and subproc.poll() is None :
             subproc.kill()
             return True
         else :
