@@ -13,6 +13,8 @@ from xml.dom import minidom as md
 import util.logger
 log = util.logger.getlog('idg.main')
 
+from opciones import Opt
+
 # Traducciones mediante gettext
 gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
 log.warning(_('Usando locale en directorio local. ./locale No instaladas las locales.'))
@@ -30,7 +32,7 @@ class Idg(object):
     ## Ruta al directorio de instalación de takuan por defecto
     takuan = "~/takuan"
     ## Ruta al directorio de BPELUnit
-    bpelunit = '~/bin/AeBpelEngine'
+    bpelunit = '~/AeBpelEngine'
 
     ## Referencia al objeto Proyecto abierto actualmente
     proyecto = None
@@ -67,29 +69,15 @@ class Idg(object):
         pass
 
     def set_config(self):
-        """@brief Obtiene todos los parámetros generales de los ficheros de configuración."""
-        try: 
-            xml = md.parse(self.config)
-        except:
-            log.error(_("No se pudo leer el fichero de configuración ") + self.config) 
-        else:
-            log.info(_("Usando fichero de configuración: ") + self.config)
+        """@brief Inicializa el sistema de opciones."""
+        self.opt = Opt(self.config)
+        opt = self.opt
+        opt.read()
 
-        # Leer valores individuales y establecerlos en el objeto
-        # Nombre del elemento y atributo a leer
-        # Los comprobamos y ponemos self.nombre = valor
-        for nom,attr in (('home', 'src'), ('share', 'src'),
-                         ('takuan', 'src'),('bpelunit', 'src')):
-            try:
-                val = xml.getElementsByTagName(nom)[0].getAttribute(attr)
-                val = path.abspath(path.realpath(path.expanduser(val)))
-                if path.exists(val):
-                    setattr(self, nom , val)
-                else:
-                    log.error(_("No se encuentra el directorio: ") + val)
-                    raise Exception()
-            except:
-                log.warning(_("Se usará el valor por defecto para: ") + nom)
+        self.home = opt.get('home')
+        self.share = opt.get('share')
+        self.takuan = opt.get('takuan')
+        self.bpelunit = opt.get('bpelunit')
 
         # Imprimir los directorios usados
         log.info("Home: " + self.home)
