@@ -7,8 +7,10 @@
 <config>
     <!-- Directorio del usuario -->
     <home src="~/.idiginbpel"/>
-    <!-- Directorio de instalación -->
+    <!-- Directorio de archivos de runtime-->
     <share src="/usr/share/idiginbpel"/>
     <!-- Directorio de takuan -->
     <takuan src="~/takuan"/>
+    <!-- Directorio de BPELUnit -->
+    <bpelunit src="~/bin/AeBpelEngine"/>
 </config>

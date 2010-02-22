@@ -34,8 +34,6 @@ for c in configs:
         config = c
         break
 
-
-
 # Iniciar la aplicacion
 if __name__ == "__main__":
         ## Clase principal de la aplicación con la lógica

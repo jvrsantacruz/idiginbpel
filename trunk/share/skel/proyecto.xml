@@ -5,20 +5,11 @@
     <bpr  src="bpr_file.bpr" timestamp=""/>
 
     <svr url="localhost" port="7777"/>
-    <bpelunit path=""/>
-    <instrumentador path=""/>
 
     <!-- dependencias -->
     <dependencias>
 	<!-- <dependencia src="" tipo="" rota=""/> -->
     </dependencias>
-
-    <!-- casos de prueba -->
-    <test_bpts src="test.bpts" timestamp=""/>
-
-    <trazas>
-	<!-- <traza nombre="" src="" timestamp="" actual=""/> -->
-    </trazas>
 
     <invariantes>
 	<!-- <invariante src="" timestamp="">

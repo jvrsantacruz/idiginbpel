@@ -100,8 +100,7 @@ class Proyecto(object):
     ## @{
 
     def __init__(self,nombre,idg,bpel=""):
-        """@brief Constructor de la clase proyecto.
-        Establece los valores por defecto para las rutas del proyecto.
+        """@brief Constructor de la clase proyecto.  Establece los valores por defecto para las rutas del proyecto.
         Crea el proyecto si se le indica la ruta a un bpel
         Lee la configuración del proyecto ya creado si no
         Comprueba que el proyecto esté bien
@@ -165,6 +164,7 @@ class Proyecto(object):
         self.home       =   self.idg.home
         self.share      =   self.idg.share
         self.takuan     =   self.idg.takuan
+        self.bpelunit   =   self.idg.bpelunit
 
         ## Directorio del proyecto
         self.dir        =   path.join(self.home,'proy',self.nombre) 
@@ -745,7 +745,7 @@ class Proyecto(object):
     ## @{
 
     def crear(self):
-        """@brief Crea el proyecto. """
+        """@brief Crea el proyecto."""
 
         # Comprobar el nombre
         if len(str(self.nombre).strip()) == 0: 
@@ -905,22 +905,22 @@ class Proyecto(object):
 
         # Trabajar con self.proy
         try:
-            # fechas
+            # Fechas de creación y modificación
             self.creado = root.get('creado')
             self.guardado = root.get('guardado')
 
-            # bpel_o 
+            # Bpel Original
             e = root.find('bpel_o')
             self.bpel_o = e.get('src')
 
-            # svr
+            # Servidor ActiveBpel
             e = root.find('svr')
             self.svr = e.get('url')
             self.port = e.get('port')
 
-            # Dependencias
+            # Cargar Dependencias
             self.cargar_deps(tree)
-            # Casos
+            # Cargar Casos
             self.cargar_casos()
 
         except:

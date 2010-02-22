@@ -29,6 +29,8 @@ class Idg(object):
     share = "./share"
     ## Ruta al directorio de instalación de takuan por defecto
     takuan = "~/takuan"
+    ## Ruta al directorio de BPELUnit
+    bpelunit = '~/bin/AeBpelEngine'
 
     ## Referencia al objeto Proyecto abierto actualmente
     proyecto = None
@@ -75,11 +77,12 @@ class Idg(object):
 
         # Leer valores individuales y establecerlos en el objeto
         # Nombre del elemento y atributo a leer
-        # Los comprobamos
-        for nom,attr in (('home','src'), ('share','src'), ('takuan','src')):
+        # Los comprobamos y ponemos self.nombre = valor
+        for nom,attr in (('home', 'src'), ('share', 'src'),
+                         ('takuan', 'src'),('bpelunit', 'src')):
             try:
                 val = xml.getElementsByTagName(nom)[0].getAttribute(attr)
-                val = path.abspath(path.expanduser(val))
+                val = path.abspath(path.realpath(path.expanduser(val)))
                 if path.exists(val):
                     setattr(self, nom , val)
                 else:
@@ -92,6 +95,7 @@ class Idg(object):
         log.info("Home: " + self.home)
         log.info("Share: " + self.share)
         log.info("Takuan: " + self.takuan)
+        log.info("Bpelunit: " + self.bpelunit)
 
     def exportar(self,nombre,ruta):
         """@brief Realiza un paquete tar en bz2 del directorio del proyecto.
