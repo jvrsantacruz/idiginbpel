@@ -159,12 +159,17 @@ class Proyecto(object):
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
 
+        idg = self.idg
+        opt = idg.opt
 
         # Urls generales de proyecto
-        self.home       =   self.idg.home
-        self.share      =   self.idg.share
-        self.takuan     =   self.idg.takuan
-        self.bpelunit   =   self.idg.bpelunit
+        self.home       =   opt.get('home')
+        self.share      =   opt.get('share')
+        self.takuan     =   opt.get('takuan')
+        self.bpelunit   =   opt.get('bpelunit')
+
+        self.svr        =   opt.get('svr')
+        self.port       =   opt.get('port')
 
         ## Directorio del proyecto
         self.dir        =   path.join(self.home,'proy',self.nombre) 
@@ -216,7 +221,7 @@ class Proyecto(object):
         self.ejec_subproc = None
         ## Thread instrumentador
         self.inst_thread = None
-        ## @}
+    ## @}
 
     ## @}
 
@@ -926,9 +931,9 @@ class Proyecto(object):
             self.bpel_o = e.get('src')
 
             # Servidor ActiveBpel
-            e = root.find('svr')
-            self.svr = e.get('url')
-            self.port = e.get('port')
+            #e = root.find('svr')
+            #self.svr = e.get('url')
+            #self.port = e.get('port')
 
             # Cargar Dependencias
             self.cargar_deps(tree)
@@ -972,16 +977,16 @@ class Proyecto(object):
             #    root.attrib['nombre'] = self.nombre
 
             # Server 
-            e = root.find('svr')
-            e.attrib['url'] =  self.svr
-            e.attrib['port'] =  self.port
+            #e = root.find('svr')
+            #e.attrib['url'] =  self.svr
+            #e.attrib['port'] =  self.port
 
             # bpel original
-            e = root.find('bpel_o')
-            e.attrib['src'] = self.bpel_o
+            #e = root.find('bpel_o')
+            #e.attrib['src'] = self.bpel_o
 
             # bpel proyecto
-            e = root.find('bpel')
+            #e = root.find('bpel')
         except:
             raise ProyectoError(_("Error al guardar los datos del proyecto."))
 
