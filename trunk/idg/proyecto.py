@@ -385,6 +385,18 @@ class Proyecto(object):
             log.warning(_("El proyecto ya se esta ejecutando"))
             return
 
+        # Ruta logs bpelunit
+        log.debug(self.bpelunit)
+        BUpath = path.join(self.bpelunit, 'process-logs')
+
+        # Borrar los logs antiguos bpelunit
+        try:
+            [os.remove(path.join(BUpath,f)) for f in os.listdir(BUpath)  \
+             if len(f) > 4 and f[-4:] ==  '.log']
+        except:
+            log.error(_("No se han podido eliminar los logs antiguos de \
+                        bpelunit: " + BUpath))
+
         # Ejecutar el ant en un subproceso aparte
         cmd = ("ant", "-f", self.build, "test")
         log.info(_("Ejecutando tests: ") + str(cmd) )

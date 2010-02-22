@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """Clase Monitorizadora de la ejecucion de los casos de prueba"""
 
-import gtk
+import os
+import shutil
 import time
 import re
+import gtk
 from threading import Thread
 
 import util.logger
@@ -128,11 +130,12 @@ class Ejecucion(Thread):
                     # trabajo realizado por la conexión.
                     if self.i_case == 0:
                         self.barra.set_fraction(0.06)
+
+                    # Actualizamos el texto con el contador de casos
                     self.i_case = self.i_case + 1
                     self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
                     self.ui.activar_ejec_caso(caso, 2)
                     gtk.gdk.threads_leave()
-
 
                 # Mensaje Test case passed.
                 # main INFO  Test case passed.
@@ -150,6 +153,22 @@ class Ejecucion(Thread):
                     # Ponerle el icono correspondiente
                     self.ui.activar_ejec_caso(caso, 3)
                     gtk.gdk.threads_leave()
+
+                    # Movemos el log generado y lo renombramos
+                    BUpath = os.path.join(self.proy.bpelunit,'process-logs')
+                    src = ""
+                    dst = ""
+                    try:
+                        # Tomamos el primer log que haya en process-logs
+                        src = os.path.join(BUpath, os.listdir(BUpath)[0])
+                        dst = os.path.join(self.proy.trazas_dir, 
+                                           caso + "-" +  str(time.time()))
+                        log.info('Moviendo ' + src + ' a ' + dst)
+                        # Y lo movemos al proyecto renombrándolo
+                        shutil.move(src, dst)
+                    except:
+                        log.error(_("Error al mover fichero de (src, dst): ") +
+                                    src + " " + dst)
 
         elif name == "ok"  :
             log.info(_("Ejecución terminada correctamente"))
