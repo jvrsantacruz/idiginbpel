@@ -78,3 +78,15 @@ class OptUI(object):
             #preguntar
             pass
         self.window.destroy()
+
+    def on_reset(self, widget):
+        """@brief Callback de pulsar el botón de resetear las opciones."""
+        antes = [ l[1] for l in self.list]
+        self.mod = True
+        self.opts.reset()
+        self.cargar()
+
+        # Poner iconos a los que se han modificado
+        for a,d in zip(antes,self.list):
+            if a != d[1] :
+                d[2] = gtk.STOCK_MEDIA_RECORD
