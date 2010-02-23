@@ -12,13 +12,15 @@ class Opt(object):
     """@brief Establece las opciones básicas leyendo el config.xml"""
 
     ## Diccionario con las opciones por defecto
-    _opts = { 'home' : './home',
+    _opts_defecto = { 'home' : './home',
             'share' : './share',
             'takuan' : '~/takuan',
             'bpelunit': '~/AeBpelEngine',
             'svr' : 'localhost',
             'port' : '7777'
            }
+
+    _opts = {}
 
     ## Diccionario con los atributos de las opciones por defecto
     _opts_nm = { 'home' : 'src',
@@ -29,12 +31,14 @@ class Opt(object):
             'port' : 'value'
            }
 
-
     def __init__(self, config):
         """@brief Construye el objeto Opt con la configuración. 
         @param config La ruta al fichero de configuración."""
 
         self.config = config
+        for nom, val in self._opts_defecto.items() :
+            self._opts[nom] = self.expand(val) if self._opts_nm[nom] == 'src' \
+            else val
 
     def get(self, nom):
         """@brief Devuelve una opción. 
@@ -51,13 +55,18 @@ class Opt(object):
         @retval True si se ha creado una opción nueva. False en otro caso.
         """
         # Añadirlo a las opciones si no estaba
-        retval = nom in self._opts
-        if not retval :
-            self._opts_nm[nom] = attr
+        retval = nom in self._opts[nom]
+        self._opts_nm[nom] = attr
 
         # Establecer la opción
-        self._opts[nom] = val
+        self._opts[nom] = self.expand(val) if attr == 'src' else val
         return retval
+
+    def reset(self):
+        """@brief Establece de nuevo las opciones por defecto."""
+        for nom, val in self._opts_defecto.items() :
+            self._opts[nom] = self.expand(val) if self._opts_nm[nom] == 'src' \
+            else val
 
     def write(self):
         """@brief Escribe el fichero config.
@@ -89,6 +98,32 @@ class Opt(object):
         except:
             log.error(_("No se han podido guardar las opciones en: ") + config)
 
+    def expand(self, val):
+        """@brief Expande una ruta y resuelve relativas.
+        @param val Ruta a expandir
+        """
+        try: 
+            val = path.abspath(path.realpath(path.expanduser(val)))
+        except:
+            pass
+
+        return val
+
+    def check(self, val, attr = "src"):
+        """@brief Comprueba que un argumento sea válido. 
+        @param val Valor del atributo.
+        @param attr (Opcional) Tipo del atributo. Por defecto ruta.
+        @retval Devuelve True si es válido, False si no lo es.
+        """
+        if not val or not attr:
+            return "" 
+        else :
+            if attr == 'src' :
+                c = self.expand(val)
+                return path.exists(c) 
+
+        return True
+
     def read(self):
         """@brief Lee el fichero config."""
 
@@ -118,9 +153,9 @@ class Opt(object):
 
             # Expandir la ruta si es un src
             if attr == 'src' :
-                val = path.abspath(path.realpath(path.expanduser(val)))
+                val = self.expand(val)
                 # Comprobar que la ruta existe
-                if not path.exists(val) :
+                if not self.check(val) :
                     log.error(_("No se encuentra: ") + val)
 
             # Guardar en el diccionario los valores.
