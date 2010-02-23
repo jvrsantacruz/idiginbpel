@@ -283,6 +283,9 @@ class Proyecto(object):
 
             log.debug(_("Dependencia: ") + nom)
 
+            # Comprobar si es un xsd
+            xsd = (len(nom) > 4 and '.xsd' == nom[-4:])
+
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
 
@@ -322,11 +325,11 @@ class Proyecto(object):
 
                 log.debug(nom + " --> " + path.basename(ruta))
 
-                # Si es el bpel original (first) la dependencia apuntará al
-                # directorio de dependencias (self.dep_nom)
-                # Si es una dependencia más, sus imports estarán en el
-                # mismo directorio.
-                ruta = path.basename(ruta) if not first else  \
+                # Si es el bpel original (first) o un fichero .xsd (xsd) la
+                # dependencia apuntará al directorio de dependencias
+                # (self.dep_nom) Si es una dependencia más, sus imports estarán
+                # en el mismo directorio.
+                ruta = path.basename(ruta) if not (first or xsd) else  \
                         path.join(self.dep_nom, path.basename(ruta))
 
                 # Modificar el atributo con la ruta correcta
@@ -336,23 +339,22 @@ class Proyecto(object):
             # Copiar el fichero en el proyecto
             try:
                 # Serializar el xml a un fichero en el directorio self.dep_dir
-                # Con el nombre adecuado si es el bpel original
+                # Con la ruta adecuada si es el bpel original o un xsd
                 if first :
                     file = open(self.bpel,'w')
+                elif xsd :
+                    file = open(path.join(self.dir, nom), 'w')
                 else:
-                    file = open(path.join(self.dep_dir,nom), 'w')
+                    file = open(path.join(self.dep_dir, nom), 'w')
 
                 file.write(xml.toxml('utf-8'))
             except:
                 # Si no se ha podido escribir la versión modificada del
                 # fichero, añadirlo a las dependencias rotas 
-                log.error(_("Error al escribir en el proyecto") + nom)
+                log.error(_("Error al escribir en el proyecto: ") + nom)
                 miss.add(ruta)
             finally:
                 file.close()
-
-                # Quitamos de deps las que están en miss
-                # deps = deps.difference_update(miss)
 
                 # fin del for
         # fin del for
