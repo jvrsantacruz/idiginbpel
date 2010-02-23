@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="opt_window">
+    <property name="title" translatable="yes">Opciones</property>
+    <property name="window_position">center</property>
+    <property name="default_width">500</property>
+    <property name="default_height">500</property>
+    <property name="destroy_with_parent">True</property>
+    <child>
+      <object class="GtkVBox" id="opt_contendor_v">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="Opciones generales de la aplicaci&#xF3;n">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Opciones generales de la aplicaci&#xF3;n</property>
+            <attributes>
+              <attribute name="absolute-size" value="16000"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="padding">9</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <object class="GtkTreeView" id="opt_treeview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="model">opt_list</property>
+                <child>
+                  <object class="GtkTreeViewColumn" id="opt_treeview_col_nom">
+                    <property name="resizable">True</property>
+                    <property name="min_width">150</property>
+                    <property name="title">Opci&#xF3;n</property>
+                    <child>
+                      <object class="GtkCellRendererPixbuf" id="opt_treeview_nom_pixbuf"/>
+                      <attributes>
+                        <attribute name="stock-id">2</attribute>
+                      </attributes>
+                    </child>
+                    <child>
+                      <object class="GtkCellRendererText" id="opt_treeview_nom_text"/>
+                      <attributes>
+                        <attribute name="text">0</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="opt_treeview_col_val">
+                    <property name="resizable">True</property>
+                    <property name="min_width">50</property>
+                    <property name="title">Valor</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="opt_treeview_val_text">
+                        <property name="editable">True</property>
+                        <signal name="edited" handler="on_changed"/>
+                      </object>
+                      <attributes>
+                        <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHBox" id="opt_contenedor_botones">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkButton" id="opt_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="released" handler="on_cancelar"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="opt_guardar">
+                <property name="label" translatable="yes">Guardar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="released" handler="on_guardar"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="pack_type">end</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkListStore" id="opt_list">
+    <columns>
+      <!-- column-name nom -->
+      <column type="gchararray"/>
+      <!-- column-name value -->
+      <column type="gchararray"/>
+      <!-- column-name icono -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+</interface>
