@@ -48,6 +48,12 @@ class Ejecucion(Thread):
     ## Expresión regular para capturar error de conexión
     re_cnerror_str = ""
 
+    ## Expresión regular para capturar el nombre y el nº de los casos con round
+    re_casoround_str = "^(.*) \(Round (\d+)\)$"
+
+    ## Caso actual en ejecución
+    caso_actual = ""
+
     def __init__(self,proy,proyUI,tiempo):
         """@brief Inicializa el Thread
         @param proy Instancia del proyecto
@@ -78,6 +84,7 @@ class Ejecucion(Thread):
         self.re_inicaso = re.compile(self.re_inicaso_str)
         self.re_passcaso = re.compile(self.re_passcaso_str)
         self.re_stopcaso = re.compile(self.re_stopcaso_str)
+        self.re_casoround = re.compile(self.re_casoround_str)
 
     def filtrar(self, line):
         """
@@ -123,6 +130,25 @@ class Ejecucion(Thread):
                 # main INFO  Initiating textCase 'NOMBRE'
                 if name == "ini"  :
                     caso = e.group(1)
+                    round = None
+
+                    # Comprobamos si es un caso con round
+                    r = self.re_casoround.match(caso)
+                    if r :
+                        caso = r.group(1)
+                        round = r.group(2)
+
+                    # Comprobamos si el anterior era un caso con round y por
+                    # tanto no se ha cerrado bien. Lo cerramos en ese caso.
+                    if self.caso_actual is not None  \
+                       and self.caso_actual != caso :
+                        gtk.gdk.threads_enter()
+                        self.ui.activar_ejec_caso(self.caso_actual, 3)
+                        gtk.gdk.threads_leave()
+
+                    # Establecemos la variable general caso
+                    self.caso_actual = caso
+
                     log.info(_("Iniciando caso: ") + caso)
 
                     gtk.gdk.threads_enter()
@@ -131,9 +157,18 @@ class Ejecucion(Thread):
                     if self.i_case == 0:
                         self.barra.set_fraction(0.06)
 
+                    # Aumentar el contador si no es un round es el primer round
+                    if round is None or round == '1' :
+                        self.i_case += 1 
+
                     # Actualizamos el texto con el contador de casos
-                    self.i_case = self.i_case + 1
-                    self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
+                    # tenemos en cuenta que los round tienen un texto diferente
+                    if round is None :
+                        self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
+                    else :
+                        nround = "%i (%s)" % (self.ncasos, round)
+                        self.barra.set_text("%i / %s" % (self.i_case , nround))
+
                     self.ui.activar_ejec_caso(caso, 2)
                     gtk.gdk.threads_leave()
 
@@ -146,13 +181,28 @@ class Ejecucion(Thread):
                 # main INFO Stopping testCase Test Case 'NOMBRE'
                 elif name == "stop" :
                     caso = e.group(1)
-                    log.info(_("Parado el caso: ") + caso)
-                    gtk.gdk.threads_enter()
-                    frac = self.barra.get_fraction() + self.pulse
-                    self.barra.set_fraction( frac if frac <= 1 else 1 )
-                    # Ponerle el icono correspondiente
-                    self.ui.activar_ejec_caso(caso, 3)
-                    gtk.gdk.threads_leave()
+                    rcaso = caso
+                    round = None
+
+                    # Comprobamos si es un caso con round
+                    r = self.re_casoround.match(caso)
+                    if r :
+                        rcaso = r.group(1)
+                        round = r.group(2)
+
+                    log.info(_("Parado el caso: ") + rcaso)
+
+
+                    if round is None :
+                        # Marcamos el caso actual como terminado
+                        self.caso_actual = None
+
+                        gtk.gdk.threads_enter()
+                        frac = self.barra.get_fraction() + self.pulse
+                        self.barra.set_fraction( frac if frac <= 1 else 1 )
+                        # Ponerle el icono correspondiente
+                        self.ui.activar_ejec_caso(caso, 3)
+                        gtk.gdk.threads_leave()
 
                     # Movemos el log generado y lo renombramos
                     BUpath = os.path.join(self.proy.bpelunit,'process-logs')
@@ -165,7 +215,7 @@ class Ejecucion(Thread):
                         dst = os.path.join(self.proy.trazas_dir, file)
 
                         log.info('Moviendo ' + src + ' a ' + dst)
-                        # Y lo movemos al proyecto renombrándolo
+                        # Y lo movemos al proyecto 
                         shutil.move(src, dst)
                     except:
                         log.error(_("Error al mover fichero de (src, dst): ") +
