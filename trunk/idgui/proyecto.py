@@ -93,6 +93,12 @@ class ProyectoUI:
     def mensaje(self,msg):
         self.error_label.set_markup('<span color="black">'+msg+'</span>')
 
+    def cerrar(self):
+        """@Brief realiza comprobaciones y cierra el proyectoUI"""
+        # TODO preguntar si cerrar el proyecto.
+        # Cerramos el proyecto que tenemos abierto
+        self.proy.cerrar()
+
     ## @name Callbacks
     ## @{
 
@@ -687,6 +693,8 @@ class ProyectoUI:
         # Si la ejecución está en curso, se cancelará
         # Devuelve true si ha matado abruptamente el subproceso
         kill = self.proy.cancelar_ejecucion()
+
+        log.debug("Terminando ejecución: " + str(kill) )
 
         # Poner el estado en ejecución terminada
         if kill :

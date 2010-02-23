@@ -454,12 +454,13 @@ class Proyecto(object):
 
     def cancelar_ejecucion(self):
         """@brief Termina la ejecución matando el proceso relacionado."""
-        subproc = self.ejec_subproc
-        if subproc is not None and subproc.poll() is None :
-            subproc.kill()
-            return True
-        else :
+        try:
+            self.ejec_subproc.kill()
+        except:
             return False
+        else :
+            log.info("Subproceso de ejecución matado")
+            return True
 
     ## @}
 
@@ -1061,5 +1062,10 @@ class Proyecto(object):
         # `- Comprobar ejecuciones
         pass
         return self.mod
+
+    def cerrar(self):
+        """@brief Cierra el proyecto, realiza comprobaciones y lo guarda. """
+        self.cancelar_ejecucion()
+        self.guardar()
 
     ## @}

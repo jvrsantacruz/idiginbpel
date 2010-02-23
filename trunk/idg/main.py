@@ -147,12 +147,8 @@ class Idg(object):
         return True
 
     def cerrar(self):
-        """TODO: @brief Realiza comprobaciones y cierra ordenadamente"""
+        """@brief Realiza comprobaciones y cierra ordenadamente"""
 
-        # Si hay un proyecto abierto y tiene cambios
-        # preguntar si debemos guardarlo.
-        if not self.proyecto is None \
-            and not self.proyecto.guardado is None:
-            return True
-        else:
-            return False
+        # Si hay un proyecto abierto lo cerramos antes de cerrar el programa.
+        if self.proyecto is not None :
+            self.proyecto.cerrar()
