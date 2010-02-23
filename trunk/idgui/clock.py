@@ -12,10 +12,11 @@ class Clock(Thread):
         """@brief Calcula el tiempo de ejecución y lo establece en la gui
           Muere cuando se llama a cancel()."""
 
-        def __init__(self, label, intervalo = 1):
+        def __init__(self, label, intervalo = 1, padre=None):
             """@brief Constructor del thread
             @param label Label a actualizar con el tiempo.
             @param intervalo Intervalo de actualización del reloj.
+            @param padre Intancia del thread padre. Terminará con el.
             """
             Thread.__init__(self)
             ## Tiempo inicial
@@ -26,6 +27,8 @@ class Clock(Thread):
             self.pausa = False
             ## Label a actualizar con el reloj
             self.label = label
+            ## Thread padre
+            self.padre = padre
 
         def status(self):
             """@brief Devuelve si el reloj está en corriendo (True) o en pausa
@@ -58,7 +61,8 @@ class Clock(Thread):
 
         def run(self):
 
-            while not self.end:
+            while not self.end :
+
                 # Diferencia desde que empezó hasta ahora
                 diff = time.time() - self.tstart
                 # Obtener dia, horas, minutos, segundos de esa diferencia
@@ -90,4 +94,8 @@ class Clock(Thread):
 
                 # Dormir el thread un segundo
                 time.sleep(1)
+
+                # Comprobar el thread padre
+                if self.padre is not None :
+                    self.end = self.padre.poll() is not None
 

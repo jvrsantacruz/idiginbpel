@@ -144,6 +144,8 @@ class Ejecucion(Thread):
                        and self.caso_actual != caso :
                         gtk.gdk.threads_enter()
                         self.ui.activar_ejec_caso(self.caso_actual, 3)
+                        frac = self.barra.get_fraction() + self.pulse
+                        self.barra.set_fraction( frac if frac <= 1 else 1 )
                         gtk.gdk.threads_leave()
 
                     # Establecemos la variable general caso
@@ -191,7 +193,6 @@ class Ejecucion(Thread):
                         round = r.group(2)
 
                     log.info(_("Parado el caso: ") + rcaso)
-
 
                     if round is None :
                         # Marcamos el caso actual como terminado
@@ -245,23 +246,25 @@ class Ejecucion(Thread):
 
         # Control para el término del proceso
         # poll es None si el proceso no ha terminado aún.
-        end = not subproc is None and not subproc.poll() is None
+        end = subproc is None or subproc.poll() is not None
 
         # Tiempo desde el comienzo de ejecución
         # Ejecuta cada segundo la función time en un thread aparte
         # Le pasamos el label que tiene que actualizar y lo arrancamos.
-        thread_timer = Clock(self.ui.ejec_control_tiempo_label)
+        #  también le pasamos el thread de ejecución para que quede ligado.
+        thread_timer = Clock(label=self.ui.ejec_control_tiempo_label, padre=subproc)
         thread_timer.start()
 
         # El subproceso debe existir y no haber terminado
-        while not subproc is None and not end:
+        while not end:
 
             # Mandar a dormir para esperar
             time.sleep(self.t)
             log.debug("Comprobando Tests")
 
             # Saber si el proceso ha terminado
-            end = not subproc.poll() is None
+            end = subproc.poll() is not None
+
             # Leer lo que haya en la tubería
             while 1 :
                 line = subproc.stdout.readline()
