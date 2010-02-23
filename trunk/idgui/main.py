@@ -15,6 +15,7 @@ import util.logger
 log = util.logger.getlog('idgui.main')
 
 from proyecto import ProyectoUI
+from opciones import OptUI
 
 class Idgui(object):
     """@brief Objeto principal de la gui."""
@@ -30,7 +31,7 @@ class Idgui(object):
         ## Instancia de gtkbuilder
         self.builder = gtk.Builder()
         ## Instancia de la clase idg
-        self.idg = idg;
+        self.idg = idg
 
         # Thread safe
         gobject.threads_init()
@@ -294,5 +295,10 @@ class Idgui(object):
     def on_main_importar(self, widget):
         """@brief Callback de pulsar la opción de importar"""
         pass
+
+    def on_menu_opciones(self, widget):
+        """@brief Callback de seleccionar en el menú ver las opciones."""
+        OptUI(self.builder, self.idg.opt)
+
     ## @}
 

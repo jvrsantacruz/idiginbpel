@@ -78,41 +78,50 @@
                   <object class="GtkHBox" id="proy_config_dep_caja">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkTreeView" id="proy_config_dep_view">
+                      <object class="GtkScrolledWindow" id="proy_config_dep_view_scroll">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="model">proy_config_dep_list</property>
-                        <property name="headers_clickable">False</property>
+                        <property name="hscrollbar_policy">automatic</property>
+                        <property name="vscrollbar_policy">automatic</property>
                         <child>
-                          <object class="GtkTreeViewColumn" id="proy_config_dep_view_estado_col">
-                            <property name="title">Estado</property>
+                          <object class="GtkTreeView" id="proy_config_dep_view">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="model">proy_config_dep_list</property>
+                            <property name="headers_clickable">False</property>
+                            <property name="search_column">1</property>
                             <child>
-                              <object class="GtkCellRendererPixbuf" id="proy_config_dep_view_estado_renderpixbuf"/>
-                              <attributes>
-                                <attribute name="pixbuf">0</attribute>
-                              </attributes>
+                              <object class="GtkTreeViewColumn" id="proy_config_dep_view_estado_col">
+                                <property name="title">Estado</property>
+                                <child>
+                                  <object class="GtkCellRendererPixbuf" id="proy_config_dep_view_estado_renderpixbuf"/>
+                                  <attributes>
+                                    <attribute name="pixbuf">0</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
                             </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn" id="proy_config_dep_view_nombre_col">
-                            <property name="title">Nombre</property>
                             <child>
-                              <object class="GtkCellRendererText" id="proy_config_dep_view_estado_rendertext"/>
-                              <attributes>
-                                <attribute name="text">1</attribute>
-                              </attributes>
+                              <object class="GtkTreeViewColumn" id="proy_config_dep_view_nombre_col">
+                                <property name="title">Nombre</property>
+                                <child>
+                                  <object class="GtkCellRendererText" id="proy_config_dep_view_estado_rendertext"/>
+                                  <attributes>
+                                    <attribute name="text">1</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
                             </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn" id="proy_config_dep_view_ruta_col">
-                            <property name="title">Ruta</property>
                             <child>
-                              <object class="GtkCellRendererText" id="proy_config_dep_view_ruta_rendertext"/>
-                              <attributes>
-                                <attribute name="text">2</attribute>
-                              </attributes>
+                              <object class="GtkTreeViewColumn" id="proy_config_dep_view_ruta_col">
+                                <property name="title">Ruta</property>
+                                <child>
+                                  <object class="GtkCellRendererText" id="proy_config_dep_view_ruta_rendertext"/>
+                                  <attributes>
+                                    <attribute name="text">2</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
                             </child>
                           </object>
                         </child>
@@ -227,98 +236,7 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
                     <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkTable" id="proy_config_server">
-                    <property name="visible">True</property>
-                    <property name="n_rows">2</property>
-                    <property name="n_columns">2</property>
-                    <property name="homogeneous">True</property>
-                    <child>
-                      <object class="GtkLabel" id="proy_config_configuracion_label">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Configuraci&#xF3;n</property>
-                        <attributes>
-                          <attribute name="weight" value="bold"/>
-                        </attributes>
-                      </object>
-                      <packing>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHBox" id="proy_config_port_caja">
-                        <property name="visible">True</property>
-                        <child>
-                          <object class="GtkLabel" id="proy_config_port_label">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Puerto</property>
-                          </object>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkEntry" id="proy_config_port_texto">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="invisible_char">&#x25CF;</property>
-                            <property name="width_chars">5</property>
-                            <property name="text" translatable="yes">8080</property>
-                          </object>
-                          <packing>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHBox" id="proy_config_svr_caja">
-                        <property name="visible">True</property>
-                        <child>
-                          <object class="GtkLabel" id="proy_config_svr_label">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Servidor Active Bpel</property>
-                          </object>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkEntry" id="proy_config_svr_texto">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="invisible_char">&#x25CF;</property>
-                            <property name="text" translatable="yes">localhost</property>
-                          </object>
-                          <packing>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="padding">20</property>
-                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
@@ -356,7 +274,9 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="position">3</property>
+                    <property name="fill">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -364,7 +284,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_config_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Configuraci&#xF3;n</property>
+                <property name="label" translatable="yes">Proyecto</property>
                 <attributes>
                   <attribute name="weight" value="semibold"/>
                 </attributes>
@@ -395,8 +315,8 @@
                       <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
                         <property name="events">GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
-                        <property name="filter">proy_casos_bpts_filtro</property>
                         <property name="create_folders">False</property>
+                        <property name="filter">proy_casos_bpts_filtro</property>
                         <signal name="file_set" handler="on_proy_casos_bpts_fichero"/>
                       </object>
                       <packing>

@@ -51,6 +51,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="main_menu_preferencias">
+                        <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Editar las preferencias generales del programa.</property>
+                        <property name="label" translatable="yes">_Preferencias</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_opciones"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="main_menu_archivo_separador">
                         <property name="visible">True</property>
                       </object>
@@ -68,7 +77,7 @@
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="menuitem4">
+              <object class="GtkMenuItem" id="Ay_uda">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Ay_uda</property>
                 <property name="use_underline">True</property>

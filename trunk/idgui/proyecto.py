@@ -113,12 +113,12 @@ class ProyectoUI:
 
         # Configuración del servidor
         ## Texto Url de conexión del servidor Active Bpel
-        self.svr_texto = self.gtk.get_object("proy_config_svr_texto")
-        self.svr_texto.set_text(self.proy.svr)
+        #self.svr_texto = self.gtk.get_object("proy_config_svr_texto")
+        #self.svr_texto.set_text(self.proy.svr)
 
         ## Texto Puerto de conexión del servidor Active Bpel
-        self.port_texto = self.gtk.get_object("proy_config_port_texto")
-        self.port_texto.set_text(self.proy.port)
+        #self.port_texto = self.gtk.get_object("proy_config_port_texto")
+        #self.port_texto.set_text(self.proy.port)
 
         # Dependencias
         ## Label con el número total de dependencias
@@ -163,9 +163,6 @@ class ProyectoUI:
                 l = [ buena, path.basename(d), _("Dentro del proyecto") ]
             self.dep_list.append(l)
 
-    def listar_dependencias_config(self):
-        """@brief Actualiza la lista de dependencias en el tree de config"""
-        pass
     ## @}
 
     ## @name Callbacks Config
