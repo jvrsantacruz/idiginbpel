@@ -315,8 +315,8 @@
                       <object class="GtkFileChooserButton" id="proy_casos_btps_fichero">
                         <property name="visible">True</property>
                         <property name="events">GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
-                        <property name="create_folders">False</property>
                         <property name="filter">proy_casos_bpts_filtro</property>
+                        <property name="create_folders">False</property>
                         <signal name="file_set" handler="on_proy_casos_bpts_fichero"/>
                       </object>
                       <packing>
@@ -800,48 +800,40 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="hbox7">
+              <object class="GtkHBox" id="proy_anl_contenedor">
                 <property name="visible">True</property>
                 <child>
-                  <object class="GtkTreeView" id="treeview3">
+                  <object class="GtkTreeView" id="proy_anl_view">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="model">proy_casos_tree</property>
                     <property name="headers_clickable">False</property>
                     <property name="search_column">0</property>
-                    <child>
-                      <object class="GtkTreeViewColumn" id="treeviewcolumn3">
-                        <property name="title">Trazas</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="Trazas"/>
-                        </child>
-                      </object>
-                    </child>
                   </object>
                   <packing>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkVBox" id="vbox7">
+                  <object class="GtkVBox" id="proy_anl_caja_derecha">
                     <property name="visible">True</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkFrame" id="frame4">
+                      <object class="GtkFrame" id="proy_anl_opt_frame">
                         <property name="visible">True</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
-                          <object class="GtkAlignment" id="alignment4">
+                          <object class="GtkAlignment" id="proy_anl_opt_alignment">
                             <property name="visible">True</property>
                             <property name="left_padding">12</property>
                             <child>
-                              <object class="GtkTable" id="table3">
+                              <object class="GtkTable" id="proy_anl_opt_table">
                                 <property name="visible">True</property>
                                 <property name="n_rows">2</property>
                                 <property name="n_columns">2</property>
                                 <child>
-                                  <object class="GtkLabel" id="label21">
+                                  <object class="GtkLabel" id="proy_anl_opt_aplanado_label">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">Tipo de Aplanado</property>
                                   </object>
@@ -850,7 +842,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkComboBox" id="combobox1">
+                                  <object class="GtkComboBox" id="proy_anl_opt_simplify_combo">
                                     <property name="visible">True</property>
                                   </object>
                                   <packing>
@@ -860,7 +852,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="label22">
+                                  <object class="GtkLabel" id="proy_anl_opt_simplify_label">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">Simplify</property>
                                   </object>
@@ -871,7 +863,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="checkbutton1">
+                                  <object class="GtkCheckButton" id="proy_anl_opt_simplify_check">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
@@ -903,7 +895,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="button7">
+                      <object class="GtkButton" id="proy_anl_ejecutar_boton">
                         <property name="label" translatable="yes">Ejecutar Daikon</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
