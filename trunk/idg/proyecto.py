@@ -59,8 +59,10 @@ class Proyecto(object):
 
     ## Directorio con los casos de prueba
     casos_nom  =    'casos'
-    ## Directorio con las trazas generadas por la ejecución
+    ## Directorio 'almacén' con las trazas generadas por la ejecución
     trazas_nom =    'trazas'
+    ## Directorio con las trazas que se usarán en el análisis
+    anltrazas_nom = 'anltrazas'
     ## Directorio con los invariantes generados
     invr_nom   =    'invariantes'
     ## Directorio con las dependencias del bpel
@@ -195,8 +197,10 @@ class Proyecto(object):
 
         ## Ruta al directorio que contiene los casos de prueba
         self.casos_dir  =   path.join(self.dir, self.casos_nom ) # Casos
-        ## Ruta al directorio que contiene las trazas
+        ## Ruta al directorio que contiene todas las trazas
         self.trazas_dir =   path.join(self.dir, self.trazas_nom) # Trazas
+        ## Ruta al directorio que contiene las trazas
+        self.anltrazas_dir =   path.join(self.dir, self.anltrazas_nom) # Trazas
         ## Ruta al directorio que contiene los invariantes
         self.invr_dir   =   path.join(self.dir, self.invr_nom)   # Invariantes
         ## Ruta al directorio que contiene las dependencias
@@ -385,7 +389,7 @@ class Proyecto(object):
             self.inst_thread.start()
 
     def ejecutar(self):
-        """@brief Ejecuta lost casos de prueba del proyecto en el servidor ABpel. """
+        """@brief Ejecuta los casos de prueba del proyecto en el servidor ABpel. """
 
         # No crear otro subproceso si ya se está ejecutando uno.
         if self.ejec_subproc is not None and self.ejec_subproc.poll() is None :
@@ -398,8 +402,7 @@ class Proyecto(object):
 
         # Borrar los logs antiguos bpelunit
         try:
-            [os.remove(path.join(BUpath,f)) for f in os.listdir(BUpath)  \
-             if len(f) > 4 and f[-4:] ==  '.log']
+            self.borrar_trazas(BUpath)
         except:
             log.error(_("No se han podido eliminar los logs antiguos de \
                         bpelunit: " + BUpath))
@@ -411,9 +414,9 @@ class Proyecto(object):
         # Sin expansión de argumentos por shell
         # El resultado va todo a stdout, el de stderr también.
         self.ejec_subproc = subproc.Popen(cmd, 
-                                          shell=False,
-                                          stdout=subproc.PIPE,
-                                          stderr=subproc.STDOUT)
+                                          shell = False,
+                                          stdout = subproc.PIPE,
+                                          stderr = subproc.STDOUT)
 
     def comprobar_abpel(self):
         """@brief Comprueba el estado del servidor ActiveBpel.
@@ -462,6 +465,24 @@ class Proyecto(object):
             log.info("Subproceso de ejecución matado")
             return True
 
+    def analizar(self):
+        """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
+        trazas seleccionadas."""
+
+        # No crear otro subproceso si ya se está ejecutando
+        if self.anl_subproc is not None and self.anl_subproc.poll() is None :
+            log.warning(_("El proyecto ya se está ejecutando"))
+            return
+
+        cmd = ["ant", "-f", self.build, "analyze"]
+        log.info(_("Analizando: ") + str(cmd))
+        # Abrimos un proceso y leeremos de su salida estandar.
+        # Redireccionamos la salida de errores a la estandar.
+        self.anl_subproc = subproc.Popen(cmd,
+                                         shell = False,
+                                         stdout = subproc.PIE,
+                                         stderr = subproc.STDOUT)
+
     ## @}
 
     ## @name Casos de prueba
@@ -505,10 +526,12 @@ class Proyecto(object):
         nom = path.basename(ruta)
         dir = path.dirname(ruta)
 
+        # Escapamos los caracteres separadores ':' por '.'
+        pnom = nom.replace(':', '.')
+
         # Lo copiamos al proyecto en casos_dir
         # Aseguramos el nombre para no sobreescribir
         i = 1
-        pnom = nom
         pruta = path.join(self.casos_dir,pnom)
 
         while path.exists(pruta):
@@ -526,8 +549,8 @@ class Proyecto(object):
         # Añadimos el fichero a fcasos
         self.fcasos.append(pnom)
 
-        # Añadimos los casos de uso 
-        self.casos[pnom] = self.list_bpts(pruta)
+        # Añadimos los casos del nuevo bpts (escapando : por . )
+        self.casos[pnom] = [n.replace(':', '.') for n in self.list_bpts(pruta)]
 
         # Actualizamos la información de test.bpts con la del proyecto
         self.add_bpts_info(pruta)
@@ -758,6 +781,108 @@ class Proyecto(object):
             e = _("No se ha podido escribir el fichero bpts ") + bpts
             log.error(e)
             raise ProyectoRecuperable(e)
+
+    ## @}
+
+    ## @name Trazas
+    ## @{
+
+    def borrar_trazas(self, dir):
+        """@brief Borra todas las trazas.log en un directorio.
+        @param dir El directorio .
+        """
+        [os.remove(path.join(dir,f)) for f in os.listdir(dir)  \
+         if len(f) > 4 and f[-4:] == '.log']
+        
+    def trazas_disponibles(self):
+        """@brief Devuelve las trazas disponibles en un diccionario
+        trazas[fichero][caso] = [fichero, fichero...] 
+        @retval Una lista con los nombres de los ficheros de trazas.
+        """
+        return self.parse_trazas(os.listdir(self.trazas_dir))
+
+    def ordenar_trazas(self, trazas):
+        """@brief Toma una lista con nombres de ficheros de trazas y la
+        devuelve ordenada por tiempo de generación.
+        @retval La lista trazas ordenada por tiempos.
+        """
+        def traza_time_cmp(x, y):
+            # Nombre a float 
+            #(sacar el timestamp del nombre de la traza y convertirlo a float.)
+            n2f = lambda n : float(n.rsplit(':',1)[1].rsplit('.',1)[0])
+            int(n2f(x) - n2f(y))
+
+        # Ordenar las trazas por tiempo de ejecución
+        trazas.sort(traza_time_cmp)
+
+    def parse_traza(self, traza):
+        """@brief Toma el nombre de un fichero de traza y devuelve 3 valores,
+        fichero, caso, time
+        @param traza El nombre del fichero de traza.
+        @retval Los 3 valores fich, caso, time 
+        """
+        # Estructura de los nombres
+        # 1(fichero):2(caso):3(timestamp)
+        # Ejemplo: LoanApprovalProcess.bpts:LargeAmount-1267033799.94.log
+        # El timestamp se encuentra en segundos y es obtenido con time.time()
+
+        fich, caso, time = f.split(':')
+        time = time.split('.',1)
+
+        return fich, caso, time
+
+    def dict_trazas(self, trazas):
+        """@brief Toma una lista con nombres de ficheros de trazas y devuelve
+        un objeto del tipo  trazas[fichero][caso] = [fich_traza, ..]
+        @param trazas Lista con los nombres de los ficheros de trazas.
+        @retval Un diccionario  donde los nombres de los ficheros de trazas están ordenados de más
+        reciente a más antiguo.
+        { fichero : {
+                        caso_prueba: [fich_traza 1, fich_traza 2, ..],
+                        caso_prueba2: [fich_traza 1, fich_traza 2, ..],
+                        ...
+                    } 
+        }
+        """
+
+        # Diccionario a devolver
+        trz = {}
+
+        # Añadir las trazas al diccionario
+        #  como están ordenadas, se añaden a las listas por orden.
+        for f in trazas :
+            fich, caso, time = self.parse_traza(f)
+
+            log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
+
+            if fichero not in trz :
+                trz[fichero] = {}
+
+            if caso not in trz[fichero] :
+                trz[fichero][caso] = []
+
+            trz[fichero][caso].append(f)
+
+        return trz
+
+    def ultimas_trazas(self, trazas) :
+        """@brief Devuelve las últimas trazas disponibles en una
+            lista.
+            @param trazas Lista con los nombres de los ficheros de trazas.
+            @retval Lista con el más reciente de cada caso de los ficheros de
+            traza.
+        """
+        tr = {}
+        tord = self.ordenar_trazas(trazas) 
+        tend = []
+        for f in trazas : 
+            nom, time = f.rsplit(':', 1)
+
+            if nom not in tr :
+                tr[nom] = True
+                tend.append(f)
+
+        return tend
 
     ## @}
 
