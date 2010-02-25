@@ -32,8 +32,25 @@
       <column type="gint"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="liststore1"/>
-  <object class="GtkWindow" id="proy_fake_window">
+  <object class="GtkTreeStore" id="proy_anl_tree">
+    <columns>
+      <!-- column-name nom -->
+      <column type="gchararray"/>
+      <!-- column-name fichero -->
+      <column type="gchararray"/>
+      <!-- column-name caso -->
+      <column type="gchararray"/>
+      <!-- column-name timestamp -->
+      <column type="gchararray"/>
+      <!-- column-name icono -->
+      <column type="gchararray"/>
+      <!-- column-name marcado -->
+      <column type="gboolean"/>
+      <!-- column-name es_radio -->
+      <column type="gboolean"/>
+    </columns>
+  </object>
+  <object class="GtkWindow" id="proy_window">
     <child>
       <object class="GtkVBox" id="proy_base_contenedor">
         <property name="visible">True</property>
@@ -346,6 +363,7 @@
                             <property name="model">proy_casos_tree</property>
                             <property name="headers_clickable">False</property>
                             <property name="search_column">9</property>
+                            <property name="hover_expand">True</property>
                             <child>
                               <object class="GtkTreeViewColumn" id="proy_casos_column">
                                 <property name="title">Casos de prueba</property>
@@ -803,12 +821,46 @@
               <object class="GtkHBox" id="proy_anl_contenedor">
                 <property name="visible">True</property>
                 <child>
-                  <object class="GtkTreeView" id="proy_anl_view">
+                  <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="model">proy_casos_tree</property>
-                    <property name="headers_clickable">False</property>
-                    <property name="search_column">0</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <child>
+                      <object class="GtkTreeView" id="proy_anl_view">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="model">proy_anl_tree</property>
+                        <property name="headers_clickable">False</property>
+                        <property name="search_column">0</property>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="proy_anl_tree_column_trazas">
+                            <property name="title">Trazas</property>
+                            <child>
+                              <object class="GtkCellRendererToggle" id="proy_anl_tree_cell_marcado">
+                                <signal name="toggled" handler="on_anl_tree_toggle"/>
+                              </object>
+                              <attributes>
+                                <attribute name="active">5</attribute>
+                                <attribute name="radio">6</attribute>
+                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkCellRendererPixbuf" id="proy_anl_tree_cell_icono"/>
+                              <attributes>
+                                <attribute name="stock-id">4</attribute>
+                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkCellRendererText" id="proy_anl_tree_cell_nombre"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="position">0</property>
@@ -842,7 +894,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkComboBox" id="proy_anl_opt_simplify_combo">
+                                  <object class="GtkComboBox" id="proy_anl_opt_aplanado_combo">
                                     <property name="visible">True</property>
                                   </object>
                                   <packing>
@@ -909,6 +961,9 @@
                     </child>
                   </object>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="padding">9</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -1047,7 +1102,6 @@
                               <object class="GtkTreeView" id="treeview4">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="model">liststore1</property>
                                 <property name="headers_clickable">False</property>
                                 <property name="search_column">0</property>
                                 <child>

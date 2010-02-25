@@ -212,7 +212,7 @@ class Ejecucion(Thread):
                     try:
                         # Tomamos el primer log que haya en process-logs
                         src = os.path.join(BUpath, os.listdir(BUpath)[0])
-                        file = caso + "-" + str(time.time()) + ".log"
+                        file = caso + ":" + str(time.time()) + ".log"
                         dst = os.path.join(self.proy.trazas_dir, file)
 
                         log.info('Moviendo ' + src + ' a ' + dst)

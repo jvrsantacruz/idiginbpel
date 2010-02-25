@@ -3,6 +3,8 @@
 
 import os.path as path
 import sys
+import shutil
+
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -70,6 +72,7 @@ class ProyectoUI:
         self.__init_config()
         self.__init_casos()
         self.__init_ejec()
+        self.__init_anl()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -193,7 +196,6 @@ class ProyectoUI:
         """@brief Callback de pulsar el botón de buscar dependencias
         @param widget Botón"""
         try:
-            from idg.proyecto import ProyectoError
             log.info("Bpel original: " + self.proy.bpel_o)
             self.proy.buscar_dependencias(self.proy.bpel_o)
         except ProyectoError:
@@ -757,6 +759,217 @@ class ProyectoUI:
             self.ejec_terminar()
         else:
             self.ejecutar()
+
+    ## @}
+
+    ## @name Analisis
+    ## @{
+
+    def __init_anl(self):
+        """@brief Inicializa las variables propias de la parte de análisis."""
+        ## Vista en árbol de las trazas disponibles
+        self.anl_view = self.gtk.get_object('proy_anl_view')
+        ## Almacenamiento en árbol de las trazas disponibles
+        self.anl_tree = self.gtk.get_object('proy_anl_tree')
+
+        ## Combo selector de los tipos de aplanado
+        self.anl_aplanado_combo = \
+                self.gtk.get_object('proy_anl_opt_aplanado_combo')
+        ## Check de empleo de simplify
+        self.anl_simplify_check = \
+                self.gtk.get_object('proy_anl_opt_simplify_check')
+
+        ## Botón de ejecución
+        self.anl_ejecutar_boton = \
+                self.gtk.get_object('proy_anl_ejecutar_boton')
+
+        self.actualizar_trazas()
+
+    def analizar(self):
+        self.actualizar_trazas()
+
+    def actualizar_trazas(self):
+        """@brief Actualiza el tree de trazas disponibles."""
+        # Acortar nombres de vista y modelo
+        m = self.anl_tree
+        v = self.anl_view
+
+        # Desconectar la vista del modelo
+        v.set_model(None)
+
+        # Limpiar el árbol
+        m.clear()
+
+        # Obtener todas las trazas en un diccionario
+        log.debug(self.proy.trazas_disponibles())
+        trz = self.proy.trazas_disponibles()
+        log.debug(trz)
+
+        # Añadir al tree el diccionario trz[fichero][caso] = [ficheros...]
+        # El tree tiene filas del tipo: nombre, fichero, caso, timestamp, icono
+        # La fila del modelo tiene los siguientes campos:
+        # [nombre, fichero, caso, timestamp, icono, esta_marcado, es_radio]
+        for f, casos in trz.items() :
+            f_iter = m.append(None, [f, f, "", "", gtk.STOCK_OPEN, True, False])
+            for c, fichs in casos.items() :
+                c_iter = m.append(f_iter, [c, f, c, "", gtk.STOCK_OPEN, True, False])
+                first = True
+                for fich in fichs :
+                    try:
+                        time = fich.rsplit(':',1)[1].rsplit('.',1)[0]
+                    except:
+                        time = ""
+                    fi_iter = m.append(c_iter, [fich, f, c, time,
+                                                gtk.STOCK_OPEN, False, True])
+
+                    # Si es el primero, ponerle el timestamp al padre y
+                    # marcarlo como incluido para el análisis
+                    if first :
+                        m.set_value(fi_iter, 5, True)
+                        m.set_value(c_iter, 0, "%s (%s %s)" % \
+                                    (c, _("De"),time))
+                        m.set_value(c_iter, 3, time)
+                        first = False
+
+        # Conectar la vista y el modelo de nuevo.
+        v.set_model(m)
+
+    def anl_view_toggle_child_lv0(self, it, val):
+        """@brief Marcar/desmarcar en el treeview de análisis los ficheros
+        completos y a todos sus hijos.
+        @param iter Iterador al fichero.
+        @param val El valor del check DESPUÉS de pulsarlo.
+        """
+        # Acortamos nombres de árbol y vista
+        m = self.anl_tree
+        v = self.anl_view
+
+        # Nos marcamos/desmarcamos
+        m.set_value(it, 5, val)
+
+        # Si lo marcamos, marcamos todos los casos y sus primeros hijos
+        # Si lo desmarcamos, desmarcamos todos los casos y todos sus hijos
+        c = m.iter_children(it) # El primer hijo
+        if val :
+            while c is not None :
+                self.anl_view_toggle_child_lv1(c, True)
+                c = m.iter_next(c)
+        else :
+            while c is not None :
+                self.anl_view_toggle_child_lv1(c, False, it)
+                c = m.iter_next(c)
+
+    def anl_view_toggle_child_lv1(self, it, val, p = None) :
+        """@brief Marcar/desmarcar en el treeview de análisis los casos
+        completos y a todos sus hijos.
+        @param iter Iterador al caso padre.
+        @param val El valor del check DESPUÉS de pulsarlo.
+        @param p Iterador al padre (Opcional).
+        """
+        # Acortamos nombres de árbol y vista
+        m = self.anl_tree
+        v = self.anl_view
+
+        # Si lo marcamos, marcamos también al primer hijo.
+        # Si lo desmarcamos, desmarcamos todos los hijos.
+
+        c = m.iter_children(it) # El primer hijo
+
+        if not val :
+            # Desmarcar todos los hijos
+            while c is not None :
+                self.anl_view_toggle_child_lv2(c, False)
+                c = m.iter_next(c)
+
+            # Marcarnos a nosotros mismos
+            m.set_value(it, 5, val)
+
+        # Si no tiene ningún hermano marcado, marcar/desmarcar al padre también.
+        # Si lo llamamos desde el padre no lo hacemos
+        if p is None :
+            p = m.iter_parent(it) 
+            b = m.iter_children(p) # Primer hermano
+            todos = True           # Flag de todos desmarcados.
+            dummy = m.get_value(b, 5) # Dummy para acumular el valor
+
+            # Recorremos todos los hermanos mirando si están todos en la misma
+            # posición. Todos marcados o todos desmarcados.
+            while b is not None :
+                if dummy != m.get_value(b, 5) :
+                    todos = False
+                    break
+                else :
+                    b = m.iter_next(b)
+
+            # Si están todos los hermanos igual, darle al padre el mismo valor
+            if todos :
+                m.set_value(p, 5, val)
+
+        if val :
+            # Marcar el primer hijo
+            self.anl_view_toggle_child_lv2(c, True)
+            # Marcarnos a nosotros mismos
+            m.set_value(it, 5, val)
+
+    def anl_view_toggle_child_lv2(self, it, val):
+        """@brief Marcar/desmarcar en el treeview de análisis los casos
+        concretos teniendo en cuenta a todos sus hermanos.
+        @param iter Iterador al caso.
+        @param val El valor del check DESPUÉS de pulsarlo.
+        """
+        # Acortamos nombres de árbol y vista
+        m = self.anl_tree
+        v = self.anl_view
+
+        # Si lo marcamos, desmarcar a los hermanos y actualizar la
+        # información del padre.
+        # Si lo desmarcamos, nada.
+        if val :
+            p = m.iter_parent(it) # El padre es lv1
+            c = m.iter_children(p) # El primer hijo
+            # Recorremos todos los hijos de su padre desmarcándolos
+            while c is not None :
+                m.set_value(c, 5, False)
+                c = m.iter_next(c)
+
+            # Actualizar la info del padre con el timestamp del hijo
+            pnom = m.get_value(p, 2) # El nombre del padre
+            time = m.get_value(it, 3) # timestamp del hijo
+            pnom = "%s (%s %s)" % (pnom, _("De"),time) # Formato nombre padre
+            m.set_value(p, 0, pnom)
+
+        # Marcamos el valor
+        m.set_value(it, 5, val)
+
+    ## @}
+
+    ## @name Callbacks Analisis
+    ## @{
+
+    def on_anl_tree_toggle(self, render, path):
+
+        # Acortamos nombres de árbol y vista
+        m = self.anl_tree
+        v = self.anl_view
+        # Obtenemos un iterador a esa fila
+        it = m.get_iter_from_string(path)
+        # Averiguamos que profundidad hay
+        lv = m.iter_depth(it)
+
+        # Cambiamos el estado de lo que se ha pulsado
+        val = not m.get_value(it, 5)
+        #m.set_value(it, 5, val)
+
+        # Si es de nivel 0 marcar/desmarcar todos los hijos nv 1
+        # Si es de nivel 1 desmarcarlos todos y en caso, marcar el primer hijo
+        # Si es de nivel 2 desmarcarlo, o marcarlo a el y desmarcar a sus
+        # hermanos
+        if lv == 0:
+            self.anl_view_toggle_child_lv0(it, val)
+        elif lv == 1:
+            self.anl_view_toggle_child_lv1(it, val)
+        else:
+            self.anl_view_toggle_child_lv2(it, val)
 
     ## @}
 

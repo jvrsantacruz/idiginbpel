@@ -9,6 +9,8 @@
     </columns>
   </object>
   <object class="GtkWindow" id="main_ventana">
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
     <signal name="destroy" handler="on_main_ventana_destroy"/>
     <child>
       <object class="GtkVBox" id="main_vbase">
