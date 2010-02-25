@@ -242,8 +242,8 @@ class Proyecto(object):
 
         # Comprobar el bpel que nos pasan
         if not path.exists( bpel ):
-            log.error(_("Error no se pudo abrir ") + bpel)
-            raise ProyectoError( _("Error no se pudo abrir ") + bpel)
+            log.error(_("El bpel no existe: ") + bpel)
+            raise ProyectoError( _("Bpel no existe: ") + bpel)
 
         # Buscar las dependencias del bpel recursivamente
         ## Lista de rutas con las dependencias del bpel
@@ -315,7 +315,7 @@ class Proyecto(object):
             # Obtener las rutas absolutas  meterlas en deps
             for i in imps:
                 attr = 'location' if i.hasAttribute('location') else 'schemaLocation'
-                # Si no está el atributo por alguna razón, continuar.
+                # Si no está el atributo por alguna razón, pasar de el.
                 ruta = i.getAttribute(attr) 
                 if not ruta:
                     continue
@@ -329,12 +329,16 @@ class Proyecto(object):
 
                 log.debug(nom + " --> " + path.basename(ruta))
 
-                # Si es el bpel original (first) o un fichero .xsd (xsd) la
-                # dependencia apuntará al directorio de dependencias
-                # (self.dep_nom) Si es una dependencia más, sus imports estarán
-                # en el mismo directorio.
-                ruta = path.basename(ruta) if not (first or xsd) else  \
-                        path.join(self.dep_nom, path.basename(ruta))
+                # Los bpel (first) y los .xsd apuntan a dependencias
+                # El resto de dependencias, al mismo directorio.
+                # Si una dependencia importa una xsd, apuntará al directorio
+                # superior.
+                if first or xsd :
+                    ruta = path.join(self.dep_nom, path.basename(ruta))
+                elif ruta.endswith('.xsd') :
+                    ruta = path.join('..', path.basename(ruta))
+                else :
+                    ruta = path.basename(ruta)
 
                 # Modificar el atributo con la ruta correcta
                 i.setAttribute(attr, ruta)
@@ -791,26 +795,27 @@ class Proyecto(object):
         """@brief Borra todas las trazas.log en un directorio.
         @param dir El directorio .
         """
-        [os.remove(path.join(dir,f)) for f in os.listdir(dir)  \
-         if len(f) > 4 and f[-4:] == '.log']
+        [os.remove(path.join(dir,f)) for f in os.listdir(dir) if f.endswith('.log')]
         
     def trazas_disponibles(self):
         """@brief Devuelve las trazas disponibles en un diccionario
         trazas[fichero][caso] = [fichero, fichero...] 
         @retval Una lista con los nombres de los ficheros de trazas.
         """
-        return self.parse_trazas(os.listdir(self.trazas_dir))
+        return self.dict_trazas(os.listdir(self.trazas_dir))
 
     def ordenar_trazas(self, trazas):
         """@brief Toma una lista con nombres de ficheros de trazas y la
-        devuelve ordenada por tiempo de generación.
-        @retval La lista trazas ordenada por tiempos.
+        devuelve ordenada por tiempo de generación de mayor a menor timestamp
+        es decir, de más nueva a la más antigua.
+        @retval La lista trazas ordenada por tiempos de la más nueva a la más
+        antigua.
         """
         def traza_time_cmp(x, y):
             # Nombre a float 
             #(sacar el timestamp del nombre de la traza y convertirlo a float.)
             n2f = lambda n : float(n.rsplit(':',1)[1].rsplit('.',1)[0])
-            int(n2f(x) - n2f(y))
+            int(n2f(y) - n2f(x))
 
         # Ordenar las trazas por tiempo de ejecución
         trazas.sort(traza_time_cmp)
@@ -826,8 +831,12 @@ class Proyecto(object):
         # Ejemplo: LoanApprovalProcess.bpts:LargeAmount-1267033799.94.log
         # El timestamp se encuentra en segundos y es obtenido con time.time()
 
-        fich, caso, time = f.split(':')
-        time = time.split('.',1)
+        try:
+            fich, caso, time = traza.split(':')
+            time = time.split('.',1)[0]
+        except:
+            log.error(_("Hay una traza que no sigue el formato: " + traza))
+            return "","",""
 
         return fich, caso, time
 
@@ -854,14 +863,18 @@ class Proyecto(object):
             fich, caso, time = self.parse_traza(f)
 
             log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
+            if not fich or not caso or not time :
+                log.warning(_("Hay una traza que no sigue el formato y que no\
+                              se adjunta: ") + f)
+                continue
 
-            if fichero not in trz :
-                trz[fichero] = {}
+            if fich not in trz :
+                trz[fich] = {}
 
-            if caso not in trz[fichero] :
-                trz[fichero][caso] = []
+            if caso not in trz[fich] :
+                trz[fich][caso] = []
 
-            trz[fichero][caso].append(f)
+            trz[fich][caso].append(f)
 
         return trz
 
@@ -876,7 +889,7 @@ class Proyecto(object):
         tord = self.ordenar_trazas(trazas) 
         tend = []
         for f in trazas : 
-            nom, time = f.rsplit(':', 1)
+            nom = f.rsplit(':', 1)[0]
 
             if nom not in tr :
                 tr[nom] = True
@@ -890,40 +903,46 @@ class Proyecto(object):
     ## @{
 
     def crear(self):
-        """@brief Crea el proyecto."""
+        """@brief Crea el proyecto desde 0 la primera vez."""
 
-        # Comprobar el nombre
-        if len(str(self.nombre).strip()) == 0: 
-            raise ProyectoError(_("Nombre de proyecto vacio"))
-
-        # Comprobar el bpel original
-        if not path.exists(self.bpel_o):
-            raise ProyectoError(_("Fichero bpel no existe ") + self.bpel_o)
-
-        # Crear el directorio nuevo en data
-        # Copiar los ficheros básicos de skel
-        log.info(_("Inicializando proyecto"))
         try:
-            shutil.copytree( path.join(self.share ,'skel') , self.dir )
+            # Comprobar el nombre
+            if len(str(self.nombre).strip()) == 0: 
+                raise ProyectoError(_("Nombre de proyecto vacio"))
+
+            # Comprobar el bpel original
+            if not path.exists(self.bpel_o):
+                raise ProyectoError(_("Fichero bpel no existe ") + self.bpel_o)
+
+            # Crear el directorio nuevo en data
+            # Copiar los ficheros básicos de skel
+            log.info(_("Inicializando proyecto"))
+            try:
+                shutil.copytree( path.join(self.share ,'skel') , self.dir )
+            except:
+                raise ProyectoError(_("Error al iniciar proyecto con: ") + \
+                                    path.join(self.share,'skel'))
+
+            # Buscar dependencias (y el bpel original modificándolo)
+            # Si falla borramos el intento de proyecto 
+            # y elevamos de nuevo la excepción
+            try:
+                log.info(_("Buscando dependencias"))
+                self.buscar_dependencias(self.bpel_o ) 
+            except ProyectoError, error:                    
+                log.error(_("Crear Proyecto: Error al crear ficheros de proyecto"))
+                raise error
+
+            # Imprimir directorios del proyecto
+            log.info(_("Proyecto creado correctamente"))
+            log.info(str(os.listdir(self.dir)))
+            return True
+
         except:
-            raise ProyectoError(_("Error al iniciar proyecto con: ") + \
-                                path.join(self.share,'skel'))
-
-        # Buscar dependencias (y el bpel original modificándolo)
-        # Si falla borramos el intento de proyecto 
-        # y elevamos de nuevo la excepción
-        try:
-            log.info(_("Buscando dependencias"))
-            self.buscar_dependencias(self.bpel_o ) 
-        except ProyectoError, error:                    
+            # Eliminar el intento de proyecto para que no queden antiguos
+            # proyectos en un estado inconsistente.
             shutil.rmtree(self.dir)
-            log.error(_("Crear Proyecto: Error al crear ficheros de proyecto"))
-            raise error
-
-        # Imprimir directorios del proyecto
-        log.info(_("Proyecto creado correctamente"))
-        log.info(str(os.listdir(self.dir)))
-        return True
+            raise
 
     def check(self):
         """@brief Comprueba que el proyecto está bien y sus ficheros de
