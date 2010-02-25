@@ -63,7 +63,9 @@ class OptUI(object):
                   self.list[path][1] + " a " + new_text) 
 
         # Modificarlo en las opciones
-        self.opts.set(self.list[path][0], new_text)
+        e = self.list[path][0]
+        attr = self.opts._opts_nm[e]
+        self.opts.set(e, new_text, attr)
         # Modificarlo en el treeview
         self.list[path][1] = new_text
         self.list[path][2] = gtk.STOCK_MEDIA_RECORD
