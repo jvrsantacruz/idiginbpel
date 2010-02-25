@@ -50,6 +50,24 @@
       <column type="gboolean"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="proy_anl_aplanado_combo_list">
+    <columns>
+      <!-- column-name nombre -->
+      <column type="gchararray"/>
+      <!-- column-name value -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">index-flattening</col>
+        <col id="1" translatable="yes">--index-flattening</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">matrix-flattening</col>
+        <col id="1" translatable="yes">--matrix-flattening</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="proy_window">
     <child>
       <object class="GtkVBox" id="proy_base_contenedor">
@@ -363,7 +381,6 @@
                             <property name="model">proy_casos_tree</property>
                             <property name="headers_clickable">False</property>
                             <property name="search_column">9</property>
-                            <property name="hover_expand">True</property>
                             <child>
                               <object class="GtkTreeViewColumn" id="proy_casos_column">
                                 <property name="title">Casos de prueba</property>
@@ -778,12 +795,38 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="proy_ejec_control_boton">
-                            <property name="label" translatable="yes">Ejecutar</property>
+                          <object class="GtkHBox" id="proy_ejec_control_box">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <signal name="released" handler="on_proy_ejec_control_boton"/>
+                            <child>
+                              <object class="GtkButton" id="proy_ejec_control_anl_boton">
+                                <property name="label" translatable="yes">Analizar</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <signal name="released" handler="on_proy_ejec_control_anl_boton"/>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
+                                <property name="pack_type">end</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="proy_ejec_control_ejec_boton">
+                                <property name="label" translatable="yes">Ejecutar</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <signal name="released" handler="on_proy_ejec_control_boton"/>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
+                                <property name="pack_type">end</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -896,6 +939,13 @@
                                 <child>
                                   <object class="GtkComboBox" id="proy_anl_opt_aplanado_combo">
                                     <property name="visible">True</property>
+                                    <property name="model">proy_anl_aplanado_combo_list</property>
+                                    <child>
+                                      <object class="GtkCellRendererText" id="proy_anl_aplanado_combo_text"/>
+                                      <attributes>
+                                        <attribute name="text">0</attribute>
+                                      </attributes>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left_attach">1</property>

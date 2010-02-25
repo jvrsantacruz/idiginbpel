@@ -493,12 +493,16 @@ class ProyectoUI:
         self.ejec_log_text = self.gtk.get_object('proy_ejec_log_text')
         # Label de estado
         self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
-        # TreeView de casos
+        ## TreeStore de casos
         self.ejec_tree = self.gtk.get_object('proy_ejec_tree')
+        ## TreeView de casos
         self.ejec_view = self.gtk.get_object('proy_ejec_view')
-        # Botón de empezar y detener
+        ## Botón de empezar y detener
         self.ejec_control_boton = \
-        self.gtk.get_object('proy_ejec_control_boton')
+        self.gtk.get_object('proy_ejec_control_ejec_boton')
+        ## Boton de analizar desde la pantalla de ejecución
+        self.ejec_control_analisis = \
+        self.gtk.get_object('proy_ejec_control_anl_boton')
         # Label del tiempo de ejecución
         self.ejec_control_tiempo_label = \
         self.gtk.get_object('proy_ejec_control_tiempo_label')
@@ -687,6 +691,7 @@ class ProyectoUI:
         """@brief Indica un error de conexión al intentar la ejecución."""
         self.idgui.estado(_("No se puede ejecutar si el servidor no está activo"))
         self.ejec_control_boton.set_label(_("Ejecutar"))
+        self.ejec_control_analisis.set_sensitive(True)
 
     def ejec_terminar(self):
         """@brief Termina la ejecución y establece los mensajes
@@ -706,6 +711,7 @@ class ProyectoUI:
 
         # Pone el botón de Detener en Ejecutar
         self.ejec_control_boton.set_label(_("Ejecutar"))
+        self.ejec_control_analisis.set_sensitive(True)
 
     def ejecutar(self):
         # Añadimos los casos seleccionados
@@ -720,6 +726,7 @@ class ProyectoUI:
 
         # Cambiar el botón de ejecutar por el de cancelar
         self.ejec_control_boton.set_label(_("Detener"))
+        self.ejec_control_analisis.set_sensitive(False)
         # Colapsar todos los casos
         self.ejec_view.collapse_all()
         # Ponerles a todos los casos y ficheros el icono de esperando
@@ -755,10 +762,18 @@ class ProyectoUI:
         return status == "Online"
 
     def on_proy_ejec_control_boton(self, widget):
+        """@brief Callback de pulsar el botón de ejecución en la pantalla de
+        ejecución.
+        """
         if widget.get_label() == _("Detener") :
             self.ejec_terminar()
         else:
             self.ejecutar()
+
+    def on_proy_ejec_control_anl_boton(self, widget):
+        """@brief Callback de pulsar el botón de análisis en la pantalla de
+        ejecución."""
+        self.analizar()
 
     ## @}
 
@@ -775,6 +790,9 @@ class ProyectoUI:
         ## Combo selector de los tipos de aplanado
         self.anl_aplanado_combo = \
                 self.gtk.get_object('proy_anl_opt_aplanado_combo')
+        # Activar por defecto --index-flattening
+        self.anl_aplanado_combo.set_active(0)
+
         ## Check de empleo de simplify
         self.anl_simplify_check = \
                 self.gtk.get_object('proy_anl_opt_simplify_check')
@@ -786,6 +804,7 @@ class ProyectoUI:
         self.actualizar_trazas()
 
     def analizar(self):
+        """@brief Acciones a realizar al iniciar el ańalisis."""
         self.actualizar_trazas()
 
     def actualizar_trazas(self):
