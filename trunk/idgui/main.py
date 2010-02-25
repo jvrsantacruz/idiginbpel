@@ -4,6 +4,7 @@
 import os
 import os.path as path
 import sys
+import traceback
 
 import pygtk
 pygtk.require("2.0")
@@ -39,6 +40,9 @@ class Idgui(object):
         gobject.threads_init()
         gtk.gdk.threads_init()
 
+        ## Opciones de la configuración
+        self.opt = idg.opt
+
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
         ## Objeto ventana
@@ -53,8 +57,8 @@ class Idgui(object):
         # Cargar el glade de la portada
         self.builder.add_from_file(path.join(self.idg.share,"ui/portada.glade"))
         ## Portada de la aplicación con el dibujo de bienvenida
-        self.html = webkit.WebView()
-        self.html.load_html_string("<p>HoHoHo</p>", "file:///")
+        self.web = webkit.WebView()
+        #self.html.load_html_string("<p>HoHoHo</p>", "file:///")
         self.portada = self.builder.get_object("portada")
         self.cargar_portada()
 
@@ -142,7 +146,8 @@ class Idgui(object):
             ## Referencia a la instancia de ProyectoUI abierta en el momento
             self.proyecto = ProyectoUI(self.idg,self,nombre,bpel)
         except:
-            log.error("Crear Proyecto %s: %s" % (sys.exc_type , sys.exc_value))
+            log.error("Crear Proyecto %s: %s" % sys.exc_info()[:2])
+            log.error("%s" % traceback.print_exc())
             self.estado("Error al cargar el proyecto")
             self.cargar_portada()
 
@@ -286,8 +291,11 @@ class Idgui(object):
         for child in children:
             child.hide()
 
-        self.portada.add(self.html)
-        self.portada.reorder_child(self.html, 2)
+        webhelp = 'file://' + path.join(self.opt.get('share'),
+                                         'help/main.html') 
+        self.web.open(webhelp)
+        self.portada.add(self.web)
+        self.portada.reorder_child(self.web, 2)
         self.portada.reparent( self.principal )
         self.portada.show_all()
 
