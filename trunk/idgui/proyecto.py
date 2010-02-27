@@ -248,32 +248,34 @@ class ProyectoUI:
         """@brief Marca o desmarca la selección con respecto a los casos metidos en test.bpts"""
         casos = self.proy.list_bpts(self.proy.test)
 
+        def foreach_aux(m, path, iter, casos) :
+            """@brief Función auxiliar para recorrer el modelo marcándolo"""
+            lv = m.iter_depth(iter)
+
+            # Si es 0 es un fichero, si es 1 es un caso
+
+            if lv == 0 :
+                fnom = m.get_value(iter, 0) # Nombre del fichero
+                m.set_value(iter, 2, False) # Marcarlo como no seleccionado
+
+            else : # lv == 1
+                parent = m.iter_parent(iter)
+                fnom = m.get_value(parent, 0)   # Nombre del fichero
+                cnom = m.get_value(iter, 0)     # Nombre del caso
+                name = "%s:%s" % (fnom, cnom)   # Nombre en el test.bpts
+
+                # Marcarlo a el y a su padre si está en los casos 
+                if name in casos :
+                    m.set_value(iter, 2, True) 
+                    m.set_value(parent, 2, True)
+                else:
+                    m.set_value(iter, 2, False) 
+
         # Desconectar la vista
         self.bpts_view.set_model(None)
 
-        m = self.bpts_tree # Acortar el nombre al tree
-
-        f = m.get_iter_root() # El primer fichero
-        # Recorrer todos los ficheros
-        while not f is None :
-            fnom = m.get_value(f, 0) # Nombre del fichero
-            m.set_value(f, 2, False) # Marcarlo como falso
-            c = m.iter_children(f)   # Primer hijo
-
-            # Recorrer todos los hijos
-            while not c is None :
-                cnom = m.get_value(c, 0) # Nombre del caso
-                nombre = "%s:%s" % (fnom, cnom) # Nombre en el test.bpts
-
-                # Marcarlo si está en el test.bpts 
-                esta = nombre in casos
-                m.set_value(c, 2, esta )
-                # Marcar el padre si está alguno de sus hijos
-                if esta :
-                    m.set_value(f, 2, esta )
-                c = m.iter_next(c)
-
-            f = m.iter_next(f)
+        # Marcar los que están en casos y desmarcar los que no
+        self.bpts_tree.foreach(foreach_aux, casos)
 
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
@@ -304,7 +306,8 @@ class ProyectoUI:
         #imgcaso = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
         # Map fichero [caso1, caso2 ... ]
 
-        self.bpts_view.set_model(None) # Desconectar la vista del modelo
+        # Desconectar la vista del modelo
+        self.bpts_view.set_model(None) 
 
         casos = self.proy.casos  # Acortar el nombre del diccionario de casos
         ficheros = casos.keys()  # Lista de los ficheros que hay en casos
@@ -334,7 +337,8 @@ class ProyectoUI:
             for c in casos[fnom] :  
                 m.append(it, [c, gtk.STOCK_FILE, True])       # Añadir caso
 
-        self.bpts_view.set_model(self.bpts_tree) # Conectar la vista de nuevo
+        # Conectar la vista de nuevo
+        self.bpts_view.set_model(self.bpts_tree) 
 
     def info_bpts_fichero(self,fichero):
         """@brief Establece la información sobre un fichero de casos de prueba
@@ -354,42 +358,45 @@ class ProyectoUI:
         # Los metemos todos en un diccionario tipo casos[fichero] = [caso1,
         # caso2, ..] y se lo pasamos al proyecto.
 
+        def aux_foreach(m, path, iter, casos):
+            """@brief Añadir los ficheros seleccionados del treestore a casos 
+            Se llama para cada fila del treestore.
+            """
+            # Profundidad de la fila en el árbol
+            # 0: ficheros
+            # 1: casos
+            lv = m.iter_depth(iter)
+            
+            if lv == 0 :
+                fnom = m.get_value(iter, 0)    # Nombre del fichero
+                # Si no estaba en casos, lo añadimos
+                log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
+                if fnom not in casos :
+                    casos[fnom] = []
+            else: # lv == 1
+                parent = m.iter_parent(iter)    # Fichero padre del caso
+                fnom = m.get_value(parent, 0)   # Nombre del fichero
+                cnom = m.get_value(iter, 0)     # Nombre del caso
+                casos[fnom].append(cnom)
+                log.debug(_("\t add el caso: ") + cnom)
+
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
-        m = self.bpts_tree # Acortar el nombre al tree
+
+        # Desconectamos el modelo
+        self.bpts_view.set_model(None)
 
         # Metermos los casos en un diccionario casos[fnom] = cnom
         casos = {}
 
-        f = m.get_iter_root()   # El primer fichero
-        # Recorremos todos los ficheros 
-        while f is not None:
-            # Si está marcado, miramos los casos hijos
-            if m.get_value(f, 2) :
-                fnom = m.get_value(f, 0)    # Nombre del fichero
-                # Lo añadimos al diccionario de casos
-                if fnom not in casos :
-                    casos[fnom] = []
-                c = m.iter_children(f)      # El primer hijo
-                log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
+        # Ejecutamos la función 
+        self.bpts_tree.foreach(aux_foreach,casos)
 
-                # Recorremos todos los casos hijos de fichero 
-                # y los metemos en casos
-                while c is not None:
-                    # Añadimos el nombre del fichero y del caso si este está
-                    # marcado
-                    if m.get_value(c,2) :
-                        cnom = m.get_value(c, 0)
-                        casos[fnom].append(cnom) # Añadirlo al diccionario
-                        log.debug(_("\t add el caso: ") + cnom)
-                    # Siguiente caso
-                    c = m.iter_next(c)
+        # Conectar el modelo de nuevo
+        self.bpts_view.set_model(self.bpts_tree) 
 
-            # Siguiente fichero
-            f = m.iter_next(f)
-
-        # Añadimos todos los ficheros y casos a la vez
+        # Los añadimos al test.bpts general para su ejecución
         self.proy.add_casos(casos)
-
+        
     ## @}
 
     ## @name Callbacks Casos
@@ -525,17 +532,12 @@ class ProyectoUI:
 
     def cargar_ejec_tree(self):
         """@brief Lee los casos que van a entrar en ejecución y actualiza el
-        tree de la parte de ejecución con ellos."""
+        tree de la parte de ejecución con ellos.
+        """
 
         # Obtenemos los casos que están en el test.bpts para ejecutarse
-        lcasos = self.proy.list_bpts(self.proy.test)
-        casos = {}
-        # Los ponemos de la forma casos[fichero] = [caso1, caso2 ..]
-        for caso in lcasos :
-            fnom, cnom = caso.split(':') # nombrefichero:nombrecaso
-            if not fnom in casos : 
-                casos[fnom] = []
-            casos[fnom].append(cnom) 
+        # En un diccionario tipo dict[file] = [case1, case2 ..]
+        casos = self.lista_casos_dict(self.proy.list_bpts(self.proy.test))
 
         # Desconectamos el modelo treestore del treeview
         self.ejec_view.set_model( None )
@@ -563,6 +565,19 @@ class ProyectoUI:
 
         # Expandirlo todo todo
         self.ejec_view.expand_all()
+
+    def lista_casos_dict(self, list):
+        """@brief Transforma una lista de casos de la forma fichero:caso en un
+        diccionario dict[file] = [case1, case2 ..]
+        """
+        casos = {}
+        for caso in lcasos :
+            fnom, cnom = caso.split(':') # file:case
+            if fnom not in casos :
+                casos[fnom] = []
+            casos[fnom].append(cnom)
+
+        return casos
 
     def activar_ejec_caso(self, caso, nivel):
         """@brief Actualiza el estado de un caso en el treeview.
@@ -806,6 +821,48 @@ class ProyectoUI:
     def analizar(self):
         """@brief Acciones a realizar al iniciar el ańalisis."""
         self.actualizar_trazas()
+
+    def anl_seleccionar_trazas(self):
+        """@brief Toma la selección de trazas que hay en el treeview de trazas
+        y las devuelve en un diccionario. Solo un fichero de traza por caso.
+        Los casos que tienen varias vueltas en ejecución (Rounds), cada round
+        pasa como un caso distinto.
+        @retval Devuelve una estructura tipo trz[file][case] = tfile
+        """
+        # Acortar nombres de árbol y vista
+        m = self.anl_tree
+        v = self.anl_view
+
+        trz = {}
+
+        # Obtener del modelo los casos seleccionados
+        # [nombre, fichero, caso, timestamp, icono, esta_marcado, es_radio]
+        fit = m.iter_root() # Iterador a nivel de ficheros
+        while fit is not None :
+
+            # Si el padre está marcado, alguno de sus hijos lo está
+            if m.get_value(fit, 5) :
+                fnom = m.get_value(fit, 0)  # Nombre del fichero de casos
+                cit = m.iter_children(fit)  # Primer caso
+                while cit is not None: 
+                    # Si el padre está marcado...
+                    if m.get_value(cit, 5):
+                        cnom = m.get_value(cit, 0)      # Nombre del caso
+                        tfit = m.iter_children(cit)     # Primer trace file
+                        # Find first checked trace file 
+                        while tfit is not None :
+                            # Add to dict if is checked
+                            if m.get_value(cit, 5) :
+                                trz[fnom][cnom] = m.get_value(tfit, 0)    
+                                break
+
+                        tfit = m.iter_next(tfit) # Siguiente trace file
+
+                    cit = m.iter_next(cit) # Siguiente caso
+
+            fit = m.iter_next(fit) # Siguiente fichero
+
+        return trz
 
     def actualizar_trazas(self):
         """@brief Actualiza el tree de trazas disponibles."""
