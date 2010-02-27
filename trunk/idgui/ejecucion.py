@@ -48,11 +48,21 @@ class Ejecucion(Thread):
     ## Expresión regular para capturar error de conexión
     re_cnerror_str = ""
 
+    ## Expresión regular para capturar la parada de todos los casos
+    re_passall_str = "Now stopping test suite:"
+
+    ## Expresión regular para capturar un error dentro de un caso
+    # 1. Texto del error
+    re_errorcaso_str = "A test failure or error occurred on (.*)$"
+
     ## Expresión regular para capturar el nombre y el nº de los casos con round
     re_casoround_str = "^(.*) \(Round (\d+)\)$"
 
     ## Caso actual en ejecución
     caso_actual = ""
+
+    ## Error en el caso actual en ejecución
+    caso_actual_error = False
 
     def __init__(self,proy,proyUI,tiempo):
         """@brief Inicializa el Thread
@@ -85,6 +95,8 @@ class Ejecucion(Thread):
         self.re_passcaso = re.compile(self.re_passcaso_str)
         self.re_stopcaso = re.compile(self.re_stopcaso_str)
         self.re_casoround = re.compile(self.re_casoround_str)
+        self.re_passall = re.compile(self.re_passall_str)
+        self.re_errorcaso = re.compile(self.re_errorcaso_str)
 
     def filtrar(self, line):
         """
@@ -95,7 +107,10 @@ class Ejecucion(Thread):
 
         # Filtrar las lineas del log
         # Aplicamos todas las expresiones hasta que una acierte
-        exps = ((self.re_log, "log") , (self.re_OK, "ok"), (self.re_KO, "ko"))
+        exps = ((self.re_log, "log") , 
+                (self.re_OK, "ok"), 
+                (self.re_KO, "ko"))
+
         m = name = None
         for rexp, nm in exps :
             m = rexp.match(line)
@@ -114,8 +129,14 @@ class Ejecucion(Thread):
                m.group(3) == 'INFO' :
 
                 # Aplicamos expresiones al mensaje hasta que alguna acierte
-                exps = ((self.re_inicaso, "ini"), (self.re_passcaso, "pass"),
-                        (self.re_stopcaso, "stop"))
+                exps = ((self.re_inicaso, "ini"), 
+                        (self.re_passcaso, "pass"),
+                        (self.re_stopcaso, "stop"), 
+                        (self.re_passall, "passall"),
+                        (self.re_passall, "passall"),
+                        (self.re_errorcaso, "error")
+                       )
+
                 e = name = None
                 for rexp, nm in exps:
                     e = rexp.match(m.group(5))
@@ -183,44 +204,16 @@ class Ejecucion(Thread):
                 # main INFO Stopping testCase Test Case 'NOMBRE'
                 elif name == "stop" :
                     caso = e.group(1)
-                    rcaso = caso
-                    round = None
+                    self.stop_case(caso)
 
-                    # Comprobamos si es un caso con round
-                    r = self.re_casoround.match(caso)
-                    if r :
-                        rcaso = r.group(1)
-                        round = r.group(2)
+                elif name == "error" :
+                    error = e.group(1)
+                    self.error_case(error)
 
-                    log.info(_("Parado el caso: ") + rcaso)
-
-                    if round is None :
-                        # Marcamos el caso actual como terminado
-                        self.caso_actual = None
-
-                        gtk.gdk.threads_enter()
-                        frac = self.barra.get_fraction() + self.pulse
-                        self.barra.set_fraction( frac if frac <= 1 else 1 )
-                        # Ponerle el icono correspondiente
-                        self.ui.activar_ejec_caso(caso, 3)
-                        gtk.gdk.threads_leave()
-
-                    # Movemos el log generado y lo renombramos
-                    BUpath = os.path.join(self.proy.bpelunit,'process-logs')
-                    src = ""
-                    dst = ""
-                    try:
-                        # Tomamos el primer log que haya en process-logs
-                        src = os.path.join(BUpath, os.listdir(BUpath)[0])
-                        file = caso + ":" + str(time.time()) + ".log"
-                        dst = os.path.join(self.proy.trazas_dir, file)
-
-                        log.info('Moviendo ' + src + ' a ' + dst)
-                        # Y lo movemos al proyecto 
-                        shutil.move(src, dst)
-                    except:
-                        log.error(_("Error al mover fichero de (src, dst): ") +
-                                    src + " " + dst)
+                # Terminados todos los casos
+                # main INFO Now stopping test suite
+                elif name == "passall" :
+                    self.pass_all()
 
         elif name == "ok"  :
             log.info(_("Ejecución terminada correctamente"))
@@ -229,6 +222,69 @@ class Ejecucion(Thread):
             log.info(_("Error al ejecutar"))
 
         return line
+
+    def error_case(self, error):
+        """@brief Función que procesa el fallo de un caso.
+        @param name El nombre del caso
+        @param error El texto del error
+        """
+        log.info("Error en el caso %s" % error)
+        self.caso_actual_error = True
+
+    def pass_all(self):
+        """@brief Función que procesa la parada de todos los casos."""
+        # Cerrar el caso actual si está aún abierto
+        if self.caso_actual is not None :
+            self.stop_case(self.caso_actual) 
+
+        # Poner la barra de progreso a tope
+        gtk.gdk.threads_enter()
+        self.barra.set_fraction(1)
+        gtk.gdk.threads_leave()
+
+
+    def stop_case(self, name) :
+        """@brief Función que procesa la parada de un caso.
+        @params name El nombre del caso
+        """
+        rcaso = name
+        round = None
+
+        # Comprobamos si es un caso con round
+        r = self.re_casoround.match(name)
+        if r :
+            rcaso = r.group(1)
+            round = r.group(2)
+
+        log.info(_("Parado el caso: ") + rcaso)
+
+        if round is None :
+            # Marcamos el caso actual como terminado
+            self.caso_actual = None
+
+            gtk.gdk.threads_enter()
+            frac = self.barra.get_fraction() + self.pulse
+            self.barra.set_fraction( frac if frac <= 1 else 1 )
+            # Ponerle el icono correspondiente
+            self.ui.activar_ejec_caso(name, 4 if self.caso_actual_error else 3)
+            self.caso_actual_error = False
+            gtk.gdk.threads_leave()
+
+            # Movemos el log generado y lo renombramos
+            BUpath = os.path.join(self.proy.bpelunit,'process-logs')
+            src = ""
+            dst = ""
+            try:
+                # Tomamos el primer log que haya en process-logs
+                src = os.path.join(BUpath, os.listdir(BUpath)[0])
+                file = name + ":" + str(time.time()) + ".log"
+                dst = os.path.join(self.proy.trazas_dir, file)
+
+                log.info('Moviendo ' + src + ' a ' + dst)
+                # Y lo movemos al proyecto 
+                shutil.move(src, dst)
+            except:
+                log.error("Error al mover fichero de %s a %s" % (src, dst))
 
     def run(self):
         """
