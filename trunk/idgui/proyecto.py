@@ -248,11 +248,12 @@ class ProyectoUI:
         """@brief Marca o desmarca la selección con respecto a los casos metidos en test.bpts"""
         casos = self.proy.list_bpts(self.proy.test)
 
-        def foreach_aux(m, path, iter, casos) :
+        def aux_foreach(m, path, iter, casos) :
             """@brief Función auxiliar para recorrer el modelo marcándolo"""
+            # Profundidad de la fila en el árbol
+            # 0: ficheros
+            # 1: casos
             lv = m.iter_depth(iter)
-
-            # Si es 0 es un fichero, si es 1 es un caso
 
             if lv == 0 :
                 fnom = m.get_value(iter, 0) # Nombre del fichero
@@ -275,7 +276,7 @@ class ProyectoUI:
         self.bpts_view.set_model(None)
 
         # Marcar los que están en casos y desmarcar los que no
-        self.bpts_tree.foreach(foreach_aux, casos)
+        self.bpts_tree.foreach(aux_foreach, casos)
 
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
@@ -362,23 +363,27 @@ class ProyectoUI:
             """@brief Añadir los ficheros seleccionados del treestore a casos 
             Se llama para cada fila del treestore.
             """
-            # Profundidad de la fila en el árbol
-            # 0: ficheros
-            # 1: casos
-            lv = m.iter_depth(iter)
-            
-            if lv == 0 :
-                fnom = m.get_value(iter, 0)    # Nombre del fichero
-                # Si no estaba en casos, lo añadimos
-                log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
-                if fnom not in casos :
-                    casos[fnom] = []
-            else: # lv == 1
-                parent = m.iter_parent(iter)    # Fichero padre del caso
-                fnom = m.get_value(parent, 0)   # Nombre del fichero
-                cnom = m.get_value(iter, 0)     # Nombre del caso
-                casos[fnom].append(cnom)
-                log.debug(_("\t add el caso: ") + cnom)
+            if m.get_value(iter, 2) : 
+                # Profundidad de la fila en el árbol
+                # 0: ficheros
+                # 1: casos
+                lv = m.iter_depth(iter)
+
+                if lv == 0 :
+                    fnom = m.get_value(iter, 0)    # Nombre del fichero
+                    log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
+
+                    # Si no estaba en casos, lo añadimos
+                    if fnom not in casos :
+                        casos[fnom] = []
+
+                else: # lv == 1
+                    parent = m.iter_parent(iter)    # Fichero padre del caso
+                    fnom = m.get_value(parent, 0)   # Nombre del fichero
+                    cnom = m.get_value(iter, 0)     # Nombre del caso
+
+                    log.debug(_("\t add el caso: ") + cnom)
+                    casos[fnom].append(cnom)
 
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
 
@@ -571,7 +576,7 @@ class ProyectoUI:
         diccionario dict[file] = [case1, case2 ..]
         """
         casos = {}
-        for caso in lcasos :
+        for caso in list:
             fnom, cnom = caso.split(':') # file:case
             if fnom not in casos :
                 casos[fnom] = []
@@ -829,38 +834,50 @@ class ProyectoUI:
         pasa como un caso distinto.
         @retval Devuelve una estructura tipo trz[file][case] = tfile
         """
-        # Acortar nombres de árbol y vista
-        m = self.anl_tree
-        v = self.anl_view
+        def aux_foreach(m, path, iter, trz):
+            """@brief Función auxiliar al recorrer el modelo."""
 
+            # Solo lo evaluamos si está seleccionado
+            if m.get_value(iter, 5) :
+                # Profundidad de la fila en el árbol
+                # 0: ficheros
+                # 1: casos
+                # 2: trace file
+                if m.iter_depth(iter) == 2 :
+                    # Get parents (file and cases)
+                    iter_case = m.iter_parent(iter)
+                    iter_file = m.iger_parent(iter_case)
+
+                    # Get names (trace file, case and file)
+                    nom = m.get_value(iter, 0)
+                    cnom = m.get_value(iter_case, 0)
+                    fnom = m.get_value(iter_file, 0)
+
+                    # Check the dict
+                    if fnom not in trz[fnom] :
+                        trz[fnom] = {}
+
+                    # Is an error to have two trace files for the same case
+                    if cnom in trz[fnom] :
+                        # If we return True, the foreach ends, so we return
+                        # False, to end the function and continue the
+                        # iteration.
+                        return False 
+
+                    # Add to the dict
+                    trz[fnom][cnom] = nom
+
+        # Diccionario en el que almacenaremos los ficheros de traza
         trz = {}
 
-        # Obtener del modelo los casos seleccionados
-        # [nombre, fichero, caso, timestamp, icono, esta_marcado, es_radio]
-        fit = m.iter_root() # Iterador a nivel de ficheros
-        while fit is not None :
+        # Desconectar el modelo
+        self.anl_view.set_model(None)
 
-            # Si el padre está marcado, alguno de sus hijos lo está
-            if m.get_value(fit, 5) :
-                fnom = m.get_value(fit, 0)  # Nombre del fichero de casos
-                cit = m.iter_children(fit)  # Primer caso
-                while cit is not None: 
-                    # Si el padre está marcado...
-                    if m.get_value(cit, 5):
-                        cnom = m.get_value(cit, 0)      # Nombre del caso
-                        tfit = m.iter_children(cit)     # Primer trace file
-                        # Find first checked trace file 
-                        while tfit is not None :
-                            # Add to dict if is checked
-                            if m.get_value(cit, 5) :
-                                trz[fnom][cnom] = m.get_value(tfit, 0)    
-                                break
+        # Actualizar el tree 
+        self.anl_tree.foreach(aux_foreach, trz)
 
-                        tfit = m.iter_next(tfit) # Siguiente trace file
-
-                    cit = m.iter_next(cit) # Siguiente caso
-
-            fit = m.iter_next(fit) # Siguiente fichero
+        # Conectarlo de nuevo
+        self.anl_view.set_model(self.anl_tree)
 
         return trz
 
@@ -877,9 +894,9 @@ class ProyectoUI:
         m.clear()
 
         # Obtener todas las trazas en un diccionario
-        log.debug(self.proy.trazas_disponibles())
+        #log.debug(self.proy.trazas_disponibles())
         trz = self.proy.trazas_disponibles()
-        log.debug(trz)
+        #log.debug(trz)
 
         # Añadir al tree el diccionario trz[fichero][caso] = [ficheros...]
         # El tree tiene filas del tipo: nombre, fichero, caso, timestamp, icono
