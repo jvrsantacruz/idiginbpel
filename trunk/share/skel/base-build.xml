@@ -25,8 +25,10 @@
     <!-- Opciones por defecto para el analizador de Daikon -->
     <property name="analyzer.flags" value="--metrics --simplify --index-flattening"/>
 
-    <!-- Ruta a los process logs de Tomcat -->
-    <property name="processlog.dir" location="${env.HOME}/AeBpelEngine/process-logs/"/>
+    <!-- Ruta a los process logs de Tomcat (No se necesita, lo hace la
+         aplicación ahora) -->
+    <!-- <property name="processlog.dir" location="${env.HOME}/AeBpelEngine/process-logs/"/>  -->
+    <property name="processlog.dir" location="${proy}/anl_trazas"/> 
 
     <!-- Nombre del fichero BPEL instrumentado -->
     <property name="instrumented.bpel"  value="bpel_ins.bpel"/>
@@ -73,7 +75,6 @@
     </target>
 
     <target name="analyze" depends="init" description="Analyses the results of the last run with Daikon">
-
         <!-- Borramos la carpeta de análisis de Daikon (si estuviera) y la
         creamos de nuevo -->
         <delete dir="${daikonout.dir}"/>
@@ -106,6 +107,11 @@
                 </depend>
             </fileset>
         </apply>
+        <!-- Movemos el decls que se crea en el directorio de trabajo -->
+        <!--
+	<echo>Moviendo ficheros de ${user.dir} a ${proy}</echo>
+        <move file="${user.dir}/${instrumented.decls}.xml" todir="${proy}"/>
+        -->
     </target>
 
     <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
