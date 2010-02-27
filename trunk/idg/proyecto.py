@@ -288,7 +288,7 @@ class Proyecto(object):
             log.debug(_("Dependencia: ") + nom)
 
             # Comprobar si es un xsd
-            xsd = (len(nom) > 4 and '.xsd' == nom[-4:])
+            xsd = nom.endswith('.xsd')
 
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
@@ -335,10 +335,12 @@ class Proyecto(object):
                 # superior.
                 if first or xsd :
                     ruta = path.join(self.dep_nom, path.basename(ruta))
-                elif ruta.endswith('.xsd') :
-                    ruta = path.join('..', path.basename(ruta))
+                #elif ruta.endswith('.xsd') :
+                #    ruta = path.join('..', path.basename(ruta))
                 else :
                     ruta = path.basename(ruta)
+
+                log.debug(ruta)
 
                 # Modificar el atributo con la ruta correcta
                 i.setAttribute(attr, ruta)
@@ -347,11 +349,14 @@ class Proyecto(object):
             # Copiar el fichero en el proyecto
             try:
                 # Serializar el xml a un fichero en el directorio self.dep_dir
-                # Con la ruta adecuada si es el bpel original o un xsd
+                # Con la ruta adecuada si es el bpel original. El xsd lo
+                # copiamos dos veces, dentro de dependencias, y en el mismo dir
+                # que el bpel.
+                if xsd :
+                    file = open(path.join(self.dir, nom), 'w')
+
                 if first :
                     file = open(self.bpel,'w')
-                elif xsd :
-                    file = open(path.join(self.dir, nom), 'w')
                 else:
                     file = open(path.join(self.dep_dir, nom), 'w')
 
@@ -796,10 +801,10 @@ class Proyecto(object):
         @param dir El directorio .
         """
         [os.remove(path.join(dir,f)) for f in os.listdir(dir) if f.endswith('.log')]
-        
+
     def trazas_disponibles(self):
         """@brief Devuelve las trazas disponibles en un diccionario
-        trazas[fichero][caso] = [fichero, fichero...] 
+        trazas[fichero][caso] = [trace_file, trace_file ..] 
         @retval Una lista con los nombres de los ficheros de trazas.
         """
         return self.dict_trazas(os.listdir(self.trazas_dir))
@@ -1077,11 +1082,6 @@ class Proyecto(object):
             e = root.find('bpel_o')
             self.bpel_o = e.get('src')
 
-            # Servidor ActiveBpel
-            #e = root.find('svr')
-            #self.svr = e.get('url')
-            #self.port = e.get('port')
-
             # Cargar Dependencias
             self.cargar_deps(tree)
             # Cargar Casos
@@ -1139,7 +1139,8 @@ class Proyecto(object):
 
     def guardar_deps(self,dom):
         """@brief Guarda las dependencias en el fichero de configuración.
-        @param dom ElementTree del proyecto abierto."""
+        @param dom ElementTree del proyecto abierto.
+        """
 
         root = dom.getroot()
         try:
@@ -1170,6 +1171,61 @@ class Proyecto(object):
         except:
             raise ProyectoError(_("Error al guardar las dependencias"))
 
+    def guardar_casos(self, dom):
+        """@brief Guarda los casos de prueba disponibles en el fichero de
+        configuración.
+        @param dom ElementTree del proyecto abierto.
+        """
+
+        root = dom.getroot()
+
+        try: 
+            # Casos de prueba
+            e = root.find('testcases')
+
+            # Quitar las antiguas
+            # Eliminamos todas
+            if e is not None :
+                root.remove(e)
+
+            # Lo creamos otra vez y añadimos los casos
+            e = et.SubElement(root, 'cases')
+
+            for file, cases in self.casos.items() :
+                efile = et.SubElement(e, 'testfile')
+                [et.SubElement(efile, 'testcase').set('name',n) for n in cases]
+        except:
+            raise ProyectoError(_("Error al guardar los casos de prueba"))
+
+    def guardar_trazas(self, dom):
+        """@brief Guarda las trazas disponibles en el fichero de configuración.
+        @param dom ElementTree del proyecto abierto.
+        """
+
+        root = dom.getroot()
+
+        try:
+            # Trazas
+            e = root.find('traces')
+
+            # Quitar las antiguas. Eliminamos todas.
+            if e is not None :
+                root.remove(e)
+
+            # La creamos de nuevo y añadimos las trazas
+            e = et.SubElement(root, 'traces')
+
+            # traces[file][case] = [trace_file, trace_file ..]
+            for file, cases in self.trazas_disponibles().items() :
+                efile = et.SubElement(e, 'file')
+                for case, tfiles in cases.items() :
+                    ecase = et.SubElement(efile, 'case')
+                    [et.SubElement(ecase, 'tracefile').set('name',n) for n in \
+                     tfiles]
+        finally:
+            #raise ProyectoError(_("Error al guardar las trazas"))
+            pass
+
     def guardar(self):
         """@brief Guarda todas las propiedades del proyecto en el fichero de
         configuración."""
@@ -1185,10 +1241,11 @@ class Proyecto(object):
             log.error(err)
             raise ProyectoError(err)
 
-        # Guarda los datos generales
+        # Guarda los datos, dependencias, casos y trazas 
         self.guardar_datos(tree)
-        # Guarda las dependencias
         self.guardar_deps(tree)
+        self.guardar_casos(tree)
+        self.guardar_trazas(tree)
 
         try:
             tree.write(self.proy)
