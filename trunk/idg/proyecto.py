@@ -61,6 +61,8 @@ class Proyecto(object):
     casos_nom  =    'casos'
     ## Directorio 'almacén' con las trazas generadas por la ejecución
     trazas_nom =    'trazas'
+    ## Directorio con las trazas que se van a usar en el análisis
+    trazas_anl_nom = 'anl_trazas'
     ## Directorio con las trazas que se usarán en el análisis
     anltrazas_nom = 'anltrazas'
     ## Directorio con los invariantes generados
@@ -199,6 +201,8 @@ class Proyecto(object):
         self.casos_dir  =   path.join(self.dir, self.casos_nom ) # Casos
         ## Ruta al directorio que contiene todas las trazas
         self.trazas_dir =   path.join(self.dir, self.trazas_nom) # Trazas
+        ## Ruta al directorio que contiene las trazas a usar en el análisis
+        self.trazas_anl_dir = path.join(self.dir, self.trazas_anl_nom)
         ## Ruta al directorio que contiene las trazas
         self.anltrazas_dir =   path.join(self.dir, self.anltrazas_nom) # Trazas
         ## Ruta al directorio que contiene los invariantes
@@ -474,13 +478,42 @@ class Proyecto(object):
             log.info("Subproceso de ejecución matado")
             return True
 
+    def seleccionar_trazas_analisis(self):
+        """@brief El análisis utiliza las trazas que están en el directorio
+        anl_trazas de manera que hay que enlazar las trazas seleccionadas para
+        el análisis desde trazas a anl_trazas.
+        @param trazas Trazas seleccionadas en una estructura tipo 
+        trz[fichero][caso] = t_file
+        """
+        # Acortar nombres
+        anl_tdir = self.trazas_anl_dir 
+        tdir = self.trazas_dir
+
+        log.info('Cleaning old trace files from %s' % anl_tdir)
+        # Limpiar ficheros antiguos seleccionados
+        # El directorio anl_tdir puede que no exista
+        try:
+            shutil.rmtree(anl_tdir)
+        except:
+            pass
+        os.mkdir(anl_tdir)
+
+        log.debug('Linking trace files from %s to %s for analysis'  
+                  % (tdir, anl_tdir))
+
+        # Añadir la selección actual enlazando los ficheros desde su lugar en
+        # self.trazas_dir
+        for file, cases in trz.items() :
+            for caso, tfile in cases.items():
+                os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
+
     def analizar(self):
         """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
         trazas seleccionadas."""
 
         # No crear otro subproceso si ya se está ejecutando
         if self.anl_subproc is not None and self.anl_subproc.poll() is None :
-            log.warning(_("El proyecto ya se está ejecutando"))
+            log.warning(_("Ya hay un análisis en curso"))
             return
 
         cmd = ["ant", "-f", self.build, "analyze"]
