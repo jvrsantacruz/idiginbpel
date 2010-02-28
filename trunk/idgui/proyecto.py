@@ -793,6 +793,7 @@ class ProyectoUI:
     def on_proy_ejec_control_anl_boton(self, widget):
         """@brief Callback de pulsar el botón de análisis en la pantalla de
         ejecución."""
+        self.actualizar_trazas()
         self.analizar()
 
     ## @}
@@ -825,7 +826,13 @@ class ProyectoUI:
 
     def analizar(self):
         """@brief Acciones a realizar al iniciar el ańalisis."""
-        self.actualizar_trazas()
+        # Limpiar lo que hay en el directorio de trazas a analizar 
+        self.proy.borrar_trazas(self.proy.trazas_anl_dir)
+        # Tomar las trazas seleccionadas en el treeview y añadirlas al
+        # directorio de trazas a analizar.
+        trz = self.anl_seleccionar_trazas()
+        self.proy.seleccionar_trazas_analisis(trz)
+        # TODO: cargar 
 
     def anl_seleccionar_trazas(self):
         """@brief Toma la selección de trazas que hay en el treeview de trazas
@@ -882,7 +889,7 @@ class ProyectoUI:
         return trz
 
     def actualizar_trazas(self):
-        """@brief Actualiza el tree de trazas disponibles."""
+        """@brief Actualiza en el tree de trazas , las trazas disponibles."""
         # Acortar nombres de vista y modelo
         m = self.anl_tree
         v = self.anl_view
@@ -1040,7 +1047,6 @@ class ProyectoUI:
     ## @{
 
     def on_anl_tree_toggle(self, render, path):
-
         # Acortamos nombres de árbol y vista
         m = self.anl_tree
         v = self.anl_view

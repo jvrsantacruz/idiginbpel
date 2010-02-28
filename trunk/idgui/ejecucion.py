@@ -56,6 +56,7 @@ class Ejecucion(Thread):
     re_errorcaso_str = "A test failure or error occurred on (.*)$"
 
     ## Expresión regular para capturar el nombre y el nº de los casos con round
+    ## 1. Nombre del caso 2. Número del round
     re_casoround_str = "^(.*) \(Round (\d+)\)$"
 
     ## Caso actual en ejecución
@@ -98,6 +99,9 @@ class Ejecucion(Thread):
         self.re_passall = re.compile(self.re_passall_str)
         self.re_errorcaso = re.compile(self.re_errorcaso_str)
 
+    ## @name Filtros
+    ## @{
+
     def filtrar(self, line):
         """
          @brief Filtra una línea del log, aplicando las expresiones regulares
@@ -123,6 +127,7 @@ class Ejecucion(Thread):
         if name == "log" : 
             # Modificamos la línea para que quede bonita en el log
             # Dejamos los campos de la clase, el nivel y el mensaje
+            # 2. campo 3. nivel 5. mensaje
             line = m.expand('\g<2> \g<3> \g<5>\n')
 
             if m.group(2) == 'main' and  \
@@ -151,49 +156,7 @@ class Ejecucion(Thread):
                 # main INFO  Initiating textCase 'NOMBRE'
                 if name == "ini"  :
                     caso = e.group(1)
-                    round = None
-
-                    # Comprobamos si es un caso con round
-                    r = self.re_casoround.match(caso)
-                    if r :
-                        caso = r.group(1)
-                        round = r.group(2)
-
-                    # Comprobamos si el anterior era un caso con round y por
-                    # tanto no se ha cerrado bien. Lo cerramos en ese caso.
-                    if self.caso_actual is not None  \
-                       and self.caso_actual != caso :
-                        gtk.gdk.threads_enter()
-                        self.ui.activar_ejec_caso(self.caso_actual, 3)
-                        frac = self.barra.get_fraction() + self.pulse
-                        self.barra.set_fraction( frac if frac <= 1 else 1 )
-                        gtk.gdk.threads_leave()
-
-                    # Establecemos la variable general caso
-                    self.caso_actual = caso
-
-                    log.info(_("Iniciando caso: ") + caso)
-
-                    gtk.gdk.threads_enter()
-                    # Flag de primer caso, ponemos 0.06 representando el
-                    # trabajo realizado por la conexión.
-                    if self.i_case == 0:
-                        self.barra.set_fraction(0.06)
-
-                    # Aumentar el contador si no es un round es el primer round
-                    if round is None or round == '1' :
-                        self.i_case += 1 
-
-                    # Actualizamos el texto con el contador de casos
-                    # tenemos en cuenta que los round tienen un texto diferente
-                    if round is None :
-                        self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
-                    else :
-                        nround = "%i (%s)" % (self.ncasos, round)
-                        self.barra.set_text("%i / %s" % (self.i_case , nround))
-
-                    self.ui.activar_ejec_caso(caso, 2)
-                    gtk.gdk.threads_leave()
+                    self.init_case(caso)
 
                 # Mensaje Test case passed.
                 # main INFO  Test case passed.
@@ -223,6 +186,59 @@ class Ejecucion(Thread):
 
         return line
 
+    def init_case(self, name):
+        """@brief Función que procesa el inicio de un caso.
+        @param name El nombre del caso.
+        """
+        caso = name
+        round = None
+
+        # Comprobamos si es un caso con round
+        r = self.re_casoround.match(caso)
+        if r :
+            caso = r.group(1)
+            round = r.group(2)
+
+        # Comprobamos si el anterior era un caso con round y por
+        # tanto no se ha cerrado bien. Lo cerramos en ese caso.
+        if self.caso_actual is not None  \
+           and self.caso_actual != caso :
+
+            gtk.gdk.threads_enter()
+            # Activar icono de que ha terminado bien (estado 3)
+            self.ui.activar_ejec_caso(self.caso_actual, 3)
+            # Hacer avanzar la barra
+            frac = self.barra.get_fraction() + self.pulse
+            self.barra.set_fraction( frac if frac <= 1 else 1 )
+            gtk.gdk.threads_leave()
+
+        # Establecemos la variable general caso
+        self.caso_actual = caso
+
+        log.info(_("Iniciando caso: ") + caso)
+
+        gtk.gdk.threads_enter()
+        # Flag de primer caso, ponemos 0.06 representando el
+        # trabajo realizado por la conexión.
+        if self.i_case == 0:
+            self.barra.set_fraction(0.06)
+
+        # Aumentar el contador si no es un round o es el primer round
+        if round is None or round == '1' :
+            self.i_case += 1 
+
+        # Actualizamos el texto con el contador de casos
+        # tenemos en cuenta que los round tienen un texto diferente
+        if round is None :
+            self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
+        else :
+            nround = "%i (%s)" % (self.ncasos, round)
+            self.barra.set_text("%i / %s" % (self.i_case , nround))
+
+        # Activar el estado de que está ejecutándose (estado 2)
+        self.ui.activar_ejec_caso(caso, 2)
+        gtk.gdk.threads_leave()
+
     def error_case(self, error):
         """@brief Función que procesa el fallo de un caso.
         @param name El nombre del caso
@@ -241,7 +257,6 @@ class Ejecucion(Thread):
         gtk.gdk.threads_enter()
         self.barra.set_fraction(1)
         gtk.gdk.threads_leave()
-
 
     def stop_case(self, name) :
         """@brief Función que procesa la parada de un caso.
@@ -285,6 +300,8 @@ class Ejecucion(Thread):
                 shutil.move(src, dst)
             except:
                 log.error("Error al mover fichero de %s a %s" % (src, dst))
+
+    ## @}
 
     def run(self):
         """
