@@ -35,6 +35,8 @@ class ProyectoUI:
         self.idgui = idgui
         ## Objeto gtkbuilder de idgui
         self.gtk = idgui.builder
+        ## Objeto de opciones
+        self.opts = self.idg.opt
 
         # Estado de la barra inferior
         idgui.estado(_("Iniciando el proyecto"))
@@ -54,7 +56,7 @@ class ProyectoUI:
             raise
 
         # Cargar el glade del proyecto
-        self.gtk.add_from_file(path.join(self.idg.share,"ui/proyecto_base.glade"))
+        self.gtk.add_from_file(path.join(self.idg.share,"ui/proy.glade"))
 
         # Obtener los elementos de la gui
 
@@ -115,19 +117,20 @@ class ProyectoUI:
 
     def __init_config(self):
         """@brief Inicializar la pantalla de configuración."""
+        # Cargar el glade de esta parte
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_config.glade"))
+        # Obtener el contenedor de esa parte y añadirlo al notebook
+        self.config_cont = self.gtk.get_object('proy_config_container')
+        self.config_cont.reparent(self.gtk.get_object('proy_nb_config_dummy_box'))
+
+
         ## Nombre del proyecto
         self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
-
         self.nombre_label.set_text(self.proy.nombre)
 
         # Configuración del servidor
-        ## Texto Url de conexión del servidor Active Bpel
-        #self.svr_texto = self.gtk.get_object("proy_config_svr_texto")
-        #self.svr_texto.set_text(self.proy.svr)
 
-        ## Texto Puerto de conexión del servidor Active Bpel
-        #self.port_texto = self.gtk.get_object("proy_config_port_texto")
-        #self.port_texto.set_text(self.proy.port)
 
         # Dependencias
         ## Label con el número total de dependencias
@@ -222,6 +225,14 @@ class ProyectoUI:
 
     def __init_casos(self):
         """@brief Inicializar la pantalla de casos de prueba."""
+        # Cargar el glade correspondiente 
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_cases.glade"))
+        # Obtener el contenedor de esa parte y añadirlo al notebook
+        self.cases_cont = self.gtk.get_object('proy_cases_container')
+        self.cases_cont.reparent(self.gtk.get_object('proy_nb_cases_dummy_box'))
+
+
         # Configurar el filtro de ficheros btps
         self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
         ## Selector de ficheros bpts
@@ -498,6 +509,13 @@ class ProyectoUI:
 
     def __init_ejec(self):
         """@brief Inicializa la parte de ejecución. """
+        # Cargar el glade correspondiente
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_exec.glade"))
+        # Obtener el contenedor de esa parte y añadirlo al notebook
+        self.exec_cont = self.gtk.get_object('proy_exec_container')
+        self.exec_cont.reparent(self.gtk.get_object('proy_nb_exec_dummy_box'))
+        self.exec_cont.show_all()
 
         # Obtenemos los objetos que empleamos
         # Texto del log
@@ -803,6 +821,27 @@ class ProyectoUI:
 
     def __init_anl(self):
         """@brief Inicializa las variables propias de la parte de análisis."""
+        # Cargar el glade de trazas
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_traces.glade"))
+        # Obtener el contenedor de esa parte y añadirlo al notebook
+        self.trz_cont = self.gtk.get_object('proy_trz_container')
+        self.trz_cont.reparent(self.gtk.get_object('proy_nb_trz_dummy_box'))
+
+        # Cargar el glade de analisis
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_anl.glade"))
+        # Obtener el contenedor y añadirlo al notebook
+        self.anl_cont = self.gtk.get_object('proy_anl_container')
+        self.anl_cont.reparent(self.gtk.get_object('proy_nb_anl_dummy_box'))
+
+        # Cargar el glade de analisis
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_inv.glade"))
+        # Obtener el contenedor y añadirlo al notebook
+        self.inv_cont = self.gtk.get_object('proy_inv_container')
+        self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
+
         ## Vista en árbol de las trazas disponibles
         self.anl_view = self.gtk.get_object('proy_anl_view')
         ## Almacenamiento en árbol de las trazas disponibles

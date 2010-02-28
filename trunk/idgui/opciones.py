@@ -24,7 +24,7 @@ class OptUI(object):
         self.mod = False
 
         # Añadir el glade
-        gtk.add_from_file(path.join(opts.get('share'),"ui/opciones.glade"))
+        gtk.add_from_file(path.join(opts.get('share'),"ui/opts.glade"))
         self.window = gtk.get_object('opt_window')
 
         # Vista 

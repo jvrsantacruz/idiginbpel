@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkTreeStore" id="proy_anl_tree">
+    <columns>
+      <!-- column-name nom -->
+      <column type="gchararray"/>
+      <!-- column-name fichero -->
+      <column type="gchararray"/>
+      <!-- column-name caso -->
+      <column type="gchararray"/>
+      <!-- column-name timestamp -->
+      <column type="gchararray"/>
+      <!-- column-name icono -->
+      <column type="gchararray"/>
+      <!-- column-name marcado -->
+      <column type="gboolean"/>
+      <!-- column-name es_radio -->
+      <column type="gboolean"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="proy_anl_aplanado_combo_list">
+    <columns>
+      <!-- column-name nombre -->
+      <column type="gchararray"/>
+      <!-- column-name value -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">index-flattening</col>
+        <col id="1" translatable="yes">--index-flattening</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">matrix-flattening</col>
+        <col id="1" translatable="yes">--matrix-flattening</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkWindow" id="window1">
+    <child>
+      <object class="GtkHBox" id="proy_trz_container">
+        <property name="visible">True</property>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTreeView" id="proy_anl_view">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="model">proy_anl_tree</property>
+                <property name="headers_clickable">False</property>
+                <property name="search_column">0</property>
+                <child>
+                  <object class="GtkTreeViewColumn" id="proy_anl_tree_column_trazas">
+                    <property name="title">Trazas</property>
+                    <child>
+                      <object class="GtkCellRendererToggle" id="proy_anl_tree_cell_marcado">
+                        <signal name="toggled" handler="on_anl_tree_toggle"/>
+                      </object>
+                      <attributes>
+                        <attribute name="active">5</attribute>
+                        <attribute name="radio">6</attribute>
+                      </attributes>
+                    </child>
+                    <child>
+                      <object class="GtkCellRendererPixbuf" id="proy_anl_tree_cell_icono"/>
+                      <attributes>
+                        <attribute name="stock-id">4</attribute>
+                      </attributes>
+                    </child>
+                    <child>
+                      <object class="GtkCellRendererText" id="proy_anl_tree_cell_nombre"/>
+                      <attributes>
+                        <attribute name="text">0</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkVBox" id="proy_anl_caja_derecha">
+            <property name="visible">True</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkFrame" id="proy_anl_opt_frame">
+                <property name="visible">True</property>
+                <property name="label_xalign">0</property>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkAlignment" id="proy_anl_opt_alignment">
+                    <property name="visible">True</property>
+                    <property name="top_padding">10</property>
+                    <property name="bottom_padding">10</property>
+                    <property name="left_padding">10</property>
+                    <property name="right_padding">10</property>
+                    <child>
+                      <object class="GtkTable" id="proy_anl_opt_table">
+                        <property name="visible">True</property>
+                        <property name="n_rows">2</property>
+                        <property name="n_columns">2</property>
+                        <property name="column_spacing">6</property>
+                        <child>
+                          <object class="GtkLabel" id="proy_anl_opt_aplanado_label">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Tipo de Aplanado</property>
+                          </object>
+                          <packing>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="proy_anl_opt_aplanado_combo">
+                            <property name="visible">True</property>
+                            <property name="model">proy_anl_aplanado_combo_list</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="proy_anl_aplanado_combo_text"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="proy_anl_opt_simplify_label">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Simplify</property>
+                          </object>
+                          <packing>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="proy_anl_opt_simplify_check">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="label">
+                  <object class="GtkLabel" id="label19">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Opciones&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="proy_anl_ejecutar_boton">
+                <property name="label" translatable="yes">Ejecutar Daikon</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="pack_type">end</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="padding">9</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
