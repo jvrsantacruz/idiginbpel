@@ -503,9 +503,8 @@ class Proyecto(object):
 
         # Añadir la selección actual enlazando los ficheros desde su lugar en
         # self.trazas_dir
-        for file, cases in trz.items() :
-            for caso, tfile in cases.items():
-                os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
+        for caso, tfile in trz.items()[1].items() :
+            os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
 
     def analizar(self):
         """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
@@ -637,7 +636,7 @@ class Proyecto(object):
         # Le ponemos al wsdl el valor del que hemos abierto wsdl
         try:
             if wsdl.hasChildNodes :
-                log.debug(wsdl.firstChild.data)
+                #log.debug(wsdl.firstChild.data) #DEBUG
                 if twsdl.firstChild :
                     twsdl.removeChild(twsdl.firstChild) # Eliminar el nodo texto
                 # Añadir nuevo
@@ -658,7 +657,7 @@ class Proyecto(object):
                 sub.setAttributeNS(self.test_url, 'name', p.getAttribute('name'))
                 sub.setAttributeNS(self.test_url, 'wsdl', path.join(self.dep_nom, p.getAttribute('wsdl')))
                 tdeploy.appendChild(sub)
-                log.debug(sub)
+                #log.debug(sub) #DEBUG
 
         try:
             file = open(self.test,'w')
@@ -666,7 +665,7 @@ class Proyecto(object):
         except:
             raise ProyectoRecuperable(_("No se ha podido escribir el fichero de tests") + self.test)
 
-        log.debug(tdeploy.toxml('utf-8'))
+        #log.debug(tdeploy.toxml('utf-8')) #DEBUG
 
         self.hay_casos = True
 
