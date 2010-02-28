@@ -2,70 +2,42 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkListStore" id="proy_anl_aplanado_combo_list">
-    <columns>
-      <!-- column-name nombre -->
-      <column type="gchararray"/>
-      <!-- column-name value -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">index-flattening</col>
-        <col id="1" translatable="yes">--index-flattening</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">matrix-flattening</col>
-        <col id="1" translatable="yes">--matrix-flattening</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkTreeStore" id="proy_anl_tree">
-    <columns>
-      <!-- column-name nom -->
-      <column type="gchararray"/>
-      <!-- column-name fichero -->
-      <column type="gchararray"/>
-      <!-- column-name caso -->
-      <column type="gchararray"/>
-      <!-- column-name timestamp -->
-      <column type="gchararray"/>
-      <!-- column-name icono -->
-      <column type="gchararray"/>
-      <!-- column-name marcado -->
-      <column type="gboolean"/>
-      <!-- column-name es_radio -->
-      <column type="gboolean"/>
-    </columns>
-  </object>
   <object class="GtkWindow" id="window1">
     <child>
       <object class="GtkVBox" id="proy_anl_container">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkHBox" id="proy_anl_hbox">
             <property name="visible">True</property>
             <property name="spacing">10</property>
             <child>
-              <object class="GtkFrame" id="frame1">
+              <object class="GtkFrame" id="proy_anl_frame">
                 <property name="visible">True</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkAlignment" id="alignment1">
+                  <object class="GtkAlignment" id="proy_anl_alignment">
                     <property name="visible">True</property>
                     <property name="left_padding">12</property>
                     <child>
-                      <object class="GtkTreeView" id="treeview1">
+                      <object class="GtkScrolledWindow" id="proy_anl_scroll">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="hscrollbar_policy">automatic</property>
+                        <property name="vscrollbar_policy">automatic</property>
+                        <child>
+                          <object class="GtkTreeView" id="proy_anl_view">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel" id="label2">
+                  <object class="GtkLabel" id="proy_anl_frame_label">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">&lt;b&gt;Trazas seleccionadas&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
@@ -77,29 +49,29 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox3">
+              <object class="GtkVBox" id="proy_anl_right_vbox">
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkFrame" id="frame2">
+                  <object class="GtkFrame" id="proy_anl_data_frame">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment2">
+                      <object class="GtkAlignment" id="proy_anl_data_frame_align">
                         <property name="visible">True</property>
                         <property name="top_padding">10</property>
                         <property name="bottom_padding">10</property>
                         <property name="left_padding">10</property>
                         <property name="right_padding">10</property>
                         <child>
-                          <object class="GtkTable" id="table1">
+                          <object class="GtkTable" id="proy_anl_data_table">
                             <property name="visible">True</property>
                             <property name="n_rows">2</property>
                             <property name="n_columns">2</property>
                             <property name="column_spacing">7</property>
                             <child>
-                              <object class="GtkLabel" id="label5">
+                              <object class="GtkLabel" id="proy_anl_data_flat-title_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">Aplanado</property>
                               </object>
@@ -109,7 +81,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="label6">
+                              <object class="GtkLabel" id="proy_anl_data_simplify-title_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">Simplify</property>
                               </object>
@@ -121,7 +93,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="label7">
+                              <object class="GtkLabel" id="proy_anl_data_flat_label">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">
 </property>
@@ -134,7 +106,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="label8">
+                              <object class="GtkLabel" id="proy_anl_data_simplify_label">
                                 <property name="visible">True</property>
                               </object>
                               <packing>
@@ -151,7 +123,7 @@
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="label3">
+                      <object class="GtkLabel" id="proy_anl_data_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">&lt;b&gt;Datos&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
@@ -165,24 +137,24 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFrame" id="proy_ejec_frame1">
+                  <object class="GtkFrame" id="proy_anl_control_frame">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkAlignment" id="proy_ejec_align1">
+                      <object class="GtkAlignment" id="proy_anl_control_frame_align">
                         <property name="visible">True</property>
                         <property name="top_padding">10</property>
                         <property name="bottom_padding">10</property>
                         <property name="left_padding">10</property>
                         <property name="right_padding">10</property>
                         <child>
-                          <object class="GtkVBox" id="proy_ejec_control_caja1">
+                          <object class="GtkVBox" id="proy_anl_control_vbox">
                             <property name="visible">True</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">2</property>
                             <child>
-                              <object class="GtkProgressBar" id="proy_ejec_control_bar1">
+                              <object class="GtkProgressBar" id="proy_anl_control_bar">
                                 <property name="visible">True</property>
                                 <property name="show_text">True</property>
                                 <property name="discrete_blocks">100</property>
@@ -192,10 +164,10 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkHBox" id="proy_ejec_control_abajo_caja1">
+                              <object class="GtkHBox" id="proy_anl_control_hbox">
                                 <property name="visible">True</property>
                                 <child>
-                                  <object class="GtkLabel" id="proy_ejec_control_tiempo-titulo_label1">
+                                  <object class="GtkLabel" id="proy_control_time-title_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0.98000001907348633</property>
                                     <property name="label" translatable="yes">Tiempo:</property>
@@ -205,7 +177,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="proy_ejec_control_tiempo_label1">
+                                  <object class="GtkLabel" id="proy_control_time_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                   </object>
@@ -225,7 +197,7 @@
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="proy_ejec_control_titulo_label1">
+                      <object class="GtkLabel" id="proy_anl_control_frame_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">&lt;b&gt;Control de Ejecuci&#xF3;n&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
@@ -238,19 +210,19 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFrame" id="Log">
+                  <object class="GtkFrame" id="proy_anl_log_frame">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment4">
+                      <object class="GtkAlignment" id="proy_anl_log_frame_align">
                         <property name="visible">True</property>
                         <property name="top_padding">10</property>
                         <property name="bottom_padding">10</property>
                         <property name="left_padding">10</property>
                         <property name="right_padding">10</property>
                         <child>
-                          <object class="GtkTextView" id="textview1">
+                          <object class="GtkTextView" id="proy_anl_log_text">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -258,7 +230,7 @@
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="label9">
+                      <object class="GtkLabel" id="proy_anl_log_frame_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">&lt;b&gt;Log&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
@@ -280,13 +252,13 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="proy_anl_ex_button_box">
+          <object class="GtkHBox" id="proy_anl_exec_button_box">
             <property name="visible">True</property>
             <child>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkButton" id="proy_anl_ex_boton">
+              <object class="GtkButton" id="proy_anl_exec_boton">
                 <property name="label" translatable="yes">Analizar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>

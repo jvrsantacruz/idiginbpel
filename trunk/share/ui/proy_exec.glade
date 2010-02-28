@@ -18,10 +18,10 @@
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkHBox" id="proy_ejec_arriba_caja">
+          <object class="GtkHBox" id="proy_exec_up_hbox">
             <property name="visible">True</property>
             <child>
-              <object class="GtkLabel" id="proy_ejec_svr_label">
+              <object class="GtkLabel" id="proy_exec_svr_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Estado del servidor Active Bpel:</property>
               </object>
@@ -32,7 +32,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="proy_ejec_svr_boton">
+              <object class="GtkButton" id="proy_exec_svr_boton">
                 <property name="label" translatable="yes">Comprobar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -47,7 +47,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="proy_ejec_svr-estado_label">
+              <object class="GtkLabel" id="proy_exec_svr-state_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">OK</property>
                 <attributes>
@@ -68,18 +68,18 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="proy_ejec_abajo_caja">
+          <object class="GtkHBox" id="proy_exec_down_hbox">
             <property name="visible">True</property>
             <property name="spacing">9</property>
             <child>
-              <object class="GtkScrolledWindow" id="proy_ejec_scroll_view">
+              <object class="GtkScrolledWindow" id="proy_exec_scroll_view">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <property name="shadow_type">in</property>
                 <child>
-                  <object class="GtkTreeView" id="proy_ejec_view">
+                  <object class="GtkTreeView" id="proy_exec_view">
                     <property name="height_request">300</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -88,16 +88,16 @@
                     <property name="search_column">1</property>
                     <property name="level_indentation">1</property>
                     <child>
-                      <object class="GtkTreeViewColumn" id="proy_ejec_column">
+                      <object class="GtkTreeViewColumn" id="proy_exec_column">
                         <property name="title">Casos de prueba</property>
                         <child>
-                          <object class="GtkCellRendererPixbuf" id="proy_ejec_cellpixbuf"/>
+                          <object class="GtkCellRendererPixbuf" id="proy_exec_cellpixbuf"/>
                           <attributes>
                             <attribute name="stock-id">1</attribute>
                           </attributes>
                         </child>
                         <child>
-                          <object class="GtkCellRendererText" id="proy_ejec_celltext"/>
+                          <object class="GtkCellRendererText" id="proy_exec_celltext"/>
                           <attributes>
                             <attribute name="text">0</attribute>
                           </attributes>
@@ -112,11 +112,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="proy_ejec_der_caja">
+              <object class="GtkVBox" id="proy_exec_right_vbox">
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkFrame" id="proy_ejec_frame">
+                  <object class="GtkFrame" id="proy_exec_frame">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">in</property>
@@ -128,12 +128,12 @@
                         <property name="left_padding">10</property>
                         <property name="right_padding">10</property>
                         <child>
-                          <object class="GtkVBox" id="proy_ejec_control_caja">
+                          <object class="GtkVBox" id="proy_exec_control_vbox">
                             <property name="visible">True</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">2</property>
                             <child>
-                              <object class="GtkProgressBar" id="proy_ejec_control_bar">
+                              <object class="GtkProgressBar" id="proy_exec_control_bar">
                                 <property name="visible">True</property>
                                 <property name="show_text">True</property>
                                 <property name="discrete_blocks">100</property>
@@ -143,10 +143,10 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkHBox" id="proy_ejec_control_abajo_caja">
+                              <object class="GtkHBox" id="proy_ejec_control_down_hbox">
                                 <property name="visible">True</property>
                                 <child>
-                                  <object class="GtkLabel" id="proy_ejec_control_tiempo-titulo_label">
+                                  <object class="GtkLabel" id="proy_exec_control_time-title_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0.98000001907348633</property>
                                     <property name="label" translatable="yes">Tiempo:</property>
@@ -156,7 +156,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="proy_ejec_control_tiempo_label">
+                                  <object class="GtkLabel" id="proy_exec_control_time_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                   </object>
@@ -176,7 +176,7 @@
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="proy_ejec_control_titulo_label">
+                      <object class="GtkLabel" id="proy_exec_control_title_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">&lt;b&gt;Control de Ejecuci&#xF3;n&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
@@ -189,12 +189,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFrame" id="proy_ejec_log_frame">
+                  <object class="GtkFrame" id="proy_exec_log_frame">
                     <property name="visible">True</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkAlignment" id="proy_ejec_log_align">
+                      <object class="GtkAlignment" id="proy_exec_log_align">
                         <property name="visible">True</property>
                         <property name="top_padding">10</property>
                         <property name="bottom_padding">10</property>
@@ -222,7 +222,7 @@
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="proy_ejec_log_label">
+                      <object class="GtkLabel" id="proy_exec_log_label">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">&lt;b&gt;Log&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
@@ -234,15 +234,15 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="proy_ejec_control_box">
+                  <object class="GtkHBox" id="proy_exec_control_hbox">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkButton" id="proy_ejec_control_anl_boton">
+                      <object class="GtkButton" id="proy_exec_control_anl_button">
                         <property name="label" translatable="yes">Analizar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
-                        <signal name="released" handler="on_proy_ejec_control_anl_boton"/>
+                        <signal name="released" handler="on_proy_exec_control_anl_button"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -252,12 +252,12 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="proy_ejec_control_ejec_boton">
+                      <object class="GtkButton" id="proy_exec_control_exec_button">
                         <property name="label" translatable="yes">Ejecutar</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
-                        <signal name="released" handler="on_proy_ejec_control_boton"/>
+                        <signal name="released" handler="on_proy_exec_control_button"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

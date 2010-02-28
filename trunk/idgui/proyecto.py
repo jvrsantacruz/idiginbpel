@@ -63,18 +63,18 @@ class ProyectoUI:
         ## Contenedor de la gui 
         self.principal = self.gtk.get_object("principal")
         ## Base del proyecto
-        self.proyecto_base = self.gtk.get_object("proy_base_contenedor")
+        self.proyecto_base = self.gtk.get_object("proy_container")
         ## Notebook en el que está contenido el proyecto
-        self.proyecto_notebook = self.gtk.get_object("proy_base_cuaderno")
+        self.proyecto_notebook = self.gtk.get_object("proy_notebook")
 
         ## Label indicador de errores y dejarlo vacío
-        self.error_label = self.gtk.get_object("proy_base_errores_label")
+        self.error_label = self.gtk.get_object("proy_error_label")
         self.error(error)
 
         self.__init_config()
         self.__init_casos()
         self.__init_ejec()
-        self.__init_anl()
+        self.__init_trz()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -126,7 +126,7 @@ class ProyectoUI:
 
 
         ## Nombre del proyecto
-        self.nombre_label = self.gtk.get_object("proy_config_nombre_label")
+        self.nombre_label = self.gtk.get_object("proy_config_name_label")
         self.nombre_label.set_text(self.proy.nombre)
 
         # Configuración del servidor
@@ -134,9 +134,9 @@ class ProyectoUI:
 
         # Dependencias
         ## Label con el número total de dependencias
-        self.dep_totales_label = self.gtk.get_object("proy_config_dep_totales_label")
+        self.dep_totales_label = self.gtk.get_object("proy_config_dep_total_label")
         ## Label con el número de dependencias rotas
-        self.dep_rotas_label = self.gtk.get_object("proy_config_dep_rotas_label")
+        self.dep_rotas_label = self.gtk.get_object("proy_config_dep_broken_label")
 
         ## Lista de depencencias Modelo Datos 
         self.dep_list = self.gtk.get_object("proy_config_dep_list")
@@ -180,7 +180,7 @@ class ProyectoUI:
     ## @name Callbacks Config
     ## @{
 
-    def on_proy_config_dep_inst_boton(self,widget):
+    def on_proy_config_dep_inst_button(self,widget):
         """@brief Callback de pulsar el botón de instrumentar.
         @param widget Botón"""
 
@@ -195,7 +195,7 @@ class ProyectoUI:
             self.idgui.estado(_("Error al instrumentar."))
             #self.mensaje(_("Instrumentación correcta."))
 
-    def on_proy_config_dep_buscar_boton(self,widget):
+    def on_proy_config_dep_search_button(self,widget):
         """@brief Callback de pulsar el botón de buscar dependencias
         @param widget Botón"""
         try:
@@ -208,7 +208,7 @@ class ProyectoUI:
         self.idgui.estado(_("Dependencias encontradas: ") + \
                           str(len(self.proy.deps)))
 
-    def on_proy_config_guardar_boton(self,widget):
+    def on_proy_config_save_button(self,widget):
         """@brief Callback de pulsar el botón de guardar en la pantalla de
         configuración de un proyecto."""
         # Recolectar información de los labels
@@ -234,13 +234,13 @@ class ProyectoUI:
 
 
         # Configurar el filtro de ficheros btps
-        self.gtk.get_object("proy_casos_bpts_filtro").add_pattern("*.bpts")
+        self.gtk.get_object("proy_cases_bpts_filter").add_pattern("*.bpts")
         ## Selector de ficheros bpts
-        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_fichero")
+        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_file")
         ## TreeStore de los casos de prueba
-        self.bpts_tree = self.gtk.get_object("proy_casos_tree")
+        self.bpts_tree = self.gtk.get_object("proy_cases_tree")
         ## TreeView de los casos de prueba
-        self.bpts_view = self.gtk.get_object("proy_casos_view")
+        self.bpts_view = self.gtk.get_object("proy_cases_view")
 
         # Actualizar los casos en la vista
         self.cargar_bpts_tree()
@@ -251,9 +251,10 @@ class ProyectoUI:
         self.last_path = ""
 
         # Información sobre el caso
-        self.bpts_nombre_label = self.gtk.get_object("proy_casos_info_nombre_label")
-        self.bpts_n_label = self.gtk.get_object("proy_casos_info_n_label")
-        self.bpts_nsel_label = self.gtk.get_object("proy_casos_info_nsel_label")
+        self.bpts_nombre_label =  \
+                self.gtk.get_object("proy_cases_info_name_label")
+        self.bpts_n_label = self.gtk.get_object("proy_cases_info_n_label")
+        self.bpts_nsel_label = self.gtk.get_object("proy_cases_info_nsel_label")
 
     def marcar_bpts_tree(self):
         """@brief Marca o desmarca la selección con respecto a los casos metidos en test.bpts"""
@@ -418,7 +419,7 @@ class ProyectoUI:
     ## @name Callbacks Casos
     ## @{
 
-    def on_proy_casos_bpts_fichero(self,widget):
+    def on_proy_cases_bpts_file(self,widget):
         """@brief Callback de seleccionar un fichero bpts."""
         self.idgui.estado(_("Añadiendo fichero de casos de prueba"))
         if self.last_path :
@@ -490,13 +491,13 @@ class ProyectoUI:
                     if vacio :
                         model.set_value(parent, 2, False)
 
-    def on_proy_casos_ejec_ana_boton(self, widget):
+    def on_proy_cases_exec_anl_button(self, widget):
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
         # Y comenzamos la ejecución
         self.ejecutar()
 
-    def on_proy_casos_ejec_boton(self, widget):
+    def on_proy_cases_exec_button(self, widget):
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
         # Y comenzamos la ejecución
@@ -519,25 +520,25 @@ class ProyectoUI:
 
         # Obtenemos los objetos que empleamos
         # Texto del log
-        self.ejec_log_buffer = self.gtk.get_object('proy_ejec_log_buffer')
-        self.ejec_log_text = self.gtk.get_object('proy_ejec_log_text')
+        self.ejec_log_buffer = self.gtk.get_object('proy_exec_log_buffer')
+        self.ejec_log_text = self.gtk.get_object('proy_exec_log_text')
         # Label de estado
-        self.ejec_estado_label = self.gtk.get_object('proy_ejec_svr-estado_label') 
+        self.ejec_estado_label = self.gtk.get_object('proy_exec_svr-state_label') 
         ## TreeStore de casos
-        self.ejec_tree = self.gtk.get_object('proy_ejec_tree')
+        self.ejec_tree = self.gtk.get_object('proy_exec_tree')
         ## TreeView de casos
-        self.ejec_view = self.gtk.get_object('proy_ejec_view')
+        self.ejec_view = self.gtk.get_object('proy_exec_view')
         ## Botón de empezar y detener
         self.ejec_control_boton = \
-        self.gtk.get_object('proy_ejec_control_ejec_boton')
+        self.gtk.get_object('proy_exec_control_exec_button')
         ## Boton de analizar desde la pantalla de ejecución
         self.ejec_control_analisis = \
-        self.gtk.get_object('proy_ejec_control_anl_boton')
+        self.gtk.get_object('proy_exec_control_anl_button')
         # Label del tiempo de ejecución
         self.ejec_control_tiempo_label = \
-        self.gtk.get_object('proy_ejec_control_tiempo_label')
+        self.gtk.get_object('proy_exec_control_time_label')
         # Barra de progreso
-        self.ejec_barra = self.gtk.get_object('proy_ejec_control_bar')
+        self.ejec_barra = self.gtk.get_object('proy_exec_control_bar')
 
         # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
         self.comprobar_servidor_abpel()
@@ -799,7 +800,7 @@ class ProyectoUI:
 
         return status == "Online"
 
-    def on_proy_ejec_control_boton(self, widget):
+    def on_proy_exec_control_button(self, widget):
         """@brief Callback de pulsar el botón de ejecución en la pantalla de
         ejecución.
         """
@@ -808,7 +809,7 @@ class ProyectoUI:
         else:
             self.ejecutar()
 
-    def on_proy_ejec_control_anl_boton(self, widget):
+    def on_proy_exec_control_anl_button(self, widget):
         """@brief Callback de pulsar el botón de análisis en la pantalla de
         ejecución."""
         self.actualizar_trazas()
@@ -816,10 +817,10 @@ class ProyectoUI:
 
     ## @}
 
-    ## @name Analisis
+    ## @name Trazas
     ## @{
 
-    def __init_anl(self):
+    def __init_trz(self):
         """@brief Inicializa las variables propias de la parte de análisis."""
         # Cargar el glade de trazas
         self.gtk.add_from_file(path.join(self.opts.get('share'),
@@ -835,7 +836,7 @@ class ProyectoUI:
         self.anl_cont = self.gtk.get_object('proy_anl_container')
         self.anl_cont.reparent(self.gtk.get_object('proy_nb_anl_dummy_box'))
 
-        # Cargar el glade de analisis
+        # Cargar el glade de invariantes
         self.gtk.add_from_file(path.join(self.opts.get('share'),
                                          "ui/proy_inv.glade"))
         # Obtener el contenedor y añadirlo al notebook
@@ -843,23 +844,23 @@ class ProyectoUI:
         self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
 
         ## Vista en árbol de las trazas disponibles
-        self.anl_view = self.gtk.get_object('proy_anl_view')
+        self.anl_view = self.gtk.get_object('proy_trz_view')
         ## Almacenamiento en árbol de las trazas disponibles
-        self.anl_tree = self.gtk.get_object('proy_anl_tree')
+        self.anl_tree = self.gtk.get_object('proy_trz_tree')
 
         ## Combo selector de los tipos de aplanado
         self.anl_aplanado_combo = \
-                self.gtk.get_object('proy_anl_opt_aplanado_combo')
+                self.gtk.get_object('proy_trz_opt_flat_combo')
         # Activar por defecto --index-flattening
         self.anl_aplanado_combo.set_active(0)
 
         ## Check de empleo de simplify
         self.anl_simplify_check = \
-                self.gtk.get_object('proy_anl_opt_simplify_check')
+                self.gtk.get_object('proy_trz_opt_simplify_check')
 
         ## Botón de ejecución
         self.anl_ejecutar_boton = \
-                self.gtk.get_object('proy_anl_ejecutar_boton')
+                self.gtk.get_object('proy_trz_anl_boton')
 
         self.actualizar_trazas()
 
@@ -871,7 +872,7 @@ class ProyectoUI:
         # directorio de trazas a analizar.
         trz = self.anl_seleccionar_trazas()
         self.proy.seleccionar_trazas_analisis(trz)
-        # TODO: cargar 
+        
 
     def anl_seleccionar_trazas(self):
         """@brief Toma la selección de trazas que hay en el treeview de trazas
@@ -1085,7 +1086,7 @@ class ProyectoUI:
     ## @name Callbacks Analisis
     ## @{
 
-    def on_anl_tree_toggle(self, render, path):
+    def on_trz_tree_toggle(self, render, path):
         # Acortamos nombres de árbol y vista
         m = self.anl_tree
         v = self.anl_view

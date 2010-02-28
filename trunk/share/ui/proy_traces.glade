@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkTreeStore" id="proy_anl_tree">
+  <object class="GtkTreeStore" id="proy_trz_tree">
     <columns>
       <!-- column-name nom -->
       <column type="gchararray"/>
@@ -20,7 +20,7 @@
       <column type="gboolean"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="proy_anl_aplanado_combo_list">
+  <object class="GtkListStore" id="proy_trz_flat_combo_list">
     <columns>
       <!-- column-name nombre -->
       <column type="gchararray"/>
@@ -43,25 +43,25 @@
       <object class="GtkHBox" id="proy_trz_container">
         <property name="visible">True</property>
         <child>
-          <object class="GtkScrolledWindow" id="scrolledwindow1">
+          <object class="GtkScrolledWindow" id="proy_trz_scroll">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
             <property name="vscrollbar_policy">automatic</property>
             <property name="shadow_type">in</property>
             <child>
-              <object class="GtkTreeView" id="proy_anl_view">
+              <object class="GtkTreeView" id="proy_trz_view">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">proy_anl_tree</property>
+                <property name="model">proy_trz_tree</property>
                 <property name="headers_clickable">False</property>
                 <property name="search_column">0</property>
                 <child>
-                  <object class="GtkTreeViewColumn" id="proy_anl_tree_column_trazas">
+                  <object class="GtkTreeViewColumn" id="proy_trz_tree_column_traces">
                     <property name="title">Trazas</property>
                     <child>
-                      <object class="GtkCellRendererToggle" id="proy_anl_tree_cell_marcado">
-                        <signal name="toggled" handler="on_anl_tree_toggle"/>
+                      <object class="GtkCellRendererToggle" id="proy_trz_tree_cell_selected">
+                        <signal name="toggled" handler="on_trz_tree_toggle"/>
                       </object>
                       <attributes>
                         <attribute name="active">5</attribute>
@@ -69,13 +69,13 @@
                       </attributes>
                     </child>
                     <child>
-                      <object class="GtkCellRendererPixbuf" id="proy_anl_tree_cell_icono"/>
+                      <object class="GtkCellRendererPixbuf" id="proy_trz_tree_cell_icon"/>
                       <attributes>
                         <attribute name="stock-id">4</attribute>
                       </attributes>
                     </child>
                     <child>
-                      <object class="GtkCellRendererText" id="proy_anl_tree_cell_nombre"/>
+                      <object class="GtkCellRendererText" id="proy_trz_tree_cell_name"/>
                       <attributes>
                         <attribute name="text">0</attribute>
                       </attributes>
@@ -90,29 +90,29 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="proy_anl_caja_derecha">
+          <object class="GtkVBox" id="proy_trz_right_vbox">
             <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkFrame" id="proy_anl_opt_frame">
+              <object class="GtkFrame" id="proy_trz_opt_frame">
                 <property name="visible">True</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">in</property>
                 <child>
-                  <object class="GtkAlignment" id="proy_anl_opt_alignment">
+                  <object class="GtkAlignment" id="proy_trz_opt_alignment">
                     <property name="visible">True</property>
                     <property name="top_padding">10</property>
                     <property name="bottom_padding">10</property>
                     <property name="left_padding">10</property>
                     <property name="right_padding">10</property>
                     <child>
-                      <object class="GtkTable" id="proy_anl_opt_table">
+                      <object class="GtkTable" id="proy_trz_opt_table">
                         <property name="visible">True</property>
                         <property name="n_rows">2</property>
                         <property name="n_columns">2</property>
                         <property name="column_spacing">6</property>
                         <child>
-                          <object class="GtkLabel" id="proy_anl_opt_aplanado_label">
+                          <object class="GtkLabel" id="proy_trz_opt_flat_label">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Tipo de Aplanado</property>
                           </object>
@@ -121,11 +121,11 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBox" id="proy_anl_opt_aplanado_combo">
+                          <object class="GtkComboBox" id="proy_trz_opt_flat_combo">
                             <property name="visible">True</property>
-                            <property name="model">proy_anl_aplanado_combo_list</property>
+                            <property name="model">proy_trz_flat_combo_list</property>
                             <child>
-                              <object class="GtkCellRendererText" id="proy_anl_aplanado_combo_text"/>
+                              <object class="GtkCellRendererText" id="proy_trz_flat_combo_text"/>
                               <attributes>
                                 <attribute name="text">0</attribute>
                               </attributes>
@@ -138,7 +138,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="proy_anl_opt_simplify_label">
+                          <object class="GtkLabel" id="proy_trz_opt_simplify_label">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Simplify</property>
                           </object>
@@ -149,7 +149,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkCheckButton" id="proy_anl_opt_simplify_check">
+                          <object class="GtkCheckButton" id="proy_trz_opt_simplify_check">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -168,7 +168,7 @@
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel" id="label19">
+                  <object class="GtkLabel" id="proy_trz_opt_label">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">&lt;b&gt;Opciones&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
@@ -181,7 +181,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="proy_anl_ejecutar_boton">
+              <object class="GtkButton" id="proy_trz_anl_button">
                 <property name="label" translatable="yes">Ejecutar Daikon</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
