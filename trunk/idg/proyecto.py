@@ -836,14 +836,21 @@ class Proyecto(object):
         @retval La lista trazas ordenada por tiempos de la más nueva a la más
         antigua.
         """
+        # Función que obtiene un float con el tiempo de la traza
+        n2f = lambda n : float(self.parse_traza(n)[2])
+
         def traza_time_cmp(x, y):
             # Nombre a float 
             #(sacar el timestamp del nombre de la traza y convertirlo a float.)
-            n2f = lambda n : float(n.rsplit(':',1)[1].rsplit('.',1)[0])
-            int(n2f(y) - n2f(x))
+            # Devolver la diferencia 
+            try: 
+                return int(n2f(y) - n2f(x))
+            except :
+                return -1
 
         # Ordenar las trazas por tiempo de ejecución
         trazas.sort(traza_time_cmp)
+        return trazas
 
     def parse_traza(self, traza):
         """@brief Toma el nombre de un fichero de traza y devuelve 3 valores,
@@ -852,13 +859,12 @@ class Proyecto(object):
         @retval Los 3 valores fich, caso, time 
         """
         # Estructura de los nombres
-        # 1(fichero):2(caso):3(timestamp)
+        # 0(fichero):1(caso):2(timestamp)
         # Ejemplo: LoanApprovalProcess.bpts:LargeAmount-1267033799.94.log
         # El timestamp se encuentra en segundos y es obtenido con time.time()
-
         try:
             fich, caso, time = traza.split(':')
-            time = time.split('.',1)[0]
+            time = time.rsplit('.',1)[0]
         except:
             log.error(_("Hay una traza que no sigue el formato: " + traza))
             return "","",""
@@ -882,9 +888,12 @@ class Proyecto(object):
         # Diccionario a devolver
         trz = {}
 
+        # Ordenar las trazas que se pasan
+        tord = self.ordenar_trazas(trazas)
+
         # Añadir las trazas al diccionario
         #  como están ordenadas, se añaden a las listas por orden.
-        for f in trazas :
+        for f in tord :
             fich, caso, time = self.parse_traza(f)
 
             log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
@@ -913,7 +922,7 @@ class Proyecto(object):
         tr = {}
         tord = self.ordenar_trazas(trazas) 
         tend = []
-        for f in trazas : 
+        for f in tord : 
             nom = f.rsplit(':', 1)[0]
 
             if nom not in tr :
