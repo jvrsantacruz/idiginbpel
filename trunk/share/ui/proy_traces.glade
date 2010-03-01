@@ -2,24 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkTreeStore" id="proy_trz_tree">
-    <columns>
-      <!-- column-name nom -->
-      <column type="gchararray"/>
-      <!-- column-name fichero -->
-      <column type="gchararray"/>
-      <!-- column-name caso -->
-      <column type="gchararray"/>
-      <!-- column-name timestamp -->
-      <column type="gchararray"/>
-      <!-- column-name icono -->
-      <column type="gchararray"/>
-      <!-- column-name marcado -->
-      <column type="gboolean"/>
-      <!-- column-name es_radio -->
-      <column type="gboolean"/>
-    </columns>
-  </object>
   <object class="GtkListStore" id="proy_trz_flat_combo_list">
     <columns>
       <!-- column-name nombre -->
@@ -37,6 +19,26 @@
         <col id="1" translatable="yes">--matrix-flattening</col>
       </row>
     </data>
+  </object>
+  <object class="GtkTreeStore" id="proy_trz_tree">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name file -->
+      <column type="gchararray"/>
+      <!-- column-name case -->
+      <column type="gchararray"/>
+      <!-- column-name timestamp -->
+      <column type="gchararray"/>
+      <!-- column-name icon -->
+      <column type="gchararray"/>
+      <!-- column-name selected -->
+      <column type="gboolean"/>
+      <!-- column-name is_radio -->
+      <column type="gboolean"/>
+      <!-- column-name pretty_name -->
+      <column type="gchararray"/>
+    </columns>
   </object>
   <object class="GtkWindow" id="window1">
     <child>
@@ -77,7 +79,7 @@
                     <child>
                       <object class="GtkCellRendererText" id="proy_trz_tree_cell_name"/>
                       <attributes>
-                        <attribute name="text">0</attribute>
+                        <attribute name="text">7</attribute>
                       </attributes>
                     </child>
                   </object>

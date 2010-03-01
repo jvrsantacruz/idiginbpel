@@ -9,6 +9,7 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 
+import util.clock 
 import util.logger
 log = util.logger.getlog('idgui.proyecto')
 
@@ -947,26 +948,32 @@ class ProyectoUI:
         # Añadir al tree el diccionario trz[fichero][caso] = [ficheros...]
         # El tree tiene filas del tipo: nombre, fichero, caso, timestamp, icono
         # La fila del modelo tiene los siguientes campos:
-        # [nombre, fichero, caso, timestamp, icono, esta_marcado, es_radio]
+        # [name, file, case, timestamp, icon, selected, is_radio, pretty_name]
         for f, casos in trz.items() :
-            f_iter = m.append(None, [f, f, "", "", gtk.STOCK_OPEN, True, False])
+            f_iter = m.append(None, [f, f, "", "", gtk.STOCK_OPEN, True, False,
+                                    f])
             for c, fichs in casos.items() :
-                c_iter = m.append(f_iter, [c, f, c, "", gtk.STOCK_OPEN, True, False])
+                c_iter = m.append(f_iter, [c, f, c, "", gtk.STOCK_OPEN, True,
+                                           False, c])
                 first = True
                 for fich in fichs :
-                    try:
-                        time = fich.rsplit(':',1)[1].rsplit('.',1)[0]
-                    except:
-                        time = ""
-                    fi_iter = m.append(c_iter, [fich, f, c, time,
-                                                gtk.STOCK_OPEN, False, True])
+                    # casesfile.bpts:casename:timestamp.log
+                    try: time = fich.rsplit(':',1)[1].rsplit('.',1)[0]
+                    except: time = "0.0"
 
-                    # Si es el primero, ponerle el timestamp al padre y
-                    # marcarlo como incluido para el análisis
+                    # Conseguir un nombre bonito con solo la hora
+                    ftime = util.clock.min_format(float(time))
+
+                    # Añadirlo 
+                    fi_iter = m.append(c_iter, 
+                                       [fich, f, c, time, gtk.STOCK_OPEN,
+                                        False, True, ftime])
+
+                    # Seleccionar al padre y ponerle el nombre con la fecha del
+                    # primer hijo.
                     if first :
-                        m.set_value(fi_iter, 5, True)
-                        m.set_value(c_iter, 0, "%s (%s %s)" % \
-                                    (c, _("De"),time))
+                        m.set_value(fi_iter, 5, True) 
+                        m.set_value(c_iter, 7, "%s (%s)" % (c, ftime))
                         m.set_value(c_iter, 3, time)
                         first = False
 
@@ -1017,14 +1024,15 @@ class ProyectoUI:
         if not val :
             # Desmarcar todos los hijos
             while c is not None :
-                self.anl_view_toggle_child_lv2(c, False)
+                m.set_value(c, 5, False)
                 c = m.iter_next(c)
 
             # Marcarnos a nosotros mismos
             m.set_value(it, 5, val)
 
         # Si no tiene ningún hermano marcado, marcar/desmarcar al padre también.
-        # Si lo llamamos desde el padre no lo hacemos
+        # Si lo llamamos desde el padre no lo hacemos porque el padre ya tendrá
+        # su valor correspondiente.
         if p is None :
             p = m.iter_parent(it) 
             b = m.iter_children(p) # Primer hermano
@@ -1074,11 +1082,14 @@ class ProyectoUI:
             # Actualizar la info del padre con el timestamp del hijo
             pnom = m.get_value(p, 2) # El nombre del padre
             time = m.get_value(it, 3) # timestamp del hijo
-            pnom = "%s (%s %s)" % (pnom, _("De"),time) # Formato nombre padre
-            m.set_value(p, 0, pnom)
+            m.set_value(it, 3, time) # timestamp del padre
+            time = util.clock.min_format(float(time)) # En formato cadena
+            pnom = "%s (%s)" % (pnom,time) # Formato nombre padre
+            m.set_value(p, 7, pnom)
 
-        # Marcamos el valor
-        m.set_value(it, 5, val)
+            # Marcamos el valor para él y para el padre
+            m.set_value(it, 5, val)
+            m.set_value(p, 5, val)
 
     ## @}
 
