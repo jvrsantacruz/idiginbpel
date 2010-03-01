@@ -7,6 +7,7 @@ from threading import Thread
 
 import util.logger
 log = util.logger.getlog('idgui.clock')
+from util.clock import min_format
 
 class Clock(Thread):
         """@brief Calcula el tiempo de ejecución y lo establece en la gui
@@ -60,35 +61,16 @@ class Clock(Thread):
             self.end = True
 
         def run(self):
-
             while not self.end :
 
-                # Diferencia desde que empezó hasta ahora
-                diff = time.time() - self.tstart
-                # Obtener dia, horas, minutos, segundos de esa diferencia
-                date = time.gmtime(diff)
-                sec = date[5]
+                # Obtener dia, horas, minutos, segundos de la
+                # diferencia desde que empezó hasta ahora
+                date =min_format(time.time() - self.tstart)
 
-                # No mostrar dias, horas o mins si no valen nada
-                strfmt = "%i s" % sec
-                if diff > 60 :
-                    min = date[4]
-                    strfmt = ("%i m " % min) + strfmt
-                if diff > 3600 :
-                    # Compensamos las horas, que empiezan en 01
-                    hours = date[3] - 1
-                    strfmt = ("%i h " % hours) + strfmt
-                if diff > 86400 :
-                    # Compensamos los días, que empiezan en 01
-                    days = date[2] - 1 
-                    strfmt = ("%i d " % days) + strfmt
-
-                # Obtener cadena con el tiempo formateado
-                strtm = time.strftime(strfmt, date)
                 # Actualizar la hora
                 try:
                     gtk.gdk.threads_enter()
-                    self.label.set_text(strtm)
+                    self.label.set_text(date)
                 finally:
                     gtk.gdk.threads_leave()
 
