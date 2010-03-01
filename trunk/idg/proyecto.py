@@ -291,9 +291,6 @@ class Proyecto(object):
 
             log.debug(_("Dependencia: ") + nom)
 
-            # Comprobar si es un xsd
-            xsd = nom.endswith('.xsd')
-
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
 
@@ -333,15 +330,11 @@ class Proyecto(object):
 
                 log.debug(nom + " --> " + path.basename(ruta))
 
-                # Los bpel (first) y los .xsd apuntan a dependencias
-                # El resto de dependencias, al mismo directorio.
-                # Si una dependencia importa una xsd, apuntará al directorio
-                # superior.
-                if first or xsd :
+                # Los bpel (first) apuntan a dentro del directorio  dependencias
+                # El resto de dependencias, al mismo directorio en el que están.
+                if first : 
                     ruta = path.join(self.dep_nom, path.basename(ruta))
-                #elif ruta.endswith('.xsd') :
-                #    ruta = path.join('..', path.basename(ruta))
-                else :
+                else:
                     ruta = path.basename(ruta)
 
                 log.debug(ruta)
@@ -349,16 +342,10 @@ class Proyecto(object):
                 # Modificar el atributo con la ruta correcta
                 i.setAttribute(attr, ruta)
 
-
             # Copiar el fichero en el proyecto
             try:
                 # Serializar el xml a un fichero en el directorio self.dep_dir
-                # Con la ruta adecuada si es el bpel original. El xsd lo
-                # copiamos dos veces, dentro de dependencias, y en el mismo dir
-                # que el bpel.
-                if xsd :
-                    file = open(path.join(self.dir, nom), 'w')
-
+                # Con la ruta adecuada si es el bpel original. 
                 if first :
                     file = open(self.bpel,'w')
                 else:
@@ -478,11 +465,11 @@ class Proyecto(object):
             log.info("Subproceso de ejecución matado")
             return True
 
-    def seleccionar_trazas_analisis(self):
+    def seleccionar_trazas_analisis(self, trz):
         """@brief El análisis utiliza las trazas que están en el directorio
         anl_trazas de manera que hay que enlazar las trazas seleccionadas para
         el análisis desde trazas a anl_trazas.
-        @param trazas Trazas seleccionadas en una estructura tipo 
+        @param trz Trazas seleccionadas en una estructura tipo 
         trz[fichero][caso] = t_file
         """
         # Acortar nombres
@@ -503,8 +490,9 @@ class Proyecto(object):
 
         # Añadir la selección actual enlazando los ficheros desde su lugar en
         # self.trazas_dir
-        for caso, tfile in trz.items()[1].items() :
-            os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
+        for file, cases in trz.items() :
+            for case, tfile in cases.items() :
+                os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
 
     def analizar(self):
         """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
