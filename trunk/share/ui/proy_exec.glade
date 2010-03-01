@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkTreeStore" id="proy_ejec_tree">
+  <object class="GtkTreeStore" id="proy_exec_tree">
     <columns>
       <!-- column-name Caso -->
       <column type="gchararray"/>
@@ -83,7 +83,7 @@
                     <property name="height_request">300</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="model">proy_ejec_tree</property>
+                    <property name="model">proy_exec_tree</property>
                     <property name="headers_clickable">False</property>
                     <property name="search_column">1</property>
                     <property name="level_indentation">1</property>
@@ -201,20 +201,20 @@
                         <property name="left_padding">10</property>
                         <property name="right_padding">10</property>
                         <child>
-                          <object class="GtkScrolledWindow" id="proy_ejec_log_scroll">
+                          <object class="GtkScrolledWindow" id="proy_exec_log_scroll">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">automatic</property>
                             <property name="vscrollbar_policy">automatic</property>
                             <property name="shadow_type">in</property>
                             <child>
-                              <object class="GtkTextView" id="proy_ejec_log_text">
+                              <object class="GtkTextView" id="proy_exec_log_text">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="editable">False</property>
                                 <property name="justification">fill</property>
                                 <property name="indent">-2</property>
-                                <property name="buffer">proy_ejec_log_buffer</property>
+                                <property name="buffer">proy_exec_log_buffer</property>
                               </object>
                             </child>
                           </object>
@@ -287,5 +287,5 @@
       </object>
     </child>
   </object>
-  <object class="GtkTextBuffer" id="proy_ejec_log_buffer"/>
+  <object class="GtkTextBuffer" id="proy_exec_log_buffer"/>
 </interface>

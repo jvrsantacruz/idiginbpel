@@ -36,6 +36,7 @@
                 <property name="visible">True</property>
                 <property name="events">GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
                 <property name="create_folders">False</property>
+                <property name="filter">proy_cases_bpts_filter</property>
                 <signal name="file_set" handler="on_proy_cases_bpts_file"/>
               </object>
               <packing>

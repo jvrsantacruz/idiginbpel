@@ -236,7 +236,7 @@ class ProyectoUI:
         # Configurar el filtro de ficheros btps
         self.gtk.get_object("proy_cases_bpts_filter").add_pattern("*.bpts")
         ## Selector de ficheros bpts
-        self.bpts_fichero = self.gtk.get_object("proy_casos_btps_file")
+        self.bpts_fichero = self.gtk.get_object("proy_cases_btps_file")
         ## TreeStore de los casos de prueba
         self.bpts_tree = self.gtk.get_object("proy_cases_tree")
         ## TreeView de los casos de prueba
@@ -872,7 +872,6 @@ class ProyectoUI:
         # directorio de trazas a analizar.
         trz = self.anl_seleccionar_trazas()
         self.proy.seleccionar_trazas_analisis(trz)
-        
 
     def anl_seleccionar_trazas(self):
         """@brief Toma la selección de trazas que hay en el treeview de trazas
@@ -893,7 +892,7 @@ class ProyectoUI:
                 if m.iter_depth(iter) == 2 :
                     # Get parents (file and cases)
                     iter_case = m.iter_parent(iter)
-                    iter_file = m.iger_parent(iter_case)
+                    iter_file = m.iter_parent(iter_case)
 
                     # Get names (trace file, case and file)
                     nom = m.get_value(iter, 0)
@@ -901,7 +900,7 @@ class ProyectoUI:
                     fnom = m.get_value(iter_file, 0)
 
                     # Check the dict
-                    if fnom not in trz[fnom] :
+                    if fnom not in trz :
                         trz[fnom] = {}
 
                     # Is an error to have two trace files for the same case
