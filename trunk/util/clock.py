@@ -25,28 +25,18 @@ def min_format(seconds = None):
     # tm_sec=30, tm_wday=0, tm_yday=60, tm_isdst=0) ( 1-3-2010 at 20:57:30 ) 
     # 0. year 1. month 2. day of month 3. hours 4. minutes 5. seconds
     ldate = gmtime(seconds)
-    strfmt = "%d-%m-%Y %H:%M:%S"
 
-    if seconds <  31536000 :  # Less than a year
-        strfmt = ""
+    if seconds <  31536000 :  # Less than a year, count
+        # Time string, Min seconds to show it
+        vals = (("%i d " % (ldate[2] - 1), 86400),
+                 ("%i h " % ldate[3], 3600), 
+                 ("%i m " % ldate[4], 60),
+                 ("%i s" % ldate[5], 0))
 
-        # More than a day
-        if seconds > 86400 :
-            # -1 day to compensate that starts at 1
-            strfmt += "%i d " % (ldate[2] - 1)
+        return "".join([string for string, sec in vals if seconds >= sec])
 
-        # More than an hour
-        if seconds > 3600 :
-            strfmt += "%i h " % ldate[3]
-
-        # More than a minute
-        if seconds > 60 : 
-           strfmt += "%i m " % ldate[4]
-
-        # Seconds always are in the timecount
-        strfmt += "%i s" % ldate[5]
-
-    return strftime(strfmt, ldate)
+    else :  # Timestamp
+        return strftime("%d-%m-%Y %H:%M:%S", ldate)
 
 # Tests
 if __name__ == "__main__" :
