@@ -85,6 +85,7 @@ class Opt(object):
         else:
             log.info(_("Escribiendo opciones config en: ") + config)
 
+        # Recorremos el nombre de la variable y sus atributos
         for nom, attr in self._opts_nm.iteritems() :
             e = root.find(nom)
             # Si no existe, crearlo

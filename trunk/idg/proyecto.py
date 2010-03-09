@@ -120,6 +120,9 @@ class Proyecto(object):
         ## Instancia del control del proyecto
         self.idg = idg
 
+        ## Instancia del control de opciones
+        self.opts = idg.opt
+
         ## Ruta del bpel original (si está especificado)
         self.bpel_o =   path.abspath( bpel ) if bpel else ""
 
@@ -164,7 +167,7 @@ class Proyecto(object):
         """@brief Establece las variables internas del objeto"""
 
         idg = self.idg
-        opt = idg.opt
+        opt = self.opts
 
         # Urls generales de proyecto
         self.home       =   opt.get('home')
@@ -584,9 +587,17 @@ class Proyecto(object):
         # Actualizamos la información de test.bpts con la del proyecto
         self.add_bpts_info(pruta)
 
+    def bpts_find_delays(self, bpts):
+        """@brief Toma un bpts y renombra cada caso añadiéndole entre
+        paréntesis el número de rounds que realiza en base a sus delaySequences
+        @bpts Ruta al bpts o el DOM minidom abierto.
+        """
+        pass
+
     def add_bpts_info(self,bpts_path):
         """@brief Añade al bpts general del proyecto la información necesaria
-        para la ejecución. Esto sucede la primera vez que se añade un bpts.
+        para la ejecución. La primera vez que se añade un bpts incluye información extra. 
+        También declara inline los elementos de los casos de test.
         @param path Ruta al bpts."""
 
         # Abrirlo
@@ -601,6 +612,20 @@ class Proyecto(object):
         partners = deploy.getElementsByTagNameNS(self.test_url, 'partner')
         put = deploy.getElementsByTagNameNS(self.test_url, 'put')[0]
         wsdl = deploy.getElementsByTagNameNS(self.test_url, 'wsdl')[0]
+
+        # Declarar los namespaces huerfanos
+        # Esto es una acción bastante pesada y puede llevar un rato.
+        log.info('Processing bpts namespaces. This may take a while')
+        cases_dom = bpts.getElementsByTagNameNS(self.test_url, 'testCases')[0]
+        util.xml.minidom_namespaces(cases_dom)
+
+        # Guardamos el bpts tras la modificación
+        try:
+            file = open(bpts_path, "w")
+            file.write(bpts.toxml('utf-8'))
+        except:
+            raise ProyectoRecuperable('No se ha podido escribir el bpts nuevo \
+                                      %s ' % bpts_path)
 
         # Abrimos el fichero general .bpts de casos de prueba
         # Lo abrimos con minidom para conservar namespaces.
@@ -796,9 +821,6 @@ class Proyecto(object):
                 # Ponerle el nuevo nombre fichero:caso
                 caso_dom.setAttribute('name', nombre)
 
-                # Declarar inline los namespaces huerfanitos 
-                util.xml.minidom_namespaces(caso_dom)
-
                 # Clonar el caso y sus hijos, y añadirlo al test
                 test_cases.appendChild( caso_dom.cloneNode(True) ) 
 
@@ -866,7 +888,7 @@ class Proyecto(object):
             fich, caso, time = traza.split(':')
             time = time.rsplit('.',1)[0]
         except:
-            log.error(_("Hay una traza que no sigue el formato: " + traza))
+            #log.warning(_("Hay una traza que no sigue el formato: " + traza))
             return "","",""
 
         return fich, caso, time
@@ -896,10 +918,9 @@ class Proyecto(object):
         for f in tord :
             fich, caso, time = self.parse_traza(f)
 
-            log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
+            #log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
             if not fich or not caso or not time :
-                log.warning(_("Hay una traza que no sigue el formato y que no\
-                              se adjunta: ") + f)
+                log.warning("Wrong format for trace file %s " % f )
                 continue
 
             if fich not in trz :
@@ -1258,6 +1279,9 @@ class Proyecto(object):
     def guardar(self):
         """@brief Guarda todas las propiedades del proyecto en el fichero de
         configuración."""
+
+        # Guarda las opciones
+        self.opts.write()
 
         # Abrir self.proy para escribir la info del proyecto
         # Si falla elevamos una excepción
