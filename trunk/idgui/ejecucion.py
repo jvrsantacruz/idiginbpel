@@ -188,64 +188,59 @@ class Ejecucion(Thread):
 
     def init_case(self, name):
         """@brief Función que procesa el inicio de un caso.
+        Inicializa caso_actual con el nombre del caso.
         @param name El nombre del caso.
         """
-        caso = name
-        round = None
-
+        # Keep the original name
+        oname = name
         # Comprobamos si es un caso con round
-        r = self.re_casoround.match(caso)
+        r = self.re_casoround.match(name)
         if r :
-            caso = r.group(1)
+            name = r.group(1)
             round = r.group(2)
 
-        # Comprobamos si el anterior era un caso con round y por
-        # tanto no se ha cerrado bien. Lo cerramos en ese caso.
-        if self.caso_actual is not None  \
-           and self.caso_actual != caso :
+        # Si el caso anterior era un round, y este caso que se abre no es un
+        # round, es que se ha terminado el caso anterior que tenia varios
+        # rounds. Actualizamos la gui en consecuencia.
+        if self.caso_actual is not None and not r:
+            self.next_case(self.caso_actual)
 
-            gtk.gdk.threads_enter()
-            # Activar icono de que ha terminado bien (estado 3)
-            self.ui.activar_ejec_caso(self.caso_actual, 3)
-            # Hacer avanzar la barra
-            frac = self.barra.get_fraction() + self.pulse
-            self.barra.set_fraction( frac if frac <= 1 else 1 )
-            gtk.gdk.threads_leave()
+        # Establecemos el caso como caso actual 
+        self.caso_actual = name
 
-        # Establecemos la variable general caso
-        self.caso_actual = caso
+        log.info("Iniciando caso: %s" % oname)
 
-        log.info(_("Iniciando caso: ") + caso)
-
+        # Actualizar la gui
         gtk.gdk.threads_enter()
-        # Flag de primer caso, ponemos 0.06 representando el
+
+        # Si es el primer caso, ponemos 0.06 representando el
         # trabajo realizado por la conexión.
         if self.i_case == 0:
             self.barra.set_fraction(0.06)
-
-        # Aumentar el contador si no es un round o es el primer round
-        if round is None or round == '1' :
+        # Aumentar el contador de casos si es un caso normal o el primer round
+        if not r or round == '1' :
             self.i_case += 1 
 
         # Actualizamos el texto con el contador de casos
         # tenemos en cuenta que los round tienen un texto diferente
-        if round is None :
-            self.barra.set_text("%i / %i" % (self.i_case , self.ncasos))
-        else :
-            nround = "%i (%s)" % (self.ncasos, round)
-            self.barra.set_text("%i / %s" % (self.i_case , nround))
+        #  Format:
+        #  round: this_case / total_cases (this_round_case )
+        #  no round: actual_case / total_cases 
+        text = "%i / %i (%s)" % (self.i_case, self.ncasos, round) if r else \
+                "%i / %i" % (self.i_case, self.ncasos) 
+        self.barra.set_text(text)
 
         # Activar el estado de que está ejecutándose (estado 2)
-        self.ui.activar_ejec_caso(caso, 2)
+        self.ui.activar_ejec_caso(name, 2)
+
         gtk.gdk.threads_leave()
 
-    def error_case(self, error):
-        """@brief Función que procesa el fallo de un caso.
+    def stop_case(self, name) :
+        """@brief Función que procesa la parada de un caso.
         @param name El nombre del caso
-        @param error El texto del error
         """
-        log.info("Error en el caso %s" % error)
-        self.caso_actual_error = True
+        log.info("Case stopped: %s " % name)
+        self.end_case(name)
 
     def pass_all(self):
         """@brief Función que procesa la parada de todos los casos."""
@@ -258,48 +253,79 @@ class Ejecucion(Thread):
         self.barra.set_fraction(1)
         gtk.gdk.threads_leave()
 
-    def stop_case(self, name) :
-        """@brief Función que procesa la parada de un caso.
-        @params name El nombre del caso
+    def error_case(self, error):
+        """@brief Función que procesa el fallo de un caso.
+        Establece la variable caso_actual_error a verdadera.
+        @param name El nombre del caso
+        @param error El texto del error
         """
-        rcaso = name
-        round = None
+        log.info("Error en el caso %s" % error)
+        self.caso_actual_error = True
 
-        # Comprobamos si es un caso con round
-        r = self.re_casoround.match(name)
-        if r :
-            rcaso = r.group(1)
-            round = r.group(2)
+    ## @}
 
-        log.info(_("Parado el caso: ") + rcaso)
+    ## @name Actions
+    ## @{
 
-        if round is None :
-            # Marcamos el caso actual como terminado
+    def end_case(self, name):
+        """@brief Función que maneja el término de un caso
+        Actualiza la barra y el tree en la gui y mueve el log correspondiente.
+        Si es un round no mueve la barra.
+        @param name El nombre del caso
+        """
+        log.info("Ending case: %s" % name)
+
+        # ¿Is our case a round case or a complete one?
+        round = self.re_casoround.match(name)
+
+        if not round :
+            # Mark actual complete case as finished
             self.caso_actual = None
+            # Actualize gui
+            self.next_case(name)
 
-            gtk.gdk.threads_enter()
-            frac = self.barra.get_fraction() + self.pulse
-            self.barra.set_fraction( frac if frac <= 1 else 1 )
-            # Ponerle el icono correspondiente
-            self.ui.activar_ejec_caso(name, 4 if self.caso_actual_error else 3)
-            self.caso_actual_error = False
-            gtk.gdk.threads_leave()
+        # Move the (should be) only trace file in bpelunit logs directory
+        BUpath = os.path.join(self.proy.bpelunit,'process-logs')
+        src = ""
+        dst = ""
+        try:
+            # Take the first trace file listed in bpelunit logs directory
+            src = os.path.join(BUpath, os.listdir(BUpath)[0])
 
-            # Movemos el log generado y lo renombramos
-            BUpath = os.path.join(self.proy.bpelunit,'process-logs')
-            src = ""
-            dst = ""
-            try:
-                # Tomamos el primer log que haya en process-logs
-                src = os.path.join(BUpath, os.listdir(BUpath)[0])
-                file = name + ":" + str(time.time()) + ".log"
-                dst = os.path.join(self.proy.trazas_dir, file)
+            log.debug("Lo que hay en process-logs: " + str(os.listdir(BUpath)))
 
-                log.info('Moviendo ' + src + ' a ' + dst)
-                # Y lo movemos al proyecto 
-                shutil.move(src, dst)
-            except:
-                log.error("Error al mover fichero de %s a %s" % (src, dst))
+            # Compose the name: completecasename:timestamp.log
+            file = name + ":" + str(time.time()) + ".log"
+            dst = os.path.join(self.proy.trazas_dir, file)
+
+            log.info('Moving log from: ' + src + ' to: ' + dst)
+
+            # Move into the proyecto
+            shutil.move(src, dst)
+        except:
+            log.error("Error moving trace file %s from: %s to: %s"  \
+                      % (name,src, dst))
+
+    def next_case(self, name):
+        """@brief Actualiza la barra incrementándola cuando se detecta que un
+        caso completo (no un round) se termina.
+        @param name El nombre del caso (completo, sin el rounds)
+        """
+        gtk.gdk.threads_enter()
+
+        log.debug('Cerrando: %s' % name )
+
+        # Make the bar grow
+        frac = self.barra.get_fraction() + self.pulse
+        self.barra.set_fraction( frac if frac <= 1 else 1 )
+
+        # Set level and icon on treeview
+        self.ui.activar_ejec_caso(name, 4 if self.caso_actual_error else 3)
+
+        # Clean error flag
+        self.caso_actual_error = False
+
+        gtk.gdk.threads_leave()
 
     ## @}
 
@@ -365,3 +391,4 @@ class Ejecucion(Thread):
         gtk.gdk.threads_enter()
         self.ui.ejec_terminar()
         gtk.gdk.threads_leave()
+

@@ -212,9 +212,6 @@ class ProyectoUI:
     def on_proy_config_save_button(self,widget):
         """@brief Callback de pulsar el botón de guardar en la pantalla de
         configuración de un proyecto."""
-        # Recolectar información de los labels
-        self.proy.svr = self.svr_texto.get_text()
-        self.proy.port = self.port_texto.get_text()
         # Guardar el proyecto
         self.proy.guardar()
         self.idgui.estado(_("Proyecto guardado."))
@@ -302,7 +299,14 @@ class ProyectoUI:
 
         # Limpiar el modelo
         self.bpts_tree.clear()
-        for fich,casos in self.proy.casos.iteritems() :
+
+        items = self.proy.casos.items()
+        log.debug(items)
+        items.sort( lambda x,y : cmp(x[0],y[0]) )
+        log.debug(items)
+
+        # Añadir los casos
+        for fich,casos in items :
             #log.info('Fichero bpts seleccionado: ' + fich)
             iter = self.bpts_tree.append(None, [ fich, gtk.STOCK_OPEN, True])
             for c in casos :
@@ -311,48 +315,6 @@ class ProyectoUI:
 
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
-
-    def actualizar_bpts_tree(self):
-        """@brief Actualiza los ficheros de casos en el tree store de casos con
-        respecto al diccionario de casos."""
-        # Iconos de fichero y de caso
-        #imgfich = self.dep_view.render_icon(gtk.STOCK_CANCEL, gtk.ICON_SIZE_MENU)
-        #imgcaso = self.dep_view.render_icon(gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
-        # Map fichero [caso1, caso2 ... ]
-
-        # Desconectar la vista del modelo
-        self.bpts_view.set_model(None) 
-
-        casos = self.proy.casos  # Acortar el nombre del diccionario de casos
-        ficheros = casos.keys()  # Lista de los ficheros que hay en casos
-
-        m = self.bpts_tree       # Acortar el nombre al modelo tree store
-        f = m.get_iter_root()    # Primer fichero en el tree store
-
-        # Recorremos todos los ficheros
-        while not f is None :
-            fnom = m.get_value(f, 0)  # Nombre del fichero
-            try:
-                ficheros.remove(fnom) # Lo tachamos de la lista
-            except:
-                # Si no estaba en la lista, es que es viejo y se ha borrado
-                # lo eliminamos del tree. 
-                fnext = m.iter_next(f)
-                m.remove(f)
-                f = fnext
-            else:
-                f = m.iter_next(f)
-
-        # Ahora recorremos lo que queda en la lista
-        # los que no se hayan tachado, son los añadidos nuevos
-        for fnom in ficheros :
-            it = m.append(None, [fnom, gtk.STOCK_OPEN, True]) # Añadir fichero
-            # Añadir los casos para ese fichero
-            for c in casos[fnom] :  
-                m.append(it, [c, gtk.STOCK_FILE, True])       # Añadir caso
-
-        # Conectar la vista de nuevo
-        self.bpts_view.set_model(self.bpts_tree) 
 
     def info_bpts_fichero(self,fichero):
         """@brief Establece la información sobre un fichero de casos de prueba
@@ -439,7 +401,7 @@ class ProyectoUI:
         else:
             self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
             self.bpts_fichero.set_filename("")
-            self.actualizar_bpts_tree()
+            self.cargar_bpts_tree()
 
     def on_bpts_view_check_toggle(self,render,path):
         """@brief Callback de marcar un caso para ejecución en el tree de la
