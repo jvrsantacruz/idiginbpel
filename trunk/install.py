@@ -22,16 +22,13 @@ __IDG_REPO_URL__ = 'https://forja.rediris.es/svn/cusl4-idigin/trunk'
 # Idiginbpel directory (where the code will be placed)
 __IDG_NAME_DIR__ = 'IdiginBPEL'
 __IDG_DIR__ = os.path.join(os.environ['HOME'], __IDG_NAME_DIR__)
-__IDG_REPO_NAME_DIR__ = 'trunk'
-__IDG_REPO_DIR__ = os.path.join(os.environ['HOME'], __IDG_REPO_NAME_DIR__)
 
-# Idiginbpel user data directory name
-__IDG_HOME_NAME_DIR__ = '.idiginbpel'
 # Idiginbpel user data directory path at home
+__IDG_HOME_NAME_DIR__ = '.idiginbpel'
 __IDG_HOME_DIR__ = os.path.join(os.environ['HOME'], __IDG_HOME_NAME_DIR__)
+
 # Idiginbpel config file and user skel directory
 __IDG_CONFIG__ = os.path.join(__IDG_DIR__, 'share', 'config.xml')
-__IDG_SKEL__ = os.path.join(__IDG_DIR__, 'share', 'skel')
 
 # Detect if is already installed
 __IDG_INSTALLED__ = os.path.exists(__IDG_DIR__)
@@ -86,17 +83,13 @@ if __INSTALL_IDG_FLAG__ :
         cmd = ('svn', 'update') 
         cwd = __IDG_DIR__
     else:
-        cmd = ('svn', 'checkout', __IDG_REPO_URL__)
+        cmd = ('svn', 'checkout', __IDG_REPO_URL__, __IDG_NAME_DIR__)
         cwd = os.environ['HOME']
 
     log.info(cmd)
 
     if subprocess.call(cmd, cwd = os.environ['HOME']) != 0 :
         log.error("Can't download IdiginBPEL from the repository")
-    else :
-        if not __IDG_INSTALLED__ and os.path.exists(__IDG_REPO_DIR__) :
-            # Rename the svn repo directory to IdiginBPEL 
-            shutil.move(__IDG_REPO_DIR__, __IDG_DIR__)
 
     # Create Idiginbpel user data directory 
     log.info('Creating user data dir: %s' % __IDG_HOME_DIR__)
@@ -104,7 +97,7 @@ if __INSTALL_IDG_FLAG__ :
         # Create user data directory 
         os.makedirs(os.path.join(__IDG_HOME_DIR__, 'proy'))
 
-        # Configure the installation
+        # Configure. Copy config file 
         log.info('Generating a new config.xml at %s' % __IDG_HOME_DIR__)
         shutil.copy(__IDG_CONFIG__, __IDG_HOME_DIR__)
     else :
