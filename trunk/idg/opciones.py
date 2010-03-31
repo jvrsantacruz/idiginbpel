@@ -40,6 +40,8 @@ class Opt(object):
             self._opts[nom] = self.expand(val) if self._opts_nm[nom] == 'src' \
             else val
 
+        self.read()
+
     def get(self, nom):
         """@brief Devuelve una opción. 
         @param nom El nombre de la opción.
@@ -144,20 +146,20 @@ class Opt(object):
                          ('takuan', 'src'),('bpelunit', 'src'),
                         ('svr', 'value'), ('port', 'value')):
 
-            # Buscar el elemento en el xml
+            # Tomamos el elemento del xml. 
+            # Si no está bien, usamos el valor por defecto.
+            val = None
             e = root.find(nom)
-            if e is None or not e.get(attr):
-                log.warning(_("Se usará el valor por defecto para: ") + nom)
-                val = self._opts[nom] 
-            else :
+            if e is not None and e.get(attr) : 
                 val = e.get(attr)
+                if not self.check(e.get(attr), attr):
+                    log.warning(_("Se usará el valor por defecto para: ") + nom)
+                    val = None
+                else :
+                    val = self.expand(val) if attr == 'src' else val
 
-            # Expandir la ruta si es un src
-            if attr == 'src' :
-                val = self.expand(val)
-                # Comprobar que la ruta existe
-                if not self.check(val) :
-                    log.error(_("No se encuentra: ") + val)
+            if val is None :
+                val = self._opts_defecto[nom]
 
             # Guardar en el diccionario los valores.
             self._opts[nom] = val
