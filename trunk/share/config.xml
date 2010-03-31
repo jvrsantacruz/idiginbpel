@@ -13,4 +13,8 @@
     <takuan src="~/takuan"/>
     <!-- Directorio de BPELUnit -->
     <bpelunit src="~/bin/AeBpelEngine"/>
+    <!-- Url servidor -->
+    <svr value="localhost" />
+    <!-- Puerto servidor -->
+    <port value="7777" />
 </config>
