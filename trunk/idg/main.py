@@ -72,7 +72,7 @@ class Idg(object):
         """@brief Inicializa el sistema de opciones."""
         self.opt = Opt(self.config)
         opt = self.opt
-        opt.read()
+        #opt.read()
 
         self.home = opt.get('home')
         self.share = opt.get('share')
