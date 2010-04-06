@@ -18,7 +18,7 @@ ProyectoIrrecuperable
 from instrum import Comprobador
 from ejecucion import Ejecucion
 
-class ProyectoUI:
+class ProyectoUI(object):
     """@brief Manejo de la interfaz de usuario del proyecto."""
 
     def __init__(self,idg,idgui,nombre,bpel=""):
@@ -76,6 +76,7 @@ class ProyectoUI:
         self.__init_casos()
         self.__init_ejec()
         self.__init_trz()
+        self.__init_anl()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -369,7 +370,7 @@ class ProyectoUI:
         casos = {}
 
         # Ejecutamos la función 
-        self.bpts_tree.foreach(aux_foreach,casos)
+        self.bpts_tree.foreach(aux_foreach, casos)
 
         # Conectar el modelo de nuevo
         self.bpts_view.set_model(self.bpts_tree) 
@@ -792,13 +793,6 @@ class ProyectoUI:
         self.trz_cont = self.gtk.get_object('proy_trz_container')
         self.trz_cont.reparent(self.gtk.get_object('proy_nb_trz_dummy_box'))
 
-        # Cargar el glade de analisis
-        self.gtk.add_from_file(path.join(self.opts.get('share'),
-                                         "ui/proy_anl.glade"))
-        # Obtener el contenedor y añadirlo al notebook
-        self.anl_cont = self.gtk.get_object('proy_anl_container')
-        self.anl_cont.reparent(self.gtk.get_object('proy_nb_anl_dummy_box'))
-
         # Cargar el glade de invariantes
         self.gtk.add_from_file(path.join(self.opts.get('share'),
                                          "ui/proy_inv.glade"))
@@ -807,9 +801,9 @@ class ProyectoUI:
         self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
 
         ## Vista en árbol de las trazas disponibles
-        self.anl_view = self.gtk.get_object('proy_trz_view')
+        self.trz_view = self.gtk.get_object('proy_trz_view')
         ## Almacenamiento en árbol de las trazas disponibles
-        self.anl_tree = self.gtk.get_object('proy_trz_tree')
+        self.trz_tree = self.gtk.get_object('proy_trz_tree')
 
         ## Combo selector de los tipos de aplanado
         self.anl_aplanado_combo = \
@@ -840,11 +834,13 @@ class ProyectoUI:
         """@brief Toma la selección de trazas que hay en el treeview de trazas
         y las devuelve en un diccionario. Solo un fichero de traza por caso.
         Los casos que tienen varias vueltas en ejecución (Rounds), cada round
-        pasa como un caso distinto.
+        pasan como un caso distinto.
         @retval Devuelve una estructura tipo trz[file][case] = tfile
         """
+
         def aux_foreach(m, path, iter, trz):
-            """@brief Función auxiliar al recorrer el modelo."""
+            """@brief Función auxiliar al recorrer el modelo. Se llama en cada
+            fila del treeview."""
 
             # Solo lo evaluamos si está seleccionado
             if m.get_value(iter, 5) :
@@ -880,21 +876,21 @@ class ProyectoUI:
         trz = {}
 
         # Desconectar el modelo
-        self.anl_view.set_model(None)
+        self.trz_view.set_model(None)
 
         # Actualizar el tree 
-        self.anl_tree.foreach(aux_foreach, trz)
+        self.trz_tree.foreach(aux_foreach, trz)
 
         # Conectarlo de nuevo
-        self.anl_view.set_model(self.anl_tree)
+        self.trz_view.set_model(self.trz_tree)
 
         return trz
 
     def actualizar_trazas(self):
         """@brief Actualiza en el tree de trazas , las trazas disponibles."""
         # Acortar nombres de vista y modelo
-        m = self.anl_tree
-        v = self.anl_view
+        m = self.trz_tree
+        v = self.trz_view
 
         # Desconectar la vista del modelo
         v.set_model(None)
@@ -912,11 +908,12 @@ class ProyectoUI:
         # La fila del modelo tiene los siguientes campos:
         # [name, file, case, timestamp, icon, selected, is_radio, pretty_name]
         for f, casos in trz.items() :
-            f_iter = m.append(None, [f, f, "", "", gtk.STOCK_OPEN, True, False,
-                                    f])
+            f_iter = m.append(None, \
+                              [f, f, "", "", gtk.STOCK_OPEN, True, False, f])
             for c, fichs in casos.items() :
-                c_iter = m.append(f_iter, [c, f, c, "", gtk.STOCK_OPEN, True,
-                                           False, c])
+                c_iter = m.append(f_iter, \
+                                  [c, f, c, "", gtk.STOCK_OPEN, True, False, c])
+
                 first = True
                 for fich in fichs :
                     # casesfile.bpts:casename:timestamp.log
@@ -949,8 +946,8 @@ class ProyectoUI:
         @param val El valor del check DESPUÉS de pulsarlo.
         """
         # Acortamos nombres de árbol y vista
-        m = self.anl_tree
-        v = self.anl_view
+        m = self.trz_tree
+        v = self.trz_view
 
         # Nos marcamos/desmarcamos
         m.set_value(it, 5, val)
@@ -960,11 +957,11 @@ class ProyectoUI:
         c = m.iter_children(it) # El primer hijo
         if val :
             while c is not None :
-                self.anl_view_toggle_child_lv1(c, True)
+                self.trz_view_toggle_child_lv1(c, True)
                 c = m.iter_next(c)
         else :
             while c is not None :
-                self.anl_view_toggle_child_lv1(c, False, it)
+                self.trz_view_toggle_child_lv1(c, False, it)
                 c = m.iter_next(c)
 
     def anl_view_toggle_child_lv1(self, it, val, p = None) :
@@ -975,8 +972,8 @@ class ProyectoUI:
         @param p Iterador al padre (Opcional).
         """
         # Acortamos nombres de árbol y vista
-        m = self.anl_tree
-        v = self.anl_view
+        m = self.trz_tree
+        v = self.trz_view
 
         # Si lo marcamos, marcamos también al primer hijo.
         # Si lo desmarcamos, desmarcamos todos los hijos.
@@ -1016,7 +1013,7 @@ class ProyectoUI:
 
         if val :
             # Marcar el primer hijo
-            self.anl_view_toggle_child_lv2(c, True)
+            self.trz_view_toggle_child_lv2(c, True)
             # Marcarnos a nosotros mismos
             m.set_value(it, 5, val)
 
@@ -1027,8 +1024,8 @@ class ProyectoUI:
         @param val El valor del check DESPUÉS de pulsarlo.
         """
         # Acortamos nombres de árbol y vista
-        m = self.anl_tree
-        v = self.anl_view
+        m = self.trz_tree
+        v = self.trz_view
 
         # Si lo marcamos, desmarcar a los hermanos y actualizar la
         # información del padre.
@@ -1055,13 +1052,13 @@ class ProyectoUI:
 
     ## @}
 
-    ## @name Callbacks Analisis
+    ## @name Callbacks Trazas
     ## @{
 
     def on_trz_tree_toggle(self, render, path):
         # Acortamos nombres de árbol y vista
-        m = self.anl_tree
-        v = self.anl_view
+        m = self.trz_tree
+        v = self.trz_view
         # Obtenemos un iterador a esa fila
         it = m.get_iter_from_string(path)
         # Averiguamos que profundidad hay
@@ -1072,15 +1069,85 @@ class ProyectoUI:
         #m.set_value(it, 5, val)
 
         # Si es de nivel 0 marcar/desmarcar todos los hijos nv 1
-        # Si es de nivel 1 desmarcarlos todos y en caso, marcar el primer hijo
+        # Si es de nivel 1 desmarcarlos todos, o marcar a él y al primer hijo
         # Si es de nivel 2 desmarcarlo, o marcarlo a el y desmarcar a sus
         # hermanos
         if lv == 0:
-            self.anl_view_toggle_child_lv0(it, val)
+            self.trz_view_toggle_child_lv0(it, val)
         elif lv == 1:
-            self.anl_view_toggle_child_lv1(it, val)
+            self.trz_view_toggle_child_lv1(it, val)
         else:
-            self.anl_view_toggle_child_lv2(it, val)
+            self.trz_view_toggle_child_lv2(it, val)
+
+    def on_trz_anl_button(self, widget):
+        """Callback de pulsar el botón de analizar con Daikon."""
+        # Siguiente página 
+        self.proy_notebook_next()
+
+        log.debug('on_trz_anl_button')
+
+        # Listar las trazas en la vista de análisis
+        self.anl_listar_trazas()
+        self.anl_actualizar_info()
+
+        log.debug('on_trz_anl_button salir')
+
+    ## @}
+
+    ## @name Análisis
+    ## @{
+
+    def __init_anl(self):
+        """Inicializa la parte de análisis"""
+        # Cargar el glade de analisis
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_anl.glade"))
+        # Obtener el contenedor y añadirlo al notebook
+        self.anl_cont = self.gtk.get_object('proy_anl_container')
+        self.anl_cont.reparent(self.gtk.get_object('proy_nb_anl_dummy_box'))
+
+        ## Modelo con las trazas que van a entrar en análisis
+        self.anl_tree = self.gtk.get_object('proy_anl_tree')
+        ## Vista del treeview con las trazas que van a entrar en análisis
+        self.anl_view = self.gtk.get_object('proy_anl_view')
+
+        ## Label de aplanado
+        self.anl_flat_label = self.gtk.get_object('proy_anl_data_flat_label')
+        self.anl_sim_label = self.gtk.get_object('proy_anl_data_simplify_label')
+
+
+    def anl_listar_trazas(self):
+        """Establece en la lista de trazas de análisis, las trazas que van a
+        entrar en Daikon."""
+
+        # Toma las trazas seleccionadas en la pantalla de trazas
+        trz = self.anl_seleccionar_trazas()
+
+        # Las metemos en la lista de análisis
+        self.anl_view.set_model(None) # Desconectar el modelo
+
+        # Función lambda para insertar los hijos
+        insert = lambda x : self.anl_tree.insert(parent, 0, [x, ''])
+
+        # Insertar los ficheros y sus hijos (casos)
+        # [ Nombre, Icono ]
+        for file, cases in trz.iteritems() :
+            parent = self.anl_tree.insert(None, 0, [file, ''])
+            map(insert, cases)
+
+        # Volver a conectar el modelo
+        self.anl_view.set_model(self.anl_tree)
+        self.anl_view.expand_all()
+
+    def anl_actualizar_info(self):
+        """Actualiza la información sobre el análisis"""
+        self.anl_flat_label.set_text(self.proy.aplanado)
+        self.anl_sim_label.set_text(_(str(self.proy.simplify)))
+
+    ## @}
+
+    ## @name Callbacks Análisis
+    ## @{
 
     ## @}
 
