@@ -1047,8 +1047,9 @@ class Proyecto(object):
 
         # Buscar el atributo y comprobarlo
         # dnms = root.find("./property[@name='takuan']")
-        dnms = bbuild.findall('property')
-        dnms = [d for d in dnms if 'name' in d.attrib and d.get('name') == 'takuan']
+        dnmsall = bbuild.findall('property')
+        dnms = [d for d in dnmsall 
+                if 'name' in d.attrib and d.get('name') == 'takuan']
 
         # Si es distinto del que tenemos en memoria, modificarlo.
         if dnms[0].get('location') != self.takuan:
@@ -1063,12 +1064,12 @@ class Proyecto(object):
             except:
                 raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
-        # Buscar y establecer simplify y el aplanamiento
-        anlflags = [d for d in dnms if 'name' in d.attrib and d.get('name')\ 
-                    == 'analyzer.flags']
+        # Buscar y establecer simplify y el aplanado
+        anlflags = [d for d in dnmsall
+                    if 'name' in d.attrib and d.get('name') == 'analyzer.flags']
 
         anlflags = anlflags[0]
-        flags = '--metrics --' + self.aplanamiento
+        flags = '--metrics --' + self.aplanado
         if self.simplify : flags += ' --simplify'
         anlflags.set('value', flags)
 
