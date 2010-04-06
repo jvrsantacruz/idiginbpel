@@ -104,13 +104,13 @@ class Proyecto(object):
     ## @{
 
     def __init__(self,nombre,idg,bpel=""):
-        """@brief Constructor de la clase proyecto.  Establece los valores por defecto para las rutas del proyecto.
-        Crea el proyecto si se le indica la ruta a un bpel
-        Lee la configuración del proyecto ya creado si no
-        Comprueba que el proyecto esté bien
-        @param nombre Nombre del proyecto a cargar/crear.
-        @param idg Instancia de la clase de control .
-        @param bpel Ruta al bpel original.
+        """@brief Constructor de la clase proyecto.  Establece los valores por
+        defecto para las rutas del proyecto.  
+        Crea el proyecto si se le indica la ruta a un bpel Lee la configuración
+        del proyecto ya creado si no Comprueba que el proyecto esté bien 
+        @param nombre Nombre del proyecto a cargar/crear.  
+        @param idg Instancia de la clase de control .  
+        @param bpel Ruta al bpel original.  
         """
         # Valores por defecto de proyecto
 
@@ -232,7 +232,16 @@ class Proyecto(object):
         self.ejec_subproc = None
         ## Thread instrumentador
         self.inst_thread = None
-    ## @}
+        ## @}
+
+        ## @name Analisis
+        ## @{
+        
+        ## Tipo de aplanado
+        self.aplanado = 'index-flattering'
+        ## Simplify
+        self.simplify = True
+        ## @}
 
     ## @}
 
@@ -514,7 +523,6 @@ class Proyecto(object):
                                          shell = False,
                                          stdout = subproc.PIE,
                                          stderr = subproc.STDOUT)
-
     ## @}
 
     ## @name Casos de prueba
@@ -954,6 +962,19 @@ class Proyecto(object):
 
     ## @}
 
+    ## @name Analisis
+    ## @{
+
+    def set_aplanado(self, modo):
+        """@brief Establece el modo de aplanado"""
+        self.aplanado = modo
+
+    def set_simplify(self, flag):
+        """@brief Establece el modo de simplify"""
+        self.simplify = flag
+
+    ## @}
+
     ## @name Cargar y Crear
     ## @{
 
@@ -1042,6 +1063,15 @@ class Proyecto(object):
             except:
                 raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
 
+        # Buscar y establecer simplify y el aplanamiento
+        anlflags = [d for d in dnms if 'name' in d.attrib and d.get('name')\ 
+                    == 'analyzer.flags']
+
+        anlflags = anlflags[0]
+        flags = '--metrics --' + self.aplanamiento
+        if self.simplify : flags += ' --simplify'
+        anlflags.set('value', flags)
+
         try:
             # Abrir el test.bpts y comprobar la configuración del servidor 
             bpts = md.parse(self.test)
@@ -1056,6 +1086,7 @@ class Proyecto(object):
         # Buscar y establecer la dirección correctamente
         bpbaseURL = bproot.getElementsByTagNameNS(self.test_url, 'baseURL')[0]
         bpbaseURL.nodeValue = "http://%s:%s/ws" % (self.svr, self.port)
+
 
         # Guardarlo
         try:
