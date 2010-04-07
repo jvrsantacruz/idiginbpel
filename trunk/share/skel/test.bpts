@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Base test file. Cases will be added to this file for execution. ->
+<!-- Base test file. Cases will be added to this file for execution. -->
 <tes:testSuite 
     xmlns:tes="http://www.bpelunit.org/schema/testSuite">
   <tes:name></tes:name>
