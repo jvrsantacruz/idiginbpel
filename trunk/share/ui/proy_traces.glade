@@ -126,6 +126,7 @@
                           <object class="GtkComboBox" id="proy_trz_opt_flat_combo">
                             <property name="visible">True</property>
                             <property name="model">proy_trz_flat_combo_list</property>
+                            <signal name="changed" handler="on_trz_opt_flat_combo"/>
                             <child>
                               <object class="GtkCellRendererText" id="proy_trz_flat_combo_text"/>
                               <attributes>
@@ -156,6 +157,7 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="on_proy_trz_opt_simplify_check"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
