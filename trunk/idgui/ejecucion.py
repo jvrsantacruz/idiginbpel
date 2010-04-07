@@ -200,9 +200,9 @@ class Ejecucion(Thread):
             round = r.group(2)
 
         # Si el caso anterior era un round, y este caso que se abre no es un
-        # round, es que se ha terminado el caso anterior que tenia varios
-        # rounds. Actualizamos la gui en consecuencia.
-        if self.caso_actual is not None and not r:
+        # round o es el primer round, es que se ha terminado el caso anterior
+        # que tenia varios rounds. Actualizamos la gui en consecuencia.
+        if self.caso_actual is not None and (not r or round == '1'):
             self.next_case(self.caso_actual)
 
         # Establecemos el caso como caso actual 
