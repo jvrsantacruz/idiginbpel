@@ -302,9 +302,7 @@ class ProyectoUI(object):
         self.bpts_tree.clear()
 
         items = self.proy.casos.items()
-        log.debug(items)
         items.sort( lambda x,y : cmp(x[0],y[0]) )
-        log.debug(items)
 
         # Añadir los casos
         for fich,casos in items :
@@ -821,15 +819,6 @@ class ProyectoUI(object):
 
         self.actualizar_trazas()
 
-    def analizar(self):
-        """@brief Acciones a realizar al iniciar el ańalisis."""
-        # Limpiar lo que hay en el directorio de trazas a analizar 
-        self.proy.borrar_trazas(self.proy.trazas_anl_dir)
-        # Tomar las trazas seleccionadas en el treeview y añadirlas al
-        # directorio de trazas a analizar.
-        trz = self.anl_seleccionar_trazas()
-        self.proy.seleccionar_trazas_analisis(trz)
-
     def anl_seleccionar_trazas(self):
         """@brief Toma la selección de trazas que hay en el treeview de trazas
         y las devuelve en un diccionario. Solo un fichero de traza por caso.
@@ -939,7 +928,7 @@ class ProyectoUI(object):
         # Conectar la vista y el modelo de nuevo.
         v.set_model(m)
 
-    def anl_view_toggle_child_lv0(self, it, val):
+    def trz_view_toggle_child_lv0(self, it, val):
         """@brief Marcar/desmarcar en el treeview de análisis los ficheros
         completos y a todos sus hijos.
         @param iter Iterador al fichero.
@@ -964,7 +953,7 @@ class ProyectoUI(object):
                 self.trz_view_toggle_child_lv1(c, False, it)
                 c = m.iter_next(c)
 
-    def anl_view_toggle_child_lv1(self, it, val, p = None) :
+    def trz_view_toggle_child_lv1(self, it, val, p = None) :
         """@brief Marcar/desmarcar en el treeview de análisis los casos
         completos y a todos sus hijos.
         @param iter Iterador al caso padre.
@@ -1017,7 +1006,7 @@ class ProyectoUI(object):
             # Marcarnos a nosotros mismos
             m.set_value(it, 5, val)
 
-    def anl_view_toggle_child_lv2(self, it, val):
+    def trz_view_toggle_child_lv2(self, it, val):
         """@brief Marcar/desmarcar en el treeview de análisis los casos
         concretos teniendo en cuenta a todos sus hermanos.
         @param iter Iterador al caso.
@@ -1050,6 +1039,10 @@ class ProyectoUI(object):
             m.set_value(it, 5, val)
             m.set_value(p, 5, val)
 
+    def trz_get_info(self):
+        """@brief Obtiene información sobre el análisis desde la interfaz y la
+        establece
+        """
     ## @}
 
     ## @name Callbacks Trazas
@@ -1084,13 +1077,9 @@ class ProyectoUI(object):
         # Siguiente página 
         self.proy_notebook_next()
 
-        log.debug('on_trz_anl_button')
-
         # Listar las trazas en la vista de análisis
         self.anl_listar_trazas()
         self.anl_actualizar_info()
-
-        log.debug('on_trz_anl_button salir')
 
     ## @}
 
@@ -1114,6 +1103,16 @@ class ProyectoUI(object):
         ## Label de aplanado
         self.anl_flat_label = self.gtk.get_object('proy_anl_data_flat_label')
         self.anl_sim_label = self.gtk.get_object('proy_anl_data_simplify_label')
+
+    def analizar(self):
+        """@brief Acciones a realizar al iniciar el ańalisis."""
+        # Limpiar lo que hay en el directorio de trazas a analizar 
+        self.proy.borrar_trazas(self.proy.trazas_anl_dir)
+        # Tomar las trazas seleccionadas en el treeview y añadirlas al
+        # directorio de trazas a analizar.
+        trz = self.anl_seleccionar_trazas()
+        self.proy.seleccionar_trazas_analisis(trz)
+
 
 
     def anl_listar_trazas(self):
@@ -1144,10 +1143,19 @@ class ProyectoUI(object):
         self.anl_flat_label.set_text(self.proy.aplanado)
         self.anl_sim_label.set_text(_(str(self.proy.simplify)))
 
+    
     ## @}
 
     ## @name Callbacks Análisis
     ## @{
+
+    def on_anl_exec_boton(self, widget):
+        """@brief Callback de pulsar el botón de analizar en la parte de
+        análisis
+        """
+        # Obtener config de la interfaz 
+        # Escribirla en la configuración
+        # Crear una instancia del thread de análisis
 
     ## @}
 
