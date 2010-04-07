@@ -34,8 +34,8 @@ class Instrumentador(Thread):
         """@brief Ejecuta el comando en la consola y pone su salida en
         self.out"""
         # Comenzar la instrumentación mandando a consola el comando
-        cmd = "ant -f %s build-bpr" % self.proy.build
-        log.info(_("Ejecutando: ") + cmd)
+        cmd = ['ant', '-f', self.proy.build, 'build-bpr']
+        log.info(_("Ejecutando: ") + str(cmd))
         proc =  subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
         self.out = proc.communicate()[0]
         self.cont = self.cont + 1
@@ -74,4 +74,3 @@ class Instrumentador(Thread):
         self.proy.inst = c
         log.debug(self.out)
         log.info(_("Instrumentación terminada ") + str(c))
-
