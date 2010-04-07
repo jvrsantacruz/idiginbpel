@@ -2,6 +2,14 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkTreeStore" id="proy_anl_tree">
+    <columns>
+      <!-- column-name Nombre -->
+      <column type="gchararray"/>
+      <!-- column-name Icono -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="window1">
     <child>
       <object class="GtkVBox" id="proy_anl_container">
@@ -30,6 +38,18 @@
                           <object class="GtkTreeView" id="proy_anl_view">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="model">proy_anl_tree</property>
+                            <child>
+                              <object class="GtkTreeViewColumn" id="proy_anl_view_column">
+                                <property name="title">Trazas a analizar</property>
+                                <child>
+                                  <object class="GtkCellRendererText" id="proy_anl_view_celltext"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -167,7 +187,7 @@
                               <object class="GtkHBox" id="proy_anl_control_hbox">
                                 <property name="visible">True</property>
                                 <child>
-                                  <object class="GtkLabel" id="proy_control_time-title_label">
+                                  <object class="GtkLabel" id="proy_anl_control_time-title_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0.98000001907348633</property>
                                     <property name="label" translatable="yes">Tiempo:</property>
@@ -177,7 +197,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="proy_control_time_label">
+                                  <object class="GtkLabel" id="proy_anl_control_time_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                   </object>
