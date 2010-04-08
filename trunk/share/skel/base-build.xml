@@ -59,15 +59,11 @@
         <fail message="Este fichero Ant no se usa directamente, sino que ha de ser importado por otro"/>
     </target>
 
-<!-- Antiguo, le eliminamos la dependencia de test -->
-    <!-- <target name="test-and-analyze" depends="test,analyze"
-	description="Runs all tests and analyses the results with Daikon"/> -->
     <target name="test-and-analyze" depends="analyze"
 	description="Runs all tests and analyses the results with Daikon"/> 
 
-    <!-- Antiguo, le eliminamos la dependencia de build-bpr-->
-    <!-- <target name="test" depends="build-bpr" description="Runs all tests with BPELUnit"> -->
     <target name="test" depends="" description="Runs all tests with BPELUnit">
+
         <!-- Ejecutamos BPELUnit -->
         <bpelunit testsuite="${bptsfile}" bpelunitdir="${env.BPELUNIT_HOME}">      
             <logging level="INFO"/>
@@ -107,11 +103,6 @@
                 </depend>
             </fileset>
         </apply>
-        <!-- Movemos el decls que se crea en el directorio de trabajo -->
-        <!--
-	<echo>Moviendo ficheros de ${user.dir} a ${proy}</echo>
-        <move file="${user.dir}/${instrumented.decls}.xml" todir="${proy}"/>
-        -->
     </target>
 
     <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
@@ -121,9 +112,9 @@
 	     de trabajo al directorio de proyecto desde el cual se
 	     importó este ant  -->
 	<!-- <move file="${user.dir}/catalog.xml" todir="${proy}"/> -->
+	<!-- <move file="${user.dir}/proceso.pdd" todir="${proy}"/> -->
         <move file="${user.dir}/tiposReunidos.xml" todir="${proy}"/>
         <move file="${user.dir}/procesoInspeccionado.decls" todir="${proy}"/>
-	<!-- <move file="${user.dir}/proceso.pdd" todir="${proy}"/> -->
         <move file="${user.dir}/procesoInspeccionado.bpel" todir="${proy}"/>
     </target>
 
