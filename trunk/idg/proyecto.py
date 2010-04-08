@@ -1059,11 +1059,6 @@ class Proyecto(object):
                 log.info(_("Modificando fichero base-build.xml"))
                 dnms[0].attrib['location'] =  self.takuan
 
-            try:
-                bbuild.write(path.join(self.dir,'base-build.xml'))
-            except:
-                raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
-
         # Buscar y establecer simplify y el aplanado
         anlflags = [d for d in dnmsall
                     if 'name' in d.attrib and d.get('name') == 'analyzer.flags']
@@ -1073,6 +1068,12 @@ class Proyecto(object):
         if self.simplify : flags += ' --simplify'
         anlflags.set('value', flags)
 
+        try:
+            bbuild.write(path.join(self.dir,'base-build.xml'))
+        except:
+            raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
+
+        
         try:
             # Abrir el test.bpts y comprobar la configuración del servidor 
             bpts = md.parse(self.test)
