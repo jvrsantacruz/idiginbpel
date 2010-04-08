@@ -1141,7 +1141,11 @@ class ProyectoUI(object):
         trz = self.anl_seleccionar_trazas()
 
         # Las metemos en la lista de análisis
-        self.anl_view.set_model(None) # Desconectar el modelo
+        # Desconectar el modelo
+        self.anl_view.set_model(None) 
+
+        # Vaciar el modelo 
+        self.anl_tree.clear()
 
         # Función lambda para insertar los hijos
         insert = lambda x : self.anl_tree.insert(parent, 0, [x, ''])
