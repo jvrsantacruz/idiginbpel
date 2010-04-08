@@ -1,0 +1,298 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-08 22:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: idiginBPEL.py:24
+msgid "Ejecutable en "
+msgstr ""
+
+#: idiginBPEL.py:36
+msgid "Buscando config en: "
+msgstr ""
+
+#: idg/instrum.py:39
+msgid "Ejecutando: "
+msgstr ""
+
+#: idg/instrum.py:76
+msgid "Instrumentación terminada"
+msgstr ""
+
+#: idg/main.py:62
+msgid "Proyectos disponibles: "
+msgstr ""
+
+#: idg/main.py:73
+msgid "No se pudo leer el fichero de configuración "
+msgstr ""
+
+#: idg/main.py:75
+msgid "Usando fichero de configuración: "
+msgstr ""
+
+#: idg/main.py:87
+msgid "No se encuentra el directorio: "
+msgstr ""
+
+#: idg/main.py:90
+msgid "Se usará el valor por defecto para: "
+msgstr ""
+
+#: idg/proyecto.py:142
+msgid "El proyecto se ha creado con errores: "
+msgstr ""
+
+#: idg/proyecto.py:236 idg/proyecto.py:237
+msgid "Error no se pudo abrir "
+msgstr ""
+
+#: idg/proyecto.py:279
+msgid "Dependencia: "
+msgstr ""
+
+#: idg/proyecto.py:290
+msgid "Error al parsear "
+msgstr ""
+
+#: idg/proyecto.py:344
+msgid "Error al escribir en el proyecto"
+msgstr ""
+
+#: idg/proyecto.py:389
+msgid "No existe el fichero de casos de prueba o no es accesible"
+msgstr ""
+
+#: idg/proyecto.py:411
+msgid ""
+"No se pudo copiar al proyecto el                                        "
+"fichero de casos de prueba: "
+msgstr ""
+
+#: idg/proyecto.py:422
+msgid "No se ha podido cargar el fichero de casos de prueba"
+msgstr ""
+
+#: idg/proyecto.py:461
+msgid "No se ha podido cargar el fichero de             tests"
+msgstr ""
+
+#: idg/proyecto.py:473
+msgid "El fichero test.bpts está roto"
+msgstr ""
+
+#: idg/proyecto.py:486
+msgid "No se ha podido escribir el fichero de tests"
+msgstr ""
+
+#: idg/proyecto.py:500
+msgid "Nombre de proyecto vacio"
+msgstr ""
+
+#: idg/proyecto.py:504
+msgid "Fichero bpel no existe "
+msgstr ""
+
+#: idg/proyecto.py:508
+msgid "Inicializando proyecto"
+msgstr ""
+
+#: idg/proyecto.py:512
+msgid "Error al iniciar proyecto con: "
+msgstr ""
+
+#: idg/proyecto.py:519
+msgid "Buscando dependencias"
+msgstr ""
+
+#: idg/proyecto.py:523
+msgid "Crear Proyecto: Error al crear ficheros de proyecto"
+msgstr ""
+
+#: idg/proyecto.py:527
+msgid "Proyecto creado correctamente"
+msgstr ""
+
+#: idg/proyecto.py:544
+msgid "No existe el fichero: "
+msgstr ""
+
+#: idg/proyecto.py:554
+msgid "No se pudo abrir el fichero base-build.xml"
+msgstr ""
+
+#: idg/proyecto.py:564
+msgid "No se ha podido configurar base-build.xml"
+msgstr ""
+
+#: idg/proyecto.py:566
+msgid "Modificando fichero base-build.xml"
+msgstr ""
+
+#: idg/proyecto.py:572
+msgid "No se pudo escribir el fichero base-build.xml"
+msgstr ""
+
+#: idg/proyecto.py:578
+msgid "No se pudo abrir el fichero de casos de prueba general"
+msgstr ""
+
+#: idg/proyecto.py:594
+msgid ""
+"No se pudo escribir el fichero de                                         "
+"casos de prueba"
+msgstr ""
+
+#: idg/proyecto.py:599
+msgid ""
+"Hay dependencias rotas en el proyecto, solucione la             situación y "
+"realice una búsqueda o cree de nuevo el proyecto"
+msgstr ""
+
+#: idg/proyecto.py:626 idg/proyecto.py:664
+msgid "Error en el fichero de configuración: "
+msgstr ""
+
+#: idg/proyecto.py:639
+msgid ""
+"No se puede abrir el fichero de             configuración del proyecto: "
+msgstr ""
+
+#: idg/proyecto.py:711
+msgid "Error al guardar los datos del proyecto."
+msgstr ""
+
+#: idg/proyecto.py:744
+msgid "Error al guardar las dependencias"
+msgstr ""
+
+#: idg/proyecto.py:754
+msgid "Escribiendo fichero de configuración : "
+msgstr ""
+
+#: idg/proyecto.py:757
+msgid "No se puede abrir el fichero de configuración  del proyecto"
+msgstr ""
+
+#: idg/proyecto.py:771
+msgid ""
+"No se pudo escribir el fichero de                                        "
+"configuración en: "
+msgstr ""
+
+#: idg/proyecto.py:798
+msgid "Error al abrir proyecto.xml"
+msgstr ""
+
+#: idgui/instrum.py:37
+msgid "Instrumentación correcta"
+msgstr ""
+
+#: idgui/instrum.py:39
+msgid "La instrumentación ha fallado."
+msgstr ""
+
+#: idgui/main.py:21
+msgid "Test"
+msgstr "TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST TRADUCIDO"
+
+#: idgui/main.py:132
+msgid "Proyecto ya cargado, no se vuelve a cargar."
+msgstr ""
+
+#: idgui/main.py:168
+msgid "Seleccionado el proyecto: "
+msgstr ""
+
+#: idgui/main.py:194
+msgid "El nombre del proyecto no puede estar vacío."
+msgstr ""
+
+#: idgui/main.py:198
+msgid "Ya existe un proyecto con ese nombre."
+msgstr ""
+
+#: idgui/main.py:206
+msgid "El nombre del proyecto no puede contener el carácter: "
+msgstr ""
+
+#: idgui/main.py:211
+msgid "Fichero bpel no seleccionado"
+msgstr ""
+
+#: idgui/main.py:213
+msgid "El fichero bpel seleccionado no existe"
+msgstr ""
+
+#: idgui/main.py:220
+msgid "Creando proyecto con el fichero bpel: "
+msgstr ""
+
+#: idgui/main.py:227
+msgid "Excepción al crear proyecto "
+msgstr ""
+
+#: idgui/proyecto.py:39
+msgid "Iniciando el proyecto"
+msgstr ""
+
+#: idgui/proyecto.py:52
+msgid "Excepción irrecuperable al crear el proyecto"
+msgstr ""
+
+#: idgui/proyecto.py:82
+msgid "Proyecto iniciado correctamente."
+msgstr ""
+
+#: idgui/proyecto.py:161
+msgid "Dentro del proyecto"
+msgstr ""
+
+#: idgui/proyecto.py:176
+msgid "Instrumentando..."
+msgstr ""
+
+#: idgui/proyecto.py:183 idgui/proyecto.py:184
+msgid "Error al instrumentar."
+msgstr ""
+
+#: idgui/proyecto.py:195
+msgid "Se ha producido un error durante la búsqueda."
+msgstr ""
+
+#: idgui/proyecto.py:198
+msgid "Dependencias encontradas: "
+msgstr ""
+
+#: idgui/proyecto.py:209
+msgid "Proyecto guardado."
+msgstr ""
+
+#: idgui/proyecto.py:261
+msgid "No existe el fichero en el proyecto"
+msgstr ""
+
+#: idgui/proyecto.py:273
+msgid "Añadiendo fichero de casos de prueba"
+msgstr ""
+
+#: idgui/proyecto.py:278
+msgid "Error al añadir fichero de casos de prueba"
+msgstr ""
+
+#: idgui/proyecto.py:281
+msgid "Añadido fichero bpts: "
+msgstr ""
