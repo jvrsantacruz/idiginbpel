@@ -75,7 +75,7 @@ class Ejecucion(Thread):
         self.proy = proy
         ## Instancia de la gui del proyecto
         self.ui = proyUI
-        ## Frecuencia de comprobación
+        ## Período de comprobación
         self.t = tiempo
         ## Número de casos a ejecutar
         self.ncasos = len(self.ui.ejec_path_casos)

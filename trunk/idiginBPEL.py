@@ -23,6 +23,7 @@ log.debug(_('Ejecutable en ') + ruta) # DEBUG
 sys.path.insert(0,ruta)
 
 # Buscamos la configuración en los posibles home,  o la por defecto en share
+# En home, dentro del proyecto, y en share
 configs = ('~/.idiginbpel', './home', '/usr/share/idiginbpel')
 
 # Buscar el config.xml en las posibles rutas por el orden especificado
