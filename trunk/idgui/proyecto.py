@@ -113,6 +113,18 @@ class ProyectoUI(object):
     def proy_notebook_next(self,widget=None):
         """@brief Callback de pulsar el botón siguiente en el proyecto."""
         self.proyecto_notebook.next_page()
+
+
+    def on_proy_notebook_switch_page(self, notebook, page, pagenum):
+        """@brief Actualiza la pestaña de trazas"""
+        # Actualizar trazas al entrar en la pestaña de trazas
+        if pagenum == 2 :
+            self.cargar_ejec_tree()
+        elif pagenum == 3 :
+            self.actualizar_trazas()
+        elif pagenum == 4 :
+            self.anl_actualizar_info()
+            self.anl_seleccionar_trazas()
     ## @}
 
     ## @name Config
@@ -1079,9 +1091,9 @@ class ProyectoUI(object):
         # Siguiente página 
         self.proy_notebook_next()
 
-        # Listar las trazas en la vista de análisis
-        self.anl_listar_trazas()
-        self.anl_actualizar_info()
+        # Analizar
+        self.analizar()
+
 
     def on_trz_opt_flat_combo(self, widget):
         """@brief Callback de cambiar la selección del combo."""
@@ -1122,12 +1134,15 @@ class ProyectoUI(object):
 
     def analizar(self):
         """@brief Acciones a realizar al iniciar el ańalisis."""
+
+        self.anl_listar_trazas()
+        self.anl_actualizar_info()
+
         # Tomar las trazas seleccionadas en el treeview y añadirlas al
         # directorio de trazas a analizar.
         trz = self.anl_seleccionar_trazas()
-        self.proy.seleccionar_trazas_analisis(trz)
         # Crear el thread con el análisis
-        self.proy.analizar()
+        self.proy.analizar(trz)
         # Crear una instancia del thread de análisis
         thread = Analisis(self.proy,self,1)
         thread.start()
@@ -1175,7 +1190,6 @@ class ProyectoUI(object):
         análisis
         """
         log.debug('Analizando')
-        self.anl_actualizar_info()
         # Comenzar el análisis
         self.analizar()
 
