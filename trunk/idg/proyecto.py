@@ -504,9 +504,11 @@ class Proyecto(object):
             for case, tfile in cases.items() :
                 os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
 
-    def analizar(self):
+    def analizar(self, trz):
         """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
         trazas seleccionadas."""
+
+        self.seleccionar_trazas_analisis(trz)
 
         # No crear otro subproceso si ya se está ejecutando
         if self.anl_subproc is not None and self.anl_subproc.poll() is None :
