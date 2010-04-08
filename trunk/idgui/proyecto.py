@@ -17,6 +17,7 @@ from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable
 from instrum import Comprobador
 from ejecucion import Ejecucion
+from analisis import Analisis
 
 class ProyectoUI(object):
     """@brief Manejo de la interfaz de usuario del proyecto."""
@@ -774,8 +775,9 @@ class ProyectoUI(object):
     def on_proy_exec_control_anl_button(self, widget):
         """@brief Callback de pulsar el botón de análisis en la pantalla de
         ejecución."""
-        self.actualizar_trazas()
-        self.analizar()
+        pass
+        #self.actualizar_trazas()
+        #self.analizar()
 
     ## @}
 
@@ -1081,6 +1083,14 @@ class ProyectoUI(object):
         self.anl_listar_trazas()
         self.anl_actualizar_info()
 
+    def on_trz_opt_flat_combo(self, widget):
+        """@brief Callback de cambiar la selección del combo."""
+        self.proy.set_aplanado(self.anl_aplanado_combo.get_active_text())
+
+    def on_trz_opt_simplify_check(self, widget):
+        """@brief Callback de cambiar el check de simplify."""
+        self.proy.set_simplify(self.anl_simplify_check.is_active())
+
     ## @}
 
     ## @name Análisis
@@ -1102,18 +1112,26 @@ class ProyectoUI(object):
 
         ## Label de aplanado
         self.anl_flat_label = self.gtk.get_object('proy_anl_data_flat_label')
+        ## Label de simplify
         self.anl_sim_label = self.gtk.get_object('proy_anl_data_simplify_label')
+
+        self.anl_listar_trazas()
+        self.anl_actualizar_info()
+
+        ## Combo de aplanado
 
     def analizar(self):
         """@brief Acciones a realizar al iniciar el ańalisis."""
-        # Limpiar lo que hay en el directorio de trazas a analizar 
-        self.proy.borrar_trazas(self.proy.trazas_anl_dir)
         # Tomar las trazas seleccionadas en el treeview y añadirlas al
         # directorio de trazas a analizar.
         trz = self.anl_seleccionar_trazas()
         self.proy.seleccionar_trazas_analisis(trz)
-
-
+        # Crear el thread con el análisis
+        self.proy.analizar()
+        # Crear una instancia del thread de análisis
+        thread = Analisis(self.proy,self,1)
+        thread.start()
+        log.debug(thread.isAlive())
 
     def anl_listar_trazas(self):
         """Establece en la lista de trazas de análisis, las trazas que van a
@@ -1143,7 +1161,6 @@ class ProyectoUI(object):
         self.anl_flat_label.set_text(self.proy.aplanado)
         self.anl_sim_label.set_text(_(str(self.proy.simplify)))
 
-    
     ## @}
 
     ## @name Callbacks Análisis
@@ -1153,9 +1170,10 @@ class ProyectoUI(object):
         """@brief Callback de pulsar el botón de analizar en la parte de
         análisis
         """
-        # Obtener config de la interfaz 
-        # Escribirla en la configuración
-        # Crear una instancia del thread de análisis
+        log.debug('Analizando')
+        self.anl_actualizar_info()
+        # Comenzar el análisis
+        self.analizar()
 
     ## @}
 
