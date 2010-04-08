@@ -157,7 +157,7 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="on_proy_trz_opt_simplify_check"/>
+                            <signal name="toggled" handler="on_trz_opt_simplify_check"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
