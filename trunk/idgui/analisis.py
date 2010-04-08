@@ -18,6 +18,32 @@ class Analisis(Thread):
     leyendo su salida.
     """
 
+    ## Expresión regular para filtrar el log
+    ## Filtra cadenas como estas :
+    ## [apply] Processing multidimensional vectors in the Daikon dtrace '/home/arl/.idiginbpel/proy/sample/daikon-out-20100408-1659/MetaSearchTest.bpts:MaxItOut:1270738043.35.dtrace' using aplanarDTraceNodeSet.pl (6/8)...
+    ## [apply] * number of CPUs:			1
+    # 1. cadena
+    re_str = " *\[apply\] (.*)$"
+
+    ## Expresión regular para comprobar el éxito
+    re_OK_str = "BUILD SUCCESSFUL"
+
+    ## Expresión regular para comprobar el fracaso
+    re_KO_str = "BUILD FAILED"
+
+    ## Comienza Daikon
+    re_daikon_str = "Running Daikon using"
+
+    ## Cadena para parsear comienzo de procesamiento de logs
+    re_exelog_str = "Converting execution log"
+
+    ## Cadena para parsear comienzo de procesamiento 
+    re_multilog_str = "Processing multidimensional vectors"
+
+    ## Estado interno 
+    estado = 'init'
+    cont = 1
+
     def __init__(self, proy, proyUI, tiempo):
         """@brief Inicializa el Thread
         @param proy Instancia del proyecto
@@ -32,6 +58,89 @@ class Analisis(Thread):
         ## Período de comprobación
         self.t = tiempo
 
+        # Compilar expresiones
+        self.re = re.compile(self.re_str)
+        self.re_OK = re.compile(self.re_OK_str)
+        self.re_KO = re.compile(self.re_KO_str)
+        self.re_daikon = re.compile(self.re_daikon_str)
+        self.re_exelog = re.compile(self.re_exelog_str)
+        self.re_multilog = re.compile(self.re_multilog_str)
+
+    def filtrar(self, line ):
+        """@brief Filtra una línea obtenida del log y actualiza la gui en
+        consecuencia
+        """
+        # Modificamos la línea quedándonos con el primer campo
+        m = self.re.match(line)
+        if m is None : return
+
+        line = m.expand('\g<1>')
+
+        exps = ((self.re_OK, "ok"),
+                (self.re_KO, "ko"),
+                (self.re_daikon, "daikon"),
+                (self.re_exelog, "exelog"),
+                (self.re_multilog, "multilog"))
+
+        m = name = None
+        for rexp, nm in exps :
+            m = rexp.match(line)
+            if m :
+                name = nm
+                break
+
+        try: 
+            gtk.gdk.threads_enter()
+
+            if name == 'ok' :
+                # Poner la barra a tope
+                #  y mensaje en el pie
+                self.estado = 'ok'
+                self.bar.set_fraction(1)
+                self.bar.set_text('Completed')
+                log.debug('ok')
+
+            elif name == 'ko' :
+                # Poner la barra a tope 
+                #  y mensaje en el pie
+                self.estado = 'ko'
+                self.bar.set_fraction(1)
+                self.bar.set_text(_('Completed with errors'))
+
+            elif name == 'daikon' :
+                # Poner la barra a 2/3
+                #  y mensaje en la barra
+                self.estado = 'daikon'
+                self.bar.set_fraction(2/3.0)
+                self.bar.set_text(_('Ejecutando Daikon'))
+
+            elif name == 'exelog' :
+                # Poner la barra a 1/6
+                #  y mensaje en la barra 
+                if self.estado != 'exelog' :
+                    self.estado = 'exelog'
+                    self.bar.set_fraction(1/6.0)
+                    self.cont = 0
+
+                ++self.cont
+                text = "Processing logs (%i)" % self.cont
+                self.bar.set_text(text)
+
+            elif name == 'multilog' :
+                # Poner barra a 1/3 
+                #  y mensaje en la barra
+                if self.estado != 'multilog':
+                    self.estado = 'multilog'
+                    self.bar.set_fraction(1/3.0)
+                    self.cont = 0
+
+                ++self.cont
+                text = "Processing multidimensional vectors (%i)" % self.cont
+                self.bar.set_text(text)
+
+        finally:
+            gtk.gdk.threads_leave()
+
     def run(self):
         """
         @brief Consulta el proceso de ejecución de los testcases y obtiene
@@ -42,6 +151,9 @@ class Analisis(Thread):
         # Obtenemos el buffer de la interfaz
         buffer = self.ui.gtk.get_object('proy_anl_log_text_buffer')
         view = self.ui.gtk.get_object('proy_anl_log_text')
+
+        # Obtenemos la barra de la interfaz y su label
+        self.bar = self.ui.gtk.get_object('proy_anl_control_bar')
 
         ## Subproceso a comprobar
         sproc = self.proy.anl_subproc
@@ -69,6 +181,9 @@ class Analisis(Thread):
                 line = sproc.stdout.readline()
                 if not line :
                     break
+
+                # Filtrar la línea y actualizar la gui
+                self.filtrar(line)
 
                 # Añadimos la línea al buffer
                 try: 
