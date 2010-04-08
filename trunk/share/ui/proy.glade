@@ -25,6 +25,7 @@
           <object class="GtkNotebook" id="proy_notebook">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <signal name="switch_page" handler="on_proy_notebook_switch_page"/>
             <child>
               <object class="GtkHBox" id="proy_nb_config_dummy_box">
                 <property name="visible">True</property>
