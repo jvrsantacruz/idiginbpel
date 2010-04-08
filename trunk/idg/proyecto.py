@@ -241,6 +241,9 @@ class Proyecto(object):
         self.aplanado = 'index-flattering'
         ## Simplify
         self.simplify = True
+
+        ## Subproceso
+        self.anl_subproc = None
         ## @}
 
     ## @}
@@ -488,14 +491,9 @@ class Proyecto(object):
         anl_tdir = self.trazas_anl_dir 
         tdir = self.trazas_dir
 
-        log.info('Cleaning old trace files from %s' % anl_tdir)
         # Limpiar ficheros antiguos seleccionados
         # El directorio anl_tdir puede que no exista
-        try:
-            shutil.rmtree(anl_tdir)
-        except:
-            pass
-        os.mkdir(anl_tdir)
+        self.borrar_trazas(anl_tdir)
 
         log.debug('Linking trace files from %s to %s for analysis'  
                   % (tdir, anl_tdir))
@@ -521,8 +519,9 @@ class Proyecto(object):
         # Redireccionamos la salida de errores a la estandar.
         self.anl_subproc = subproc.Popen(cmd,
                                          shell = False,
-                                         stdout = subproc.PIE,
+                                         stdout = subproc.PIPE,
                                          stderr = subproc.STDOUT)
+        return self.anl_subproc
     ## @}
 
     ## @name Casos de prueba
@@ -850,6 +849,7 @@ class Proyecto(object):
         """@brief Borra todas las trazas.log en un directorio.
         @param dir El directorio .
         """
+        log.info('Cleaning old trace files from %s' % self.trazas_anl_dir)
         [os.remove(path.join(dir,f)) for f in os.listdir(dir) if f.endswith('.log')]
 
     def trazas_disponibles(self):
@@ -1087,7 +1087,6 @@ class Proyecto(object):
         # Buscar y establecer la dirección correctamente
         bpbaseURL = bproot.getElementsByTagNameNS(self.test_url, 'baseURL')[0]
         bpbaseURL.nodeValue = "http://%s:%s/ws" % (self.svr, self.port)
-
 
         # Guardarlo
         try:
