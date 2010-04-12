@@ -8,7 +8,7 @@
     <!-- Directorio del usuario -->
     <home src="~/.idiginbpel"/>
     <!-- Directorio de archivos de runtime-->
-    <share src="/usr/share/idiginbpel"/>
+    <share src="~/IdiginBPEL/share"/>
     <!-- Directorio de takuan -->
     <takuan src="~/takuan"/>
     <!-- Directorio de BPELUnit -->
