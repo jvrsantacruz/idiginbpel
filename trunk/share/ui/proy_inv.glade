@@ -7,25 +7,33 @@
       <object class="GtkHBox" id="proy_inv_container">
         <property name="visible">True</property>
         <child>
-          <object class="GtkFrame" id="frame6">
+          <object class="GtkFrame" id="proy_inv_text_frame">
             <property name="visible">True</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">none</property>
             <child>
-              <object class="GtkAlignment" id="alignment6">
+              <object class="GtkAlignment" id="proy_inv_text_align">
                 <property name="visible">True</property>
                 <property name="left_padding">12</property>
                 <child>
-                  <object class="GtkTextView" id="textview2">
+                  <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="buffer">textbuffer2</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <child>
+                      <object class="GtkTextView" id="proy_inv_text_view">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="buffer">proy_inv_text_buffer</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
             </child>
             <child type="label">
-              <object class="GtkLabel" id="label24">
+              <object class="GtkLabel" id="proy_inv_text_frame_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">&lt;b&gt;Invariantes&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
@@ -37,31 +45,31 @@
           </packing>
         </child>
         <child>
-          <object class="GtkFrame" id="frame5">
+          <object class="GtkFrame" id="proy_inv_data_frame">
             <property name="visible">True</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">none</property>
             <child>
-              <object class="GtkAlignment" id="alignment5">
+              <object class="GtkAlignment" id="proy_inv_data_fram">
                 <property name="visible">True</property>
                 <property name="left_padding">12</property>
                 <child>
-                  <object class="GtkVBox" id="vbox8">
+                  <object class="GtkVBox" id="proy_inv_data_cont">
                     <property name="visible">True</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkTable" id="table4">
+                      <object class="GtkTable" id="proy_inv_data_table">
                         <property name="visible">True</property>
                         <property name="n_rows">3</property>
                         <property name="n_columns">2</property>
                         <child>
-                          <object class="GtkLabel" id="label25">
+                          <object class="GtkLabel" id="proy_inv_data_time_name">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Tiempo total</property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label26">
+                          <object class="GtkLabel" id="proy_inv_data_ninvs_name">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">N&#xBA; Invariantes generados</property>
                           </object>
@@ -71,7 +79,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label27">
+                          <object class="GtkLabel" id="proy_inv_data_ninvsint_name">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">N&#xBA; de invariantes interesantes</property>
                           </object>
@@ -81,7 +89,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label28">
+                          <object class="GtkLabel" id="proy_inv_data_time">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">1h 50m</property>
                           </object>
@@ -91,7 +99,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label29">
+                          <object class="GtkLabel" id="proy_inv_data_ninv">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">8</property>
                           </object>
@@ -103,7 +111,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label30">
+                          <object class="GtkLabel" id="proy_inv_data_ninvint">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">5</property>
                           </object>
@@ -120,17 +128,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkTreeView" id="treeview4">
+                      <object class="GtkTreeView" id="proy_inv_view">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="headers_clickable">False</property>
                         <property name="search_column">0</property>
                         <child>
-                          <object class="GtkTreeViewColumn" id="treeviewcolumn4">
+                          <object class="GtkTreeViewColumn" id="proy_inv_view_column">
                             <property name="sizing">fixed</property>
                             <property name="title">Casos de Prueba</property>
                             <child>
-                              <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                              <object class="GtkCellRendererText" id="proy_inv_view_column_cell"/>
                             </child>
                           </object>
                         </child>
@@ -144,7 +152,7 @@
               </object>
             </child>
             <child type="label">
-              <object class="GtkLabel" id="label23">
+              <object class="GtkLabel" id="proy_inv_data_frame_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">&lt;b&gt;Resumen Ejecuci&#xF3;n&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
@@ -158,7 +166,7 @@
       </object>
     </child>
   </object>
-  <object class="GtkTextBuffer" id="textbuffer2">
+  <object class="GtkTextBuffer" id="proy_inv_text_buffer">
     <property name="text" translatable="yes">Fichero_prueba.Caso_prueba:::ENTER
 
 
