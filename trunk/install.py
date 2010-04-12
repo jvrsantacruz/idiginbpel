@@ -17,7 +17,7 @@ logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s",
 log = logging.getLogger("")
 
 # Idiginbpel repository url
-__IDG_REPO_URL__ = 'https://forja.rediris.es/svn/cusl4-idigin/trunk'
+__IDG_REPO_URL__ = 'https://forja.rediris.es/svn/cusl4-idigin/tags/stable'
 
 # Idiginbpel directory (where the code will be placed)
 __IDG_NAME_DIR__ = 'IdiginBPEL'
