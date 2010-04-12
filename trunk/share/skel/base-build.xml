@@ -52,7 +52,7 @@
     </typedef>
 
     <taskdef name="instrument" 
-        classname="es.uca.webservices.bpel.InstrumentBPELProcessTask" 
+        classname="es.uca.webservices.bpel.ant.InstrumentBPELProcessTask" 
         classpathref="instr.classpath"/>
 
     <target name="abstract">
