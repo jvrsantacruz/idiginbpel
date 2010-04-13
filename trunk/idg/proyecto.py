@@ -11,6 +11,8 @@ import xml.etree.ElementTree as et
 import urllib
 import shutil 
 import re
+import glob
+import time
 
 from instrum import Instrumentador
 import util.xml
@@ -251,7 +253,7 @@ class Proyecto(object):
     ## @name Tratar Bpel
     ## @{
 
-    def buscar_dependencias(self,bpel):
+    def buscar_dependencias(self, bpel):
         """@brief Busca las dependencias de un bpel recursivamente. 
            Copia el bpel y las dependencias al proyecto.
            Modifica el bpel y las dependencias para adaptarlos al proyecto
@@ -974,6 +976,39 @@ class Proyecto(object):
     def set_simplify(self, flag):
         """@brief Establece el modo de simplify"""
         self.simplify = flag
+
+    def anl_copiar_inv(self):
+        """Copia el último invariante generado en la última ejecución a la carpeta
+        de invariantes. Renombrándolos convenientemente"""
+        log.info('Importando invariante generado')
+
+        # Importar el fichero de invariantes
+        dirs = glob.glob(path.join(self.dir, 'daikon-out*'))
+        log.debug(path.join(self.dir, 'daikon-out*'))
+        dirs.sort()
+        log.debug(dirs)
+        if dir :
+            src = os.path.join(dirs[-1], 'procesoInspeccionado.out')
+            dst = os.path.join(self.invr_dir, 'invr-' + str(time.time()) + '.out')
+            shutil.move(src, dst)
+
+    ## @}
+
+    ## @name Invariantes
+    ## @{
+
+    def inv_ultimo(self):
+        """@brief Devuelve el último invariante
+        @retval La ruta completa al último invariante o None.
+        """
+        invs = glob.glob(path.join(self.invr_dir, 'invr-*'))
+        if invs :
+            invs.sort()
+            invs = invs[-1]
+        else:
+            return None
+
+        return invs
 
     ## @}
 
