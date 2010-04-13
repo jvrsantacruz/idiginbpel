@@ -70,11 +70,12 @@ class Analisis(Thread):
         """@brief Filtra una línea obtenida del log y actualiza la gui en
         consecuencia
         """
-        # Modificamos la línea quedándonos con el primer campo
-        m = self.re.match(line)
-        if m is None : return
 
-        line = m.expand('\g<1>')
+        m = self.re.match(line)
+        if m : line = m.expand('\g<1>')
+
+        m = self.re_OK.match(line) if not m else m 
+        m = self.re_KO.match(line) if not m else m
 
         exps = ((self.re_OK, "ok"),
                 (self.re_KO, "ko"),
@@ -98,7 +99,7 @@ class Analisis(Thread):
                 self.estado = 'ok'
                 self.bar.set_fraction(1)
                 self.bar.set_text('Completed')
-                log.debug('ok')
+                log.debug('Analisis done')
 
             elif name == 'ko' :
                 # Poner la barra a tope 
@@ -106,6 +107,7 @@ class Analisis(Thread):
                 self.estado = 'ko'
                 self.bar.set_fraction(1)
                 self.bar.set_text(_('Completed with errors'))
+                log.debug('Analisis done with errors')
 
             elif name == 'daikon' :
                 # Poner la barra a 2/3
@@ -113,6 +115,7 @@ class Analisis(Thread):
                 self.estado = 'daikon'
                 self.bar.set_fraction(2/3.0)
                 self.bar.set_text(_('Ejecutando Daikon'))
+                log.debug('Daikon')
 
             elif name == 'exelog' :
                 # Poner la barra a 1/6
@@ -122,9 +125,10 @@ class Analisis(Thread):
                     self.bar.set_fraction(1/6.0)
                     self.cont = 0
 
-                ++self.cont
+                self.cont += 1
                 text = "Processing logs (%i)" % self.cont
                 self.bar.set_text(text)
+                print 'Processing log (%i)\r' % self.cont,
 
             elif name == 'multilog' :
                 # Poner barra a 1/3 
@@ -134,9 +138,10 @@ class Analisis(Thread):
                     self.bar.set_fraction(1/3.0)
                     self.cont = 0
 
-                ++self.cont
+                self.cont += 1
                 text = "Processing multidimensional vectors (%i)" % self.cont
                 self.bar.set_text(text)
+                print 'Processing multidimensional vectors (%i)\r' % self.cont,
 
         finally:
             gtk.gdk.threads_leave()
@@ -199,10 +204,11 @@ class Analisis(Thread):
 
         # Tras el análisis copiar los invariantes a la carpeta de invariantes.
         self.proy.anl_copiar_inv()
+
         # Movernos a la siguiente pestaña y mostrarlos
         try: 
             gtk.gdk.threads_enter()
-            self.ui.next_page()
-            self.inv_mostrar()
+            self.ui.proyecto_notebook.next_page()
+            self.ui.inv_cargar()
         finally:
             gtk.gdk.threads_leave()
