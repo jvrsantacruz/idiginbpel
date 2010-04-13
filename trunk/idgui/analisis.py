@@ -210,5 +210,7 @@ class Analisis(Thread):
             gtk.gdk.threads_enter()
             self.ui.proyecto_notebook.next_page()
             self.ui.inv_cargar()
+            # Cargar el tiempo que ha llevado
+            self.ui.inv_data_time.set_text(timer.stime())
         finally:
             gtk.gdk.threads_leave()

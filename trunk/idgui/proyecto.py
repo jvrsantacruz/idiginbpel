@@ -1203,6 +1203,8 @@ class ProyectoUI(object):
         self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
 
         self.inv_text_buffer = self.gtk.get_object('proy_inv_text_buffer')
+        self.inv_data_time = self.gtk.get_object('proy_inv_data_time')
+        self.inv_data_ninv = self.gtk.get_object('proy_inv_data_ninv')
 
     def inv_cargar(self):
         """@brief Carga el último fichero de invariantes en el buffer de invariantes"""
