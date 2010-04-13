@@ -31,6 +31,17 @@ class Clock(Thread):
             ## Thread padre
             self.padre = padre
 
+        def time(self):
+            """@brief Devuelve el tiempo acumulado en segundos."""
+            if self.pausa is not False :
+                self.tstart += (time.time() - self.pausa)
+
+            return time.time() - self.tstart
+
+        def stime(self):
+            """@brief Devuelve el tiempo acumulado en una cadena."""
+            return min_format(self.time())
+
         def status(self):
             """@brief Devuelve si el reloj está en corriendo (True) o en pausa
             (False).
@@ -65,7 +76,7 @@ class Clock(Thread):
 
                 # Obtener dia, horas, minutos, segundos de la
                 # diferencia desde que empezó hasta ahora
-                date =min_format(time.time() - self.tstart)
+                date = min_format(time.time() - self.tstart)
 
                 # Actualizar la hora
                 try:
@@ -80,4 +91,3 @@ class Clock(Thread):
                 # Comprobar el thread padre
                 if self.padre is not None :
                     self.end = self.padre.poll() is not None
-
