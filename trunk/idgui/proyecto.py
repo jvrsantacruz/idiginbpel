@@ -22,7 +22,7 @@ from analisis import Analisis
 class ProyectoUI(object):
     """@brief Manejo de la interfaz de usuario del proyecto."""
 
-    def __init__(self,idg,idgui,nombre,bpel=""):
+    def __init__(self, idg, idgui, nombre, bpel=""):
         """@brief Clase que maneja la interfaz de un proyecto. Lo carga o crea
         al instanciarse.
            @param idg Instancia de la clase de control
@@ -47,7 +47,7 @@ class ProyectoUI(object):
         try:
             error = ""
             ## Referencia a la instancia del Proyecto actual
-            self.proy = Proyecto(nombre,idg,bpel)
+            self.proy = Proyecto(nombre, idg, bpel)
             self.idg.proyecto = self.proy
         except (ProyectoRecuperable) as e:
             # Mostrar las recuperables en los errores en la interfaz.
@@ -78,6 +78,7 @@ class ProyectoUI(object):
         self.__init_ejec()
         self.__init_trz()
         self.__init_anl()
+        self.__init_inv()
 
         # Conectar todas las señales
         self.gtk.connect_signals(self)
@@ -805,13 +806,6 @@ class ProyectoUI(object):
         self.trz_cont = self.gtk.get_object('proy_trz_container')
         self.trz_cont.reparent(self.gtk.get_object('proy_nb_trz_dummy_box'))
 
-        # Cargar el glade de invariantes
-        self.gtk.add_from_file(path.join(self.opts.get('share'),
-                                         "ui/proy_inv.glade"))
-        # Obtener el contenedor y añadirlo al notebook
-        self.inv_cont = self.gtk.get_object('proy_inv_container')
-        self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
-
         ## Vista en árbol de las trazas disponibles
         self.trz_view = self.gtk.get_object('proy_trz_view')
         ## Almacenamiento en árbol de las trazas disponibles
@@ -1195,3 +1189,29 @@ class ProyectoUI(object):
 
     ## @}
 
+    ## @name Invariantes
+    ## @{
+
+    def __init_inv(self):
+        """Inicializa la parte de invariantes"""
+
+        # Cargar el glade de invariantes
+        self.gtk.add_from_file(path.join(self.opts.get('share'),
+                                         "ui/proy_inv.glade"))
+        # Obtener el contenedor y añadirlo al notebook
+        self.inv_cont = self.gtk.get_object('proy_inv_container')
+        self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
+
+        self.inv_text_buffer = self.gtk.get_object('proy_inv_text_buffer')
+
+    def inv_cargar(self):
+        """@brief Carga el último fichero de invariantes en el buffer de invariantes"""
+        inv = self.proy.inv_ultimo()
+        if inv :
+            finv = open(inv, 'r')
+            self.inv_text_buffer.set_text(finv.read())
+            finv.close()
+        else:
+            log.warning('Se intentó cargar un invariante, pero no hay.')
+
+    ## @}
