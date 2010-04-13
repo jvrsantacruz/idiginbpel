@@ -15,10 +15,6 @@
     <!-- Nombre del fichero BPEL original -->
     <property name="main.bpel"      value="${proy}/bpel_original.bpel"/>
 
-    <!-- Usamos el comportamiento por defecto del analizador -->
-    <property name="analyzer.flags" value="--metrics --disable-comparability"/>
-
-
     <!-- IMPORTACION -->
 
     <!-- Importamos el fichero Ant base -->
