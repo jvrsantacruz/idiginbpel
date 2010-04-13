@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Base test file. Cases will be added to this file for execution. -->
+<tes:testSuite 
+    xmlns:tes="http://www.bpelunit.org/schema/testSuite">
+  <tes:name></tes:name>
+  <tes:baseURL>http://localhost:7777/ws</tes:baseURL>
+
+  <tes:deployment>
+      <tes:put name="bpel_original" type="activebpel">
+      <tes:wsdl></tes:wsdl>
+      <tes:property name="BPRFile">bpr_file.bpr</tes:property>
+    </tes:put>
+  </tes:deployment>
+
+  <tes:testCases>
+  </tes:testCases>
+</tes:testSuite>
