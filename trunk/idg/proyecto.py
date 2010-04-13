@@ -240,7 +240,7 @@ class Proyecto(object):
         ## @{
         
         ## Tipo de aplanado
-        self.aplanado = 'index-flattering'
+        self.aplanado = 'index-flattening'
         ## Simplify
         self.simplify = True
 
@@ -1076,6 +1076,7 @@ class Proyecto(object):
 
         # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
         # incorrecta.
+        log.info("Modificando fichero base-build.xml")
         try:
             bbuild =  et.ElementTree()
             root = bbuild.parse(path.join(self.dir,'base-build.xml'))
@@ -1093,7 +1094,6 @@ class Proyecto(object):
             if len(dnms) == 0 :
                 log.error(_("No se ha podido configurar base-build.xml"))
             else:
-                log.info(_("Modificando fichero base-build.xml"))
                 dnms[0].attrib['location'] =  self.takuan
 
         # Buscar y establecer simplify y el aplanado
