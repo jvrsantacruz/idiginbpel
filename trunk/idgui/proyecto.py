@@ -1095,7 +1095,7 @@ class ProyectoUI(object):
 
     def on_trz_opt_simplify_check(self, widget):
         """@brief Callback de cambiar el check de simplify."""
-        self.proy.set_simplify(self.anl_simplify_check.is_active())
+        self.proy.set_simplify(self.anl_simplify_check.get_active())
 
     ## @}
 
