@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>idiginBPEL</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="../style.css" />
+	</head>
+
+	<body>
+		<div id="head">
+			<h1><span class="logo"><span class="logo-I">I</span><span class="logo-dig">dig</span><span class="logo-in">in</span><span class="logo-BPEL">BPEL</span></span></h1>
+			<h3>Generador de invariantes para WS-BPEL</h3>
+		</div> <!-- Close head-->
+
+		<div id="content">
+			<ul>
+				<li>
+				<h2>Sobre IdiginBPEL</h2>
+				<p><em>idiginBPEL</em> es un generador de invariantes para el lenguaje <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wsbpel" title="WS-BPEL Oasis Homepage">WS-BPEL</a>.
+				<br/> Actuando como interfaz gráfica para <a href="https://neptuno.uca.es/redmine/projects/takuan-website" title="Takuan Proyect">Takuan</a> 
+				el sistema permite, a partir de un fichero BPEL, ejecutar casos de prueba, analizar el comportamiento del BPEL en los mismos y generar invariantes que permitan estudiarlo.
+				</p>
+				</li>
+
+				<li>
+				<h2>Objetivos</h2>
+				<p>La razón del desarrollo de IdiginBPEL es permitir la ejecución masiva de test de forma sencilla así como facilitar una mejor manera de organizar el contenido generado por la aplicación (por ejemplo invariantes). La interfaz en línea de comandos original de Takuan requiere de la edición y el manejo directo de ficheros y solo permite al usuario la ejecución de pruebas en lote, siguiendo el proceso completo e incluso repitiendo etapas innecesarias.  Esto ha sido solucionado aislando cada etapa del proceso, de manera que el usuario puede realizarlas individualmente, permitiendo un control más granulado.</p>
+				</li>
+
+				<li>
+				<h2>Breve introducción</h2>
+				<p>Takuan sigue un proceso de tres pasos en la obtención de invariantes a partir de una composición BPEL y un conjunto de casos de prueba BPTS.</p>
+				<ol>
+					<li><em>Instrumentado del BPEL y resolución de dependencias</em></br>
+					Resuelve los import del BPEL y construye un paquete dispuesto para ser ejecutado en el servidor</li>
+					<li><em>Ejecución de Tests</em><br/>
+					Ejecuta el conjunto de casos de prueba BPTS contra el servidor, guardando los logs</li>
+					<li><em>Analizar las trazas de ejecución</em></li>
+					Convierte los logs en el formato de trazas de Daikon y las analiza para obtener invariantes.</li>
+				</ol>
+				<p>Idiginbpel separa cada etapa, de manera que el usuario puede fácilmente repetir una o cambiarla sin necesidad de empezar de nuevo todo el proceso desde el principio. La herramienta además evita el manejo de ficheros para configurar las pruebas, para trabajar solo necesita el programa BPEL y el conjunto de casos de prueba BPTS.</p>
+				</li>
+
+				<li>
+				<h2>Proyecto</h2>
+				<p>El código fuente está temporalmente alojado en la <a href="http://forja.rediris.es/proyects/cusl4-idigin" title="RedIris Proyect">Forja de RedIris</a> usando <a href="https://forja.rediris.es/plugins/scmsvn/viewcvs.php/?root=cusl4-idigin" title="SVN web explorer">subversion</a> junto a la <a href="http://cusl4-idigin.forja.rediris.es/doc" title="IdiginBPEL Documentation">documentación</a></p>
+			</ul>
+		</div> <!-- Close content -->
+
+		<div id="foot">
+			<ul>
+				<li><a href="https://neptuno.uca.es/redmine/projects/takuan-website" title="Takuan Proyect">Takuan</a></li> 
+				<li><a href="https://forja.rediris.es/plugins/scmsvn/viewcvs.php/?root=cusl4-idigin" title="SVN web explorer">Código</a></li> 
+				<li><a href="http://cusl4-idigin.forja.rediris.es/doc" title="IdiginBPEL Documentation">Documentación</a></li>
+				<li><a href="http://forja.rediris.es/proyects/cusl4-idigin" title="RedIris Proyect">Proyecto en RedIRIS</a></li>
+			</ul>
+			<p>Contact: javier.santacruz@uca.es</p>
+		</div> <!-- Close foot -->
+	</body>
+</html>

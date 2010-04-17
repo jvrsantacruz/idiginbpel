@@ -292,7 +292,7 @@ class Idgui(object):
             child.hide()
 
         webhelp = 'file://' + path.join(self.opt.get('share'),
-                                         'help/main.html') 
+                                         'help/es/main.html') 
         self.web.open(webhelp)
         self.portada.add(self.web)
         self.portada.reorder_child(self.web, 2)
