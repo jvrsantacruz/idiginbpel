@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>idiginBPEL</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="../style.css" />
+	</head>
+
+	<body>
+		<div id="head">
+			<h1><span class="logo"><span class="logo-I">I</span><span class="logo-dig">dig</span><span class="logo-in">in</span><span class="logo-BPEL">BPEL</span></span></h1>
+			<h3>Automatic invariant generator for WS-BPEL</h3>
+		</div> <!-- Close head-->
+
+		<div id="content">
+			<ul>
+			   <li>
+				<h2>About IdiginBPEL</h2>
+				<p> <em>IdiginBPEL</em> is an automatic invariant generator for the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wsbpel" title="WS-BPEL Oasis Homepage">WS-BPEL</a> language. <br/>
+				As a graphic interface for <a href="https://neptuno.uca.es/redmine/projects/takuan-website" title="Takuan Proyect">Takuan</a>, 
+				the application allows to run BPTS test suites and analyze BPEL program behaviour by calculating invariants that can be used to improve the compositions and debugging. 
+				</p>
+				</li>
+
+				<li>
+				<h2>Objetives</h2>
+				<p>The reason of IdiginBPEL is to make easier to run massive tests and provide a reasonable way to manage and organize generated content (i.e invariants). The Takuan's original command-line interface require the direct edition and management of files and only allows users to run batch tests, following the complete process, even repeating expensive and unnecesary steps. This has been solved by isolating every step of the workflow, so the user can use it individually, with a more fine-grained process control.</p>
+				</li>
+
+				<li>
+				<h2>Brief introduction</h2>
+				<p>Takuan has a three step workflow to obtain invariants from a BPEL composition and a BPTS test suite. </p>
+				<ol>
+					<li><em>Instrument BPEL and resolve dependences</em><br/>
+					Resolve BPEL imports and build a package ready to run on the server</li>
+					<li><em>Run tests</em><br/>
+					Run the BPTS test suite against the server storing the logs</li>
+					<li><em>Analyze execution traces</em><br/>
+					Convert logs into a Daikon trace format and analyze it to obtain invariants.</li>
+				</ol>
+				<p>IdiginBPEL separate each step so the user can easily repeat one or change it without have to start again and run the entire process from the begining. The tool also avoid file management to configure tests, only needs to work a BPEL program and the BPTS test suite.</p>
+				</li>
+
+				<li>
+				<h2>The Proyect</h2>
+				<p>Source code is temporary hosted on <a href="http://forja.rediris.es/proyects/cusl4-idigin" title="RedIris Proyect">RedIris forge.</a> using <a href="https://forja.rediris.es/plugins/scmsvn/viewcvs.php/?root=cusl4-idigin" title="SVN web explorer">subversion</a> and the <a href="http://cusl4-idigin.forja.rediris.es/doc" title="IdiginBPEL Documentation">documentation</a></p>
+				</li>
+			</ul>
+		</div> <!-- Close content -->
+
+		<div id="foot">
+			<ul>
+				<li><a href="https://neptuno.uca.es/redmine/projects/takuan-website" title="Takuan Proyect">Takuan</a></li> 
+				<li><a href="https://forja.rediris.es/plugins/scmsvn/viewcvs.php/?root=cusl4-idigin" title="SVN web explorer">Code</a></li> 
+				<li><a href="http://cusl4-idigin.forja.rediris.es/doc" title="IdiginBPEL Documentation">Documentation</a></li>
+				<li><a href="http://forja.rediris.es/proyects/cusl4-idigin" title="RedIris Proyect">Proyect on RedIRIS</a></li>
+			</ul>
+			<p>Contact: javier.santacruz@uca.es</p>
+		</div> <!-- Close foot -->
+	</body>
+</html>
