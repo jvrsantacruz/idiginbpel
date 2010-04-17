@@ -9,48 +9,53 @@
  
 /* GENERAL */
 body { 
-	background: #fafafa;
-	font: #333 lighter 15px Arial,Helvetica,Veredana,sans-serif; 
+	background: #F7F3E8;
+	font: lighter 15px Arial,Helvetica,Veredana,sans-serif; 
+	color: #2B3E42;
 }
 
-* { margin: 0; padding: 0; }
+/* * { margin: 0; padding: 0; } */
 
-h1,h2,h3,h4 { padding: 5px; margin: 3px; }
+h1,h2,h3,h4 { padding: 5px; margin: 3px; color: #77BED2;}
 
 /* LINKS */
 a:link,
 a:visited,
 a:active
 { 
-	color: #666; 
+	color: #F2583E; 
 	text-decoration:none; 
 }
 
-a:hover{
+a:hover {
 	text-decoration: underline;
 }
 
 /* HEAD */
 #head {
 	text-align: center;
+	background-color: #D5E1DD; 
 }
+
+#head h3 { color: #2B3E42; }
 
 /* CONTENT */
 #content {
-	margin: 10px;
+	margin-top: -15px; 
+	padding-left: 0px;
+	border-left: 20px solid #D5E1DD;
 }
 
 /* FOOT */
 #foot {
 	font-size: 0.8em;
 	text-align: center;
-	position: absolute;
-	bottom: 0;
 	width: 100%;
 }
 
 #foot ul {
 	display: inline-block;
+	margin: 2px;
 }
 
 #foot li {
@@ -59,3 +64,10 @@ a:hover{
 	list-style-type: none;
 }
 
+/* IdiginBPEL logo */
+.logo { font-size: 2em; }
+.logo-I, .logo-dig, .logo-in { font-family: Arial,Helvetica,Veredana;}
+.logo-I   { color: black; font-size: 1.5em; } 
+.logo-dig { color: #4c1900; font: lighter; }
+.logo-in  { color: #99284c;  font: lighter; }
+.logo-BPEL{ color: black; font: normal 1.3em Avant Garde, Century Gothic, Avant Garde Gotic;}
