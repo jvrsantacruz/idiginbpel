@@ -329,16 +329,18 @@ class ProyectoUI(object):
         # Conectar la vista de nuevo
         self.bpts_view.set_model(self.bpts_tree)
 
-    def info_bpts_fichero(self,fichero):
+    def info_bpts_fichero(self, fichero, count):
         """@brief Establece la información sobre un fichero de casos de prueba
         seleccionado.
-        @param fichero Nombre del fichero de prueba"""
+        @param iter iterador al fichero de prueba en el modelo
+        @param count número de hijos marcados.
+        """
         if fichero not in self.proy.casos :
             self.error(_("No existe el fichero en el proyecto"))
         else:
             self.bpts_nombre_label.set_text(fichero)
             self.bpts_n_label.set_text(str(len(self.proy.casos[fichero])))
-            self.bpts_nsel_label.set_text(str(""))
+            self.bpts_nsel_label.set_text(str(count))
 
     def add_casos(self):
         """@brief Toma del treeview los ficheros seleccionados para ejecución y
@@ -439,12 +441,15 @@ class ProyectoUI(object):
             # Sabemos que es un fichero si su padre es None
             # Mostrar su información en la gui, del fichero
             if parent is None :
-                self.info_bpts_fichero(model.get_value(it,0))
                 child = model.iter_children(it)
-                # Recorrer los casos y marcarlos igualmente
+                # Recorrer los casos y marcarlos igualmente, 
+                # contarlos si están marcados.
+                count = 0
                 while not child is None:
                     model.set_value(child, 2, val)
                     child = model.iter_next(child)
+                    count += 1 if val else 0
+                self.info_bpts_fichero(model.get_value(it,0), count)
 
             # Si lo que estamos marcando/desmarcando es un caso
             else :
