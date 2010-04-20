@@ -46,7 +46,15 @@ class Idg(object):
         # Leer parámetros de la configuración
         ## Ruta al fichero de configuración
         self.config = config
-        self.set_config()
+        ## Default values
+        defaults = { 'home': ['~/.idiginbpel', 'src'],
+                    'share': ['~/IdiginBPEL/share', 'src'],
+                    'takuan': ['~/takuan', 'src'],
+                    'bpelunit': ['~/bin/AeBpelEngine', 'src'],
+                    'svr': ['localhost', 'value'],
+                    'port': ['7777', 'value']
+                   }
+        self.set_config(defaults)
 
 	## Ruta base de ejecución del programa
     	self.path = path
@@ -68,22 +76,19 @@ class Idg(object):
         """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
         pass
 
-    def set_config(self):
+    def set_config(self, defaults={}):
         """@brief Inicializa el sistema de opciones."""
-        self.opt = Opt(self.config)
-        opt = self.opt
-        #opt.read()
+        self.opt = Opt(self.config, defaults)
 
-        self.home = opt.get('home')
-        self.share = opt.get('share')
-        self.takuan = opt.get('takuan')
-        self.bpelunit = opt.get('bpelunit')
+        # Basic options needed
+        self.home = self.opt.get('home')
+        self.share = self.opt.get('share')
+        self.takuan = self.opt.get('takuan')
 
-        # Imprimir los directorios usados
+        # Log main values
         log.info("Home: " + self.home)
         log.info("Share: " + self.share)
         log.info("Takuan: " + self.takuan)
-        log.info("Bpelunit: " + self.bpelunit)
 
     def exportar(self,nombre,ruta):
         """@brief Realiza un paquete tar en bz2 del directorio del proyecto.
