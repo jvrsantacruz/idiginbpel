@@ -11,15 +11,11 @@ log = util.logger.getlog('idg.opciones')
 class Opt(object):
     """@brief Establece las opciones básicas leyendo el config.xml"""
 
-    ## Diccionario con las opciones por defecto
-    _opts_defecto = { 'home' : './home',
-            'share' : './share',
-            'takuan' : '~/takuan',
-            'bpelunit': '~/AeBpelEngine',
-            'svr' : 'localhost',
-            'port' : '7777'
-           }
+    ## Default options dictionary
+    ## { id : [ value, type] }
+    _defaults = {}
 
+    ## Actual options
     _opts = {}
 
     ## Diccionario con los atributos de las opciones por defecto
@@ -31,75 +27,99 @@ class Opt(object):
             'port' : 'value'
            }
 
-    def __init__(self, config):
+    def __init__(self, config, defaults={}):
         """@brief Construye el objeto Opt con la configuración. 
-        @param config La ruta al fichero de configuración."""
-
+        @param config La ruta al fichero de configuración.
+        @paran defaults Opciones por defecto de forma {id: [value, type], ..}
+        """
         self.config = config
-        for nom, val in self._opts_defecto.items() :
-            self._opts[nom] = self.expand(val) if self._opts_nm[nom] == 'src' \
-            else val
+        self._defaults = defaults
 
+        # Expand urls (relative paths to abs paths, and expand ~)
+        for id, (val, type) in self._defaults.items() :
+            # Expand and check paths
+            if type == 'src':
+                val = self.expand(val)
+                if not self.check(val): continue
+
+            # Insert into dictionary if is a valid one.
+            self._defaults[id] = [val, type]
+
+        # Add defaults to options.
+        self._opts.update(self._defaults)
+
+        # Read configuration
         self.read()
 
-    def get(self, nom):
+    def get(self, id):
         """@brief Devuelve una opción. 
-        @param nom El nombre de la opción.
+        @param id El nombre de la opción.
         @retval El valor de la opción con nombre nom, o None si no existe.
         """
-        return self._opts[nom] if nom in self._opts else None
+        return self._opts.setdefault(id, [None])[0]
 
-    def set(self, nom, val, attr="src"):
+    def set(self, id, val, type=None):
         """@brief Establece una opción.
-        @param nom El nombre de la opción.
+        @param id El nombre de la opción.
         @param val El valor de la opción con nombre nom.
-        @param attr (Opcional) El atributo en el que se guardará.
-        @retval True si se ha creado una opción nueva. False en otro caso.
+        @param type (Opcional) El atributo en el que se guardará.
+        @retval True si se ha creado una opción nueva. False si se ha
+        actualizado una opción. None si no se ha modificado.
+
+        Si la opción no estaba antes, hay que especificar type
+        obligatoriamente. En otro caso es opcional.
         """
         # Añadirlo a las opciones si no estaba
-        retval = nom in self._opts[nom]
-        self._opts_nm[nom] = attr
+        exists = id in self._opts
+
+        # If type is not specified, try to find it
+        if type is None: 
+            if not exists: 
+                return None
+            type = self._opts[id][1]
+
+        # If type is src, check path.
+        if type == 'src':
+            val = self.expand(val)
+            if not self.check(val): 
+                return None
 
         # Establecer la opción
-        self._opts[nom] = self.expand(val) if attr == 'src' else val
-        return retval
+        self._opts[id] = [val, type]
+
+        return exists
 
     def reset(self):
-        """@brief Establece de nuevo las opciones por defecto."""
-        for nom, val in self._opts_defecto.items() :
-            self._opts[nom] = self.expand(val) if self._opts_nm[nom] == 'src' \
-            else val
+        """@brief Reset to default value values in options wich have a default
+        value
+        """
+        self._opts.update(self._defaults)
 
     def write(self):
         """@brief Escribe el fichero config.
         Escribe los cambios en el fichero config situado en opts[home], si no
         existe, lo crea.
         """
-
-        config = self.config
         try:
             dom = et.ElementTree()
-            root = dom.parse(config)
+            root = dom.parse(self.config).getroot()
         except:
-            log.error(_("No se ha podido abrir para escritura de opciones: ") +
-                      config)
+            log.error(_("cant.open.for.read") + self.config)
             return
         else:
-            log.info(_("Escribiendo opciones config en: ") + config)
+            log.info(_("writting.config.in") + self.config)
 
-        # Recorremos el nombre de la variable y sus atributos
-        for nom, attr in self._opts_nm.iteritems() :
-            e = root.find(nom)
+        # For each option, find it in config or create it.
+        for id, (val, type) in self._opts.items():
+            e = root.find(id)
             # Si no existe, crearlo
-            if e is None:
-                e = et.SubElement(root, nom)
-
-            e.set(attr, self._opts[nom])
+            if e is None: e = et.SubElement(root, nom)
+            e.set(type, val)
 
         try:
-            dom.write(config)
+            dom.write(self.config)
         except:
-            log.error(_("No se han podido guardar las opciones en: ") + config)
+            log.error(_("cant.write.file") + self.config)
 
     def expand(self, val):
         """@brief Expande una ruta y resuelve relativas.
@@ -112,60 +132,52 @@ class Opt(object):
 
         return val
 
-    def check(self, val, attr = "src"):
+    def check(self, val):
         """@brief Comprueba que un argumento sea válido. 
         @param val Valor del atributo.
-        @param attr (Opcional) Tipo del atributo. Por defecto ruta.
         @retval Devuelve True si es válido, False si no lo es.
         """
-        if not val or not attr:
-            return "" 
-        else :
-            if attr == 'src' :
-                c = self.expand(val)
-                return path.exists(c) 
+        if val is None: return False
+        return path.exists(self.expand(val)) 
 
         return True
 
     def read(self):
         """@brief Lee el fichero config."""
-
-        config = self.config
-
         try: 
             dom = et.ElementTree()
-            root = et.parse(config)
+            root = et.parse(self.config).getroot()
         except:
-            log.error(_("No se ha podido parsear el fichero de config: ") +
-                      config)
+            log.error(_('cant.parse.config.file') + self.config)
             return
         else:
-            log.info(_("Usando fichero de configuración: ") + config)
+            log.info(_('using.config.file') + self.config)
 
-        for nom,attr in (('home', 'src'), ('share', 'src'),
-                         ('takuan', 'src'),('bpelunit', 'src'),
-                        ('svr', 'value'), ('port', 'value')):
+        # Read all elements in config
+        for e in root.getchildren() :
+            #log.debug(e.tag)
 
-            # Tomamos el elemento del xml. 
-            # Si no está bien, usamos el valor por defecto.
-            val = None
-            e = root.find(nom)
-            if e is not None and e.get(attr) : 
-                val = e.get(attr)
-                if not self.check(e.get(attr), attr):
-                    log.warning(_("Se usará el valor por defecto para: ") + nom)
-                    val = None
-                else :
-                    val = self.expand(val) if attr == 'src' else val
+            # Config element from xml
+            id = e.tag
+            type = 'src' if 'src' in e.attrib else 'value'
+            val = e.get(type)
 
-            if val is None :
-                val = self._opts_defecto[nom]
+            # If attribute is path, expand and it
+            # If is a non-valid path, none.
+            if type == 'src' : 
+                val = self.expand(val) if self.check(val) else None
+
+            if val is None:
+                log.error(_('not.valid.value') + id + ": " + str(e.get(type)))
+                if id in self._defaults :
+                    log.warning(_('using.default.value.for') + id)
+                    val = self._defaults[id] 
+                else:
+                    log.warning(_('no.default.value.for') + id)
 
             # Guardar en el diccionario los valores.
-            self._opts[nom] = val
-            self._opts_nm[nom] = attr
+            self._opts[id] = [val, type]
 
     def getall(self):
         """@brief Devuelve todas las opciones disponibles. """
         return self._opts
-
