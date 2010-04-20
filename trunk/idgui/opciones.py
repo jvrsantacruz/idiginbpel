@@ -10,6 +10,9 @@ log = util.logger.getlog('idgui.opciones')
 class OptUI(object):
     """Clase que permite manejar las opciones del programa desde la gui."""
 
+    _CHANGED_ICON = gtk.STOCK_MEDIA_RECORD
+    _NORMAL_ICON = gtk.STOCK_PROPERTIES
+
     def __init__(self, gtk, opts):
         """@brief Constructor de la gui de opciones
         @param gtk Builder de gtk
@@ -44,31 +47,38 @@ class OptUI(object):
     def cargar(self):
         # Desconectar la lista de la vista
         self.view.set_model(None)
+
         # Vaciar la lista
         self.list.clear()
 
         # Recorremos las opciones creando labels e inputs
         # con los valores y añadiéndolos a la tabla
-        for nom, val in self.opts.getall().iteritems() :
-            self.list.append([nom, val, gtk.STOCK_PROPERTIES])
+        for id, (val, type) in self.opts.getall().items() :
+            self.list.append([id, val,
+                              self._NORMAL_ICON, _('msg.help.opt.' + id)])
 
         # Volver a conectar el modelo y la vista
         self.view.set_model(self.list)
 
-    def on_changed(self, cell, path, new_text):
+    def on_changed(self, cell, path, val):
         """@brief Callback de cuando se modifica una entrada."""
         # Establecer las opciones como modificadas.
-        self.mod = True
         log.debug("Modificado: " + self.list[path][0] + " de " +
-                  self.list[path][1] + " a " + new_text) 
+                  self.list[path][1] + " a " + val)
 
         # Modificarlo en las opciones
-        e = self.list[path][0]
-        attr = self.opts._opts_nm[e]
-        self.opts.set(e, new_text, attr)
+        id = self.list[path][0]
+        self.mod = self.opts.set(id, val)
+
         # Modificarlo en el treeview
-        self.list[path][1] = new_text
-        self.list[path][2] = gtk.STOCK_MEDIA_RECORD
+        if self.mod is not None:
+            self.list[path][1] = val
+            self.list[path][2] = self._CHANGED_ICON
+            self.list[path][3] = _('msg.help.opt.' + id)
+        else:
+            self.list[path][2] = self._NORMAL_ICON
+            log.error(_('cant.change.option') + id)
+            #  Indicar error
 
     def on_guardar(self, widget):
         if self.mod :
@@ -91,4 +101,4 @@ class OptUI(object):
         # Poner iconos a los que se han modificado
         for a,d in zip(antes,self.list):
             if a != d[1] :
-                d[2] = gtk.STOCK_MEDIA_RECORD
+                d[2] = self._CHANGED_ICON

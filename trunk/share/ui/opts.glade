@@ -2,6 +2,18 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkListStore" id="opt_list">
+    <columns>
+      <!-- column-name id -->
+      <column type="gchararray"/>
+      <!-- column-name value -->
+      <column type="gchararray"/>
+      <!-- column-name icono -->
+      <column type="gchararray"/>
+      <!-- column-name help -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="opt_window">
     <property name="title" translatable="yes">Opciones</property>
     <property name="window_position">center</property>
@@ -72,6 +84,17 @@
                     </child>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="Ayuda">
+                    <property name="title">Ayuda</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                      <attributes>
+                        <attribute name="text">3</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
@@ -135,15 +158,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkListStore" id="opt_list">
-    <columns>
-      <!-- column-name nom -->
-      <column type="gchararray"/>
-      <!-- column-name value -->
-      <column type="gchararray"/>
-      <!-- column-name icono -->
-      <column type="gchararray"/>
-    </columns>
   </object>
 </interface>
