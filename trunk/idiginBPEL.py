@@ -30,7 +30,7 @@ configs = ('~/.idiginbpel', './home', '/usr/share/idiginbpel')
 config = ""
 for c in configs:
     c = path.abspath(path.expanduser(path.join(c,'config.xml')))
-    log.debug(_('Buscando config en: ') + c) # DEBUG
+    log.debug(_('idiginBPEL.looking.for.config.file') + c) # DEBUG
     if path.exists(c):
         config = c
         break
