@@ -17,7 +17,7 @@ from opciones import Opt
 
 # Traducciones mediante gettext
 gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
-log.warning(_('Usando locale en directorio local. ./locale No instaladas las locales.'))
+log.warning(_('idg.main.not.installed.locales'))
 
 class Idg(object):
     """@brief Objeto principal, maneja el programa completo."""
@@ -70,7 +70,7 @@ class Idg(object):
         self.lista_proyectos = os.listdir(os.path.join(self.home,"proy"))
         self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
         self.lista_proyectos.sort()
-        log.info(_("Proyectos disponibles: ") + str(self.lista_proyectos))
+        log.info(_("idg.main.available.proyects.list") + str(self.lista_proyectos))
 
     def comprobar_proyectos(self):
         """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
