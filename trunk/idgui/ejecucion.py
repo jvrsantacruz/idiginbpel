@@ -9,7 +9,7 @@ import gtk
 from threading import Thread
 
 import util.logger
-log = util.logger.getlog('idgui.ejecucion')
+log = util.logger.getlog('idgui.tester')
 
 from idgui.clock import Clock
 
@@ -84,7 +84,7 @@ class Ejecucion(Thread):
         ## Barra de progreso
         self.barra = self.ui.ejec_barra
         self.barra.set_fraction( 0.0 )
-        self.barra.set_text( _("Conectando...") )
+        self.barra.set_text( _("idgui.tester.connecting") )
         ## Pulso de la barra de progreso
         self.pulse = 0.95 / self.ncasos
 
@@ -161,7 +161,7 @@ class Ejecucion(Thread):
                 # Mensaje Test case passed.
                 # main INFO  Test case passed.
                 elif name == "pass" :
-                    log.info(_("Caso pasado"))
+                    log.info(_("idgui.tester.pass.case"))
 
                 # Finalizado el caso de prueba
                 # main INFO Stopping testCase Test Case 'NOMBRE'
@@ -179,10 +179,10 @@ class Ejecucion(Thread):
                     self.pass_all()
 
         elif name == "ok"  :
-            log.info(_("Ejecución terminada correctamente"))
+            log.info(_("idgui.tester.testing.succesfully"))
 
         elif name == "ko" :
-            log.info(_("Error al ejecutar"))
+            log.info(_("idgui.tester.testing.error"))
 
         return line
 
