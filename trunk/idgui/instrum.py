@@ -6,7 +6,7 @@ import gtk
 import time
 
 import util.logger
-log = util.logger.getlog('idgui.instrum')
+log = util.logger.getlog('idgui.instrumenter')
 
 class Comprobador(Thread):
     """@brief Comprueba periódicamente, una vez lanzada la instrumentación, si esta se ha
@@ -28,8 +28,8 @@ class Comprobador(Thread):
         try:
             gtk.gdk.threads_enter()
             if self.proy.inst:
-                self.ui.idgui.estado(_("Instrumentación correcta"))
+                self.ui.idgui.estado(_("idgui.instrumenter.finished.successfully"))
             else:
-                self.ui.idgui.estado(_("La instrumentación ha fallado."))
+                self.ui.idgui.estado(_("idgui.instrumenter.failed"))
         finally:
             gtk.gdk.threads_leave()
