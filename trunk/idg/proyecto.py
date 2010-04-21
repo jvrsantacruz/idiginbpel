@@ -18,7 +18,7 @@ from instrum import Instrumentador
 import util.xml
 import util.logger
 
-log = util.logger.getlog('idg.proyecto')
+log = util.logger.getlog('idg.proyect')
 
 class ProyectoError(Exception):
     """@brief Clase excepción para la clase Proyecto"""
@@ -147,7 +147,7 @@ class Proyecto(object):
         try:
             self.check()
         except (ProyectoRecuperable) as e:
-            log.error(_("El proyecto se ha creado con errores: " + str(e)))
+            log.error(_("idg.proyect.created.with.errors") + str(e))
 
         ## @name Listas
         ## @{
@@ -263,8 +263,8 @@ class Proyecto(object):
 
         # Comprobar el bpel que nos pasan
         if not path.exists( bpel ):
-            log.error(_("El bpel no existe: ") + bpel)
-            raise ProyectoError( _("Bpel no existe: ") + bpel)
+            log.error(_("idg.proyect.bpel.file.dont.exist") + bpel)
+            raise ProyectoError( _("idg.proyect.bpel.file.dont.exist") + bpel)
 
         # Buscar las dependencias del bpel recursivamente
         ## Lista de rutas con las dependencias del bpel
@@ -306,7 +306,7 @@ class Proyecto(object):
             if path.exists(proy):   # Si ya existe en el proyecto
                 miss.discard(dir)  # Quitamos de las dependencias rotas 
 
-            log.debug(_("Dependencia: ") + nom)
+            log.debug(_("idg.proyect.dependence.list") + nom)
 
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
@@ -317,7 +317,7 @@ class Proyecto(object):
             except:
                 # Mostramos un error y añadimos 
                 # a las dependencias rotas
-                log.error(_("Error al parsear ") + f)
+                log.error(_("idg.proyect.parse.error") + f)
                 miss.add(f)
                 continue
 
@@ -372,7 +372,7 @@ class Proyecto(object):
             except:
                 # Si no se ha podido escribir la versión modificada del
                 # fichero, añadirlo a las dependencias rotas 
-                log.error(_("Error al escribir en el proyecto: ") + nom)
+                log.error(_("idg.proyect.cant.write") + nom)
                 miss.add(ruta)
             finally:
                 file.close()
@@ -410,7 +410,7 @@ class Proyecto(object):
 
         # No crear otro subproceso si ya se está ejecutando uno.
         if self.ejec_subproc is not None and self.ejec_subproc.poll() is None :
-            log.warning(_("El proyecto ya se esta ejecutando"))
+            log.warning(_("idg.proyect.test.already.running"))
             return
 
         # Ruta logs bpelunit
@@ -421,12 +421,11 @@ class Proyecto(object):
         try:
             self.borrar_trazas(BUpath)
         except:
-            log.error(_("No se han podido eliminar los logs antiguos de \
-                        bpelunit: " + BUpath))
+            log.error(_("idg.proyect.cant.remove.old.bpelunit.logs" + BUpath))
 
         # Ejecutar el ant en un subproceso aparte
         cmd = ("ant", "-f", self.build, "test")
-        log.info(_("Ejecutando tests: ") + str(cmd) )
+        log.info(_("idg.proyect.test.running.command") + str(cmd) )
         # Escribimos en una tubería desde la cual podremos leer el log
         # Sin expansión de argumentos por shell
         # El resultado va todo a stdout, el de stderr también.
@@ -447,28 +446,26 @@ class Proyecto(object):
         # Realizar la conexión
         try:
             f = urllib.urlopen(url)
-            log.info(_("Comprobando servidor ActiveBPEL en: ") + url)
+            log.info(_("idg.proyect.test.activebpel.server.connection") + url)
         except IOError:
-            log.error(_("No se pudo realizar la conexión con ActiveBPEL en: ") +
-                        url)
+            log.error(_("idg.proyect.cant.connect.activebpel.server") + url)
         else:
             # Comprobar el código http 
-            code = f.getcode()
-            log.debug(_("Código de la conexión al servidor ActiveBPEL: ") + \
-                      str(code))
+            log.debug(_("idg.proyect.activebpel.server.response.code") +\
+                      str(f.getcode()))
 
             # Expresión regular para saber si está activo
             patron = re.compile('.*Running.*')
 
-            activo = False
+            active = False
             # leer el resultado
             for line in f :
                 if patron.match(line) :
-                    activo = True
+                    active = True
                     break
-            log.info(_("Estado del servidor ActiveBPEL : " ) + 'Running' if activo else 'Stopped' )
-
-            return activo
+            log.info(_("idg.proyect.activebpel.server.status") + \
+                     'Running' if active else 'Stopped' )
+            return active
 
         return None
 
@@ -514,11 +511,11 @@ class Proyecto(object):
 
         # No crear otro subproceso si ya se está ejecutando
         if self.anl_subproc is not None and self.anl_subproc.poll() is None :
-            log.warning(_("Ya hay un análisis en curso"))
+            log.warning(_("idg.proyect.analysis.already.running"))
             return
 
         cmd = ["ant", "-f", self.build, "analyze"]
-        log.info(_("Analizando: ") + str(cmd))
+        log.info(_("idg.proyect.analysis.running.command") + str(cmd))
         # Abrimos un proceso y leeremos de su salida estandar.
         # Redireccionamos la salida de errores a la estandar.
         self.anl_subproc = subproc.Popen(cmd,
@@ -542,7 +539,7 @@ class Proyecto(object):
             bpts = et.ElementTree()
             bproot = bpts.parse(path)
         except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba ") + path)
+            raise ProyectoRecuperable(_("idg.proyect.cant.load.testcases.file") + path)
 
         # Construir los nombres con la uri es un peñazo
         ns = "{%s}" % self.test_url
@@ -563,7 +560,7 @@ class Proyecto(object):
 
         # Comprobamos que exista y se pueda leer
         if not path.exists(ruta) or not os.access(ruta, os.F_OK or os.R_OK):
-            raise ProyectoRecuperable(_("No existe el fichero de casos de prueba o no es accesible"))
+            raise ProyectoRecuperable(_("idg.proyect.testcase.file.dont.exist"))
 
         # Nombre del fichero y directorio de la ruta
         nom = path.basename(ruta)
@@ -587,7 +584,8 @@ class Proyecto(object):
             # Copiar de ruta a pruta (en el proyecto)
             shutil.copy(ruta,pruta)
         except:
-            raise ProyectoRecuperable(_("No se pudo copiar al proyecto el fichero de casos de prueba: ") + ruta)
+            raise ProyectoRecuperable(_("idg.proyect.cant.copy.file.to.proyect") \
+                    + ruta)
 
         # Añadimos el fichero a fcasos
         self.fcasos.append(pnom)
@@ -615,7 +613,7 @@ class Proyecto(object):
         try:
             bpts = md.parse(bpts_path)
         except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de casos de prueba ") + bpts_path)
+            raise ProyectoRecuperable(_("idg.proyect.cant.load.testfile") + bpts_path)
 
         # Elementos del fichero nuevo que añadimos
         testSuite = bpts.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
@@ -643,7 +641,7 @@ class Proyecto(object):
         try:
             test = md.parse(self.test)
         except:
-            raise ProyectoRecuperable(_("No se ha podido cargar el fichero de tests") + self.test )
+            raise ProyectoRecuperable(_("idg.proyect.cant.load.main.test.file") + self.test )
 
         # Buscamos los elementos en el test.bpts
         ttestSuite = test.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
@@ -667,9 +665,9 @@ class Proyecto(object):
                 twsdl.appendChild(test.createTextNode(path.join(self.dep_nom, 
                                                                 wsdl.firstChild.data))) 
         except:
-            raise ProyectoRecuperable(_("El fichero test.bpts está roto"))
+            raise ProyectoRecuperable(_("idg.proyect.main.test.file.is.broken"))
 
-        log.debug(_("Add informacion al bpts a partir del bpts nuevo"))
+        log.debug(_("idg.proyect.adding.info.to.main.test.file.from.new.bpts.file"))
 
         # Copiar el wsdl y los partner
         # Hay que añadirles el dependencias/ para la ruta.
@@ -687,7 +685,8 @@ class Proyecto(object):
             file = open(self.test,'w')
             file.write(test.toxml('utf-8'))
         except:
-            raise ProyectoRecuperable(_("No se ha podido escribir el fichero de tests") + self.test)
+            raise ProyectoRecuperable(\
+                    _("idg.proyect.cant.write.main.test.file") + self.test)
 
         #log.debug(tdeploy.toxml('utf-8')) #DEBUG
 
@@ -697,12 +696,12 @@ class Proyecto(object):
         """@brief Elimina todos los casos de un bpts
         @param ruta La ruta al bpts a vaciar."""
 
-        log.debug(_("Vaciando de casos de prueba el fichero: ") + ruta)
+        log.debug(_("idg.proyect.cleaning.testcases.in.file") + ruta)
 
         try:
             test_dom = md.parse(ruta)
         except:
-            e =  _("No se ha podido cargar el fichero bpts ") + ruta
+            e =  _("idg.proyect.cant.load.bpts.file") + ruta
             log.error(e)
             raise ProyectoRecuperable(e)
 
@@ -713,7 +712,7 @@ class Proyecto(object):
             file = open(self.test, 'w')
             file.write(test_dom.toxml('utf-8'))
         except:
-            e =  _("No se ha podido escribir el fichero bpts ") + ruta
+            e =  _("idg.proyect.cant.write.bpts.file") + ruta
             log.error(e)
             raise ProyectoRecuperable(e)
 
@@ -727,13 +726,13 @@ class Proyecto(object):
         try:
             test_dom = md.parse(self.test)
         except:
-            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            e =  _("idg.proyect.cant.load.main.test.file") + self.test
             log.error(e)
             raise ProyectoRecuperable(e)
 
         caso_dom = [f for f in test_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == nombre]
         if len(caso_dom) == 0 :
-            log.warning(_("Al eliminar un caso del test.bpts no se ha encontrado el caso en test.bpts ") + nombre)
+            log.warning(_("idg.proyect.testcase.not.found.in.main.test.file") + nombre)
             return
         caso_dom  = caso_dom[0]
 
@@ -772,7 +771,7 @@ class Proyecto(object):
         try:
             test_dom = md.parse(self.test)
         except:
-            e =  _("No se ha podido cargar el fichero de tests ") + self.test
+            e =  _("idg.proyect.cant.load.main.test.file") + self.test
             log.error(e)
             raise ProyectoRecuperable(e)
 
@@ -798,7 +797,7 @@ class Proyecto(object):
             try:
                 bpts_dom = md.parse(path.join(self.casos_dir, fnom))
             except:
-                e = _("No se ha podido cargar el fichero bpts ") + fnom
+                e = _("idg.proyect.cant.load.bpts.file") + fnom
                 log.error(e)
                 raise ProyectoRecuperable(e)
 
@@ -812,7 +811,7 @@ class Proyecto(object):
                 #   si ya estaba en el casos_test, lo tenemos cacheado en el
                 #   diccionario y lo añadimos.
                 if nombre in casos_test :
-                    log.warning(_("Intentando add un caso que ya estaba en el test.bpts ") 
+                    log.warning(_("idg.proyect.testcase.already.in.main.test.file") 
                                 + nombre )
                     test_cases.appendChild( casos_test[nombre] )
                     continue
@@ -825,7 +824,7 @@ class Proyecto(object):
                             if f.getAttribute('name') == caso]
 
                 if len(caso_dom) == 0 :
-                    log.warning(_("Al add un caso al test.bpts, no se ha encontrado el caso en su fichero original ") + caso)
+                    log.warning(_("idg.proyect.testcase.not.found.in.bpts.file") + caso)
                     continue 
                 caso_dom  = caso_dom[0]
 
@@ -840,7 +839,7 @@ class Proyecto(object):
             file = open(self.test,'w')
             file.write(test_dom.toxml('utf-8'))
         except:
-            e = _("No se ha podido escribir el fichero bpts ") + bpts
+            e = _("idg.proyect.cant.write.bpts.file") + bpts
             log.error(e)
             raise ProyectoRecuperable(e)
 
@@ -1021,33 +1020,33 @@ class Proyecto(object):
         try:
             # Comprobar el nombre
             if len(str(self.nombre).strip()) == 0: 
-                raise ProyectoError(_("Nombre de proyecto vacio"))
+                raise ProyectoError(_("idg.proyect.name.proyect.is.empty"))
 
             # Comprobar el bpel original
             if not path.exists(self.bpel_o):
-                raise ProyectoError(_("Fichero bpel no existe ") + self.bpel_o)
+                raise ProyectoError(_("idg.proyect.bpel.file.dont.exist") + self.bpel_o)
 
             # Crear el directorio nuevo en data
             # Copiar los ficheros básicos de skel
-            log.info(_("Inicializando proyecto"))
+            log.info(_("idg.proyect.init.proyect"))
             try:
                 shutil.copytree( path.join(self.share ,'skel') , self.dir )
             except:
-                raise ProyectoError(_("Error al iniciar proyecto con: ") + \
+                raise ProyectoError(_("idg.proyect.init.proyect.error.using") + \
                                     path.join(self.share,'skel'))
 
             # Buscar dependencias (y el bpel original modificándolo)
             # Si falla borramos el intento de proyecto 
             # y elevamos de nuevo la excepción
             try:
-                log.info(_("Buscando dependencias"))
+                log.info(_("idg.proyect.looking.for.dependences"))
                 self.buscar_dependencias(self.bpel_o ) 
             except ProyectoError, error:                    
-                log.error(_("Crear Proyecto: Error al crear ficheros de proyecto"))
+                log.error(_("idg.proyect.error.cant.import.dependences"))
                 raise error
 
             # Imprimir directorios del proyecto
-            log.info(_("Proyecto creado correctamente"))
+            log.info(_("idg.proyect.proyect.created.succesfully"))
             log.info(str(os.listdir(self.dir)))
             return True
 
@@ -1070,7 +1069,7 @@ class Proyecto(object):
 
         for f in required:
             if not path.exists( f ):
-                e =  _("No existe el fichero: ") + f
+                e =  _("idg.proyect.file.dont.exist") + f
                 log.error(e)
                 raise ProyectoIrrecuperable(e)
 
@@ -1081,7 +1080,7 @@ class Proyecto(object):
             bbuild =  et.ElementTree()
             root = bbuild.parse(path.join(self.dir,'base-build.xml'))
         except:
-            raise ProyectoRecuperable(_("No se pudo abrir el fichero base-build.xml"))
+            raise ProyectoRecuperable(_("idg.proyect.cant.open.buildfile"))
 
         # Buscar el atributo y comprobarlo
         # dnms = root.find("./property[@name='takuan']")
@@ -1092,7 +1091,7 @@ class Proyecto(object):
         # Si es distinto del que tenemos en memoria, modificarlo.
         if dnms[0].get('location') != self.takuan:
             if len(dnms) == 0 :
-                log.error(_("No se ha podido configurar base-build.xml"))
+                log.error(_("idg.proyect.cant.find.buildfile"))
             else:
                 dnms[0].attrib['location'] =  self.takuan
 
@@ -1108,14 +1107,14 @@ class Proyecto(object):
         try:
             bbuild.write(path.join(self.dir,'base-build.xml'))
         except:
-            raise ProyectoError(_("No se pudo escribir el fichero base-build.xml"))
+            raise ProyectoError(_("idg.proyect.cant.write.in.buildfile"))
 
         
         try:
             # Abrir el test.bpts y comprobar la configuración del servidor 
             bpts = md.parse(self.test)
         except:
-            raise ProyectoRecuperable(_("No se pudo abrir el fichero de casos de prueba general"))
+            raise ProyectoRecuperable(_("idg.proyect.cant.open.main.test.file"))
 
         # Buscar y establecer el nombre del proyecto
         bproot = bpts.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
@@ -1131,13 +1130,11 @@ class Proyecto(object):
             file = open(self.test, 'w')
             file.write(bpts.toxml('utf-8'))
         except:
-            raise ProyectoRecuperable(_("No se pudo escribir el fichero de \
-                                        casos de prueba"))
+            raise ProyectoRecuperable(_("idg.proyect.cant.write.main.test.file"))
 
         # Si hay dependencias rotas, avisar.
         if len(self.dep_miss) != 0:
-            msg = _("Hay dependencias rotas en el proyecto, solucione la \
-            situación y realice una búsqueda o cree de nuevo el proyecto")
+            msg = _("idg.proyect.found.broken.dependences.fix.and.search.again")
             #self.idgui.estado(msg)
             #self.error(msg)
             log.warning(msg)
@@ -1175,9 +1172,8 @@ class Proyecto(object):
                                         else self.dep_miss.append(r)
 
         except:
-            raise ProyectoError(_("Error en el fichero de configuración: ") + \
-                                self.proy + " " + str(sys.exc_value))
-
+            raise ProyectoError(_("idg.proyect.error.in.config.file") + \
+                                   self.proy + " " + str(sys.exc_value))
     def cargar_proy(self):
         """@brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
@@ -1188,8 +1184,8 @@ class Proyecto(object):
         try:
             root = tree.parse(self.proy)
         except:
-            raise ProyectoError(_("No se puede abrir el fichero de \
-            configuración del proyecto: ") + self.proy)
+            raise ProyectoError(_("idg.proyect.cant.open.config.file") + \
+                                self.proy)
 
         # Trabajar con self.proy
         try:
@@ -1207,7 +1203,7 @@ class Proyecto(object):
             self.cargar_casos()
 
         except:
-            raise ProyectoError(_("Error en el fichero de configuración: ") + \
+            raise ProyectoError(_("idg.proyect.error.in.config.file") + \
                                 self.proy + " " + str(sys.exc_value))
     ## @}
 
@@ -1254,7 +1250,7 @@ class Proyecto(object):
             # bpel proyecto
             #e = root.find('bpel')
         except:
-            raise ProyectoError(_("Error al guardar los datos del proyecto."))
+            raise ProyectoError(_("idg.proyect.cant.save.proyect.data"))
 
     def guardar_deps(self,dom):
         """@brief Guarda las dependencias en el fichero de configuración.
@@ -1288,7 +1284,7 @@ class Proyecto(object):
                     sub.attrib['ruta'] =  d
                     sub.attrib['rota'] =  str(d in self.dep_miss)
         except:
-            raise ProyectoError(_("Error al guardar las dependencias"))
+            raise ProyectoError(_("idg.proyect.cant.save.dependences"))
 
     def guardar_casos(self, dom):
         """@brief Guarda los casos de prueba disponibles en el fichero de
@@ -1314,7 +1310,7 @@ class Proyecto(object):
                 efile = et.SubElement(e, 'testfile')
                 [et.SubElement(efile, 'testcase').set('name',n) for n in cases]
         except:
-            raise ProyectoError(_("Error al guardar los casos de prueba"))
+            raise ProyectoError(_("idg.proyect.cant.save.testcases"))
 
     def guardar_trazas(self, dom):
         """@brief Guarda las trazas disponibles en el fichero de configuración.
@@ -1356,10 +1352,10 @@ class Proyecto(object):
         # Si falla elevamos una excepción
         tree = et.ElementTree()
         try:
-            log.info(_("Escribiendo fichero de configuración : ") + self.proy)
+            log.info(_("idg.proyect.writing.config.file") + self.proy)
             root = tree.parse(self.proy)
         except:
-            err = _("No se puede abrir el fichero de configuración  del proyecto") 
+            err = _("idg.proyect.cant.open.config.file") 
             log.error(err)
             raise ProyectoError(err)
 
@@ -1372,8 +1368,8 @@ class Proyecto(object):
         try:
             tree.write(self.proy)
         except: 
-            raise ProyectoError(_("No se pudo escribir el fichero de \
-                                       configuración en: ") + self.proy )
+            raise ProyectoError(_("idg.proyect.cant.write.config.file")\
+                                + self.proy )
 
     def guardado(self):
         """@brief Comprueba si hay información modificada por guardar.
