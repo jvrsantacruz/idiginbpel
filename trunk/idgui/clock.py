@@ -65,7 +65,7 @@ class Clock(Thread):
                 self.tstart += (time.time() - self.pausa)
                 self.pausa = False
             else :
-                log.warning(_("Intentando unpause en reloj no pausado"))
+                log.warning(_("idgui.clock.is.not.pause.cant.resume"))
 
         def cancel(self):
             """@brief Mata y termina el thread."""
