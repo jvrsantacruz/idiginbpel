@@ -135,7 +135,7 @@ class Idgui(object):
         #  no es el mismo que pretendemos cargar.
         if not self.idg.proyecto is None \
            and self.idg.proyecto.nombre == nombre :
-            log.info(_("Proyecto ya cargado, no se vuelve a cargar."))
+            log.info(_("idgui.main.already.loaded.nothing.to.do"))
             # Mostrarlo en la interfaz
             self.proyecto.proyecto_base.reparent(self.proyecto.principal)
             self.proyecto.proyecto_base.show()
@@ -173,7 +173,7 @@ class Idgui(object):
         # Obtener la selección
         model, sel = treeview.get_selection().get_selected()
         nombre = model.get_value(sel,0)
-        log.info(_("Seleccionado el proyecto: ") + nombre)
+        log.info(_("idgui.main.selected.proyect") + nombre)
 
         # Si hay otro ya abierto, cerrarlo
         if self.proyecto is not None :
@@ -209,11 +209,11 @@ class Idgui(object):
          # Comprobar nombre del proyecto
         # No debe estar vacio
         if not nombre:
-            error_str =  _("El nombre del proyecto no puede estar vacío.") 
+            error_str =  _("idgui.main.proyect.name.cant.be.empty") 
 
         # No debe estar usado
         elif nombre in self.idg.lista_proyectos:
-            error_str =  _("Ya existe un proyecto con ese nombre.") 
+            error_str =  _("idgui.main.proyect.name.already.exists") 
 
          # Debe ser un nombre 'unix' válido
         else:
@@ -221,28 +221,28 @@ class Idgui(object):
             wrong = "|:,!@#$()/\\\"'`~{}[]=+&^ \t"
             for i in wrong:
                 if nombre.find(i) != -1 :
-                    error_str = _("El nombre del proyecto no puede contener el carácter: ") + '"%c"' % i
+                    error_str = _("idgui.main.name.cant.contain.character") + '"%c"' % i
                     break
 
         # La ruta debe estar seleccionada
         if bpel is None:
-            error_str = _("Fichero bpel no seleccionado") 
+            error_str = _("idgui.main.bpel.file.not.selected") 
         elif not os.access(bpel, os.F_OK or os.R_OK or os.W_OK):
-            error_str = _("El fichero bpel seleccionado no existe")
+            error_str = _("idgui.main.selected.bpel.file.dont.exist")
 
         # Comprobar los errores y mostrarlos
         if error_str :
             self.errores_label.set_text(error_str)
             return error_str
 
-        log.info(_("Creando proyecto con el fichero bpel: ") + bpel)
+        log.info(_("idgui.main.creating.proyect.with.bpel") + bpel)
 
         # Creamos el proyecto
         # False si todo va bien
         try:
             self.cargar_proyecto(nombre,bpel)
         except:
-            log.error(_("Excepción al crear proyecto "))
+            log.error(_("idgui.main.exception.in.proyect.creation"))
             #errores.set_text(e)
 
         # Si el proyecto ha sido creado correctamente
