@@ -6,7 +6,7 @@ from xml.etree import ElementTree as et
 
 # Establecer el log
 import util.logger
-log = util.logger.getlog('idg.opciones')
+log = util.logger.getlog('idg.options')
 
 class Opt(object):
     """@brief Establece las opciones básicas leyendo el config.xml"""
@@ -104,10 +104,10 @@ class Opt(object):
             dom = et.ElementTree()
             root = dom.parse(self.config).getroot()
         except:
-            log.error(_("cant.open.for.read") + self.config)
+            log.error(_("idg.options.cant.open.for.read") + self.config)
             return
         else:
-            log.info(_("writting.config.in") + self.config)
+            log.info(_("idg.options.writting.config.in") + self.config)
 
         # For each option, find it in config or create it.
         for id, (val, type) in self._opts.items():
@@ -119,7 +119,7 @@ class Opt(object):
         try:
             dom.write(self.config)
         except:
-            log.error(_("cant.write.file") + self.config)
+            log.error(_("idg.options.cant.write.file") + self.config)
 
     def expand(self, val):
         """@brief Expande una ruta y resuelve relativas.
@@ -148,10 +148,10 @@ class Opt(object):
             dom = et.ElementTree()
             root = et.parse(self.config).getroot()
         except:
-            log.error(_('cant.parse.config.file') + self.config)
+            log.error(_('idg.options.cant.parse.config.file') + self.config)
             return
         else:
-            log.info(_('using.config.file') + self.config)
+            log.info(_('idg.options.using.config.file') + self.config)
 
         # Read all elements in config
         for e in root.getchildren() :
@@ -168,12 +168,12 @@ class Opt(object):
                 val = self.expand(val) if self.check(val) else None
 
             if val is None:
-                log.error(_('not.valid.value') + id + ": " + str(e.get(type)))
+                log.error(_('idg.options.not.valid.value') + id + ": " + str(e.get(type)))
                 if id in self._defaults :
-                    log.warning(_('using.default.value.for') + id)
+                    log.warning(_('idg.options.using.default.value.for') + id)
                     val = self._defaults[id] 
                 else:
-                    log.warning(_('no.default.value.for') + id)
+                    log.warning(_('idg.options.not.found.default.value.for') + id)
 
             # Guardar en el diccionario los valores.
             self._opts[id] = [val, type]
