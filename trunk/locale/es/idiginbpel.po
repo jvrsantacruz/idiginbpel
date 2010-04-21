@@ -1,298 +1,445 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# IdiginBPEL translation
+# Copyright (C) 2010 Javier Santacruz
+# This file is distributed under the same license as the IdiginBPEL package.
+# Javier Santacruz <javier.santacruz@uca.es>, 2010.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.05\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-08 22:37+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2010-04-21 17:34+0200\n"
+"PO-Revision-Date: 2010-04-21 17:35:+0200\n"
+"Last-Translator: Javier Santacruz <javier.santacruz@uca.es>\n"
+"Language-Team: Spanish <javier.santacruz@uca.es>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: idiginBPEL.py:24
-msgid "Ejecutable en "
-msgstr ""
-
-#: idiginBPEL.py:36
-msgid "Buscando config en: "
-msgstr ""
-
-#: idg/instrum.py:39
-msgid "Ejecutando: "
-msgstr ""
+#: idg/instrum.py:38
+msgid "idg.instrum.running.command"
+msgstr "Ejecutando instrumentación: "
 
 #: idg/instrum.py:76
-msgid "Instrumentación terminada"
-msgstr ""
+msgid "idg.instrum.instrumentation.finished"
+msgstr "Instrumentación terminada."
 
-#: idg/main.py:62
-msgid "Proyectos disponibles: "
-msgstr ""
+#: idg/main.py:20
+msgid "idg.main.not.installed.locales"
+msgstr "Locales no instaladas en /usr/share/locale probando con [install-dir]/locale"
 
 #: idg/main.py:73
-msgid "No se pudo leer el fichero de configuración "
-msgstr ""
+msgid "idg.main.available.proyects.list"
+msgstr "Lista de proyectos disponible: "
 
-#: idg/main.py:75
-msgid "Usando fichero de configuración: "
-msgstr ""
+#: idg/opciones.py:107
+msgid "idg.options.cant.open.for.read"
+msgstr "No se pudo abrir para lectura: "
 
-#: idg/main.py:87
-msgid "No se encuentra el directorio: "
-msgstr ""
+#: idg/opciones.py:110
+msgid "idg.options.writting.config.in"
+msgstr "No se pudo escribir la configuración en: "
 
-#: idg/main.py:90
-msgid "Se usará el valor por defecto para: "
-msgstr ""
+#: idg/opciones.py:122
+msgid "idg.options.cant.write.file"
+msgstr "No se pudo escribir el fichero: "
 
-#: idg/proyecto.py:142
-msgid "El proyecto se ha creado con errores: "
-msgstr ""
+#: idg/opciones.py:151
+msgid "idg.options.cant.parse.config.file"
+msgstr "No se pudo parsear el fichero de configuración: "
 
-#: idg/proyecto.py:236 idg/proyecto.py:237
-msgid "Error no se pudo abrir "
-msgstr ""
+#: idg/opciones.py:154
+msgid "idg.options.using.config.file"
+msgstr "Usando fichero de configuración: "
 
-#: idg/proyecto.py:279
-msgid "Dependencia: "
-msgstr ""
+#: idg/opciones.py:171
+msgid "idg.options.not.valid.value"
+msgstr "Valor inválido: "
 
-#: idg/proyecto.py:290
-msgid "Error al parsear "
-msgstr ""
+#: idg/opciones.py:173
+msgid "idg.options.using.default.value.for"
+msgstr "Usando valor por defecto para: "
 
-#: idg/proyecto.py:344
-msgid "Error al escribir en el proyecto"
-msgstr ""
+#: idg/opciones.py:176
+msgid "idg.options.not.found.default.value.for"
+msgstr "No se ha encontrado valor por defecto para la opción: "
 
-#: idg/proyecto.py:389
-msgid "No existe el fichero de casos de prueba o no es accesible"
-msgstr ""
+#: idg/proyecto.py:150
+msgid "idg.proyect.created.with.errors"
+msgstr "Proyecto creado con errores: "
 
-#: idg/proyecto.py:411
-msgid ""
-"No se pudo copiar al proyecto el                                        "
-"fichero de casos de prueba: "
-msgstr ""
+#: idg/proyecto.py:266 idg/proyecto.py:267 idg/proyecto.py:1027
+msgid "idg.proyect.bpel.file.dont.exist"
+msgstr "El fichero bpel no existe: "
 
-#: idg/proyecto.py:422
-msgid "No se ha podido cargar el fichero de casos de prueba"
-msgstr ""
+#: idg/proyecto.py:309
+msgid "idg.proyect.dependence.list"
+msgstr "Lista de dependencias: "
 
-#: idg/proyecto.py:461
-msgid "No se ha podido cargar el fichero de             tests"
-msgstr ""
+#: idg/proyecto.py:320
+msgid "idg.proyect.parse.error"
+msgstr "Error al parsear: "
 
-#: idg/proyecto.py:473
-msgid "El fichero test.bpts está roto"
-msgstr ""
+#: idg/proyecto.py:375
+msgid "idg.proyect.cant.write"
+msgstr "No se pudo escribir en: "
 
-#: idg/proyecto.py:486
-msgid "No se ha podido escribir el fichero de tests"
-msgstr ""
+#: idg/proyecto.py:413
+msgid "idg.proyect.test.already.running"
+msgstr "Los test aún están ejecutándose."
 
-#: idg/proyecto.py:500
-msgid "Nombre de proyecto vacio"
-msgstr ""
+#: idg/proyecto.py:424
+msgid "idg.proyect.cant.remove.old.bpelunit.logs"
+msgstr "No se han podido eliminar los logs antiguos de bpelunit "
 
-#: idg/proyecto.py:504
-msgid "Fichero bpel no existe "
-msgstr ""
+#: idg/proyecto.py:428
+msgid "idg.proyect.test.running.command"
+msgstr "Ejecutando tests: "
 
-#: idg/proyecto.py:508
-msgid "Inicializando proyecto"
-msgstr ""
+#: idg/proyecto.py:449
+msgid "idg.proyect.test.activebpel.server.connection"
+msgstr "Probando conexión con servidor ActiveBPEL: "
 
-#: idg/proyecto.py:512
-msgid "Error al iniciar proyecto con: "
-msgstr ""
+#: idg/proyecto.py:451
+msgid "idg.proyect.cant.connect.activebpel.server"
+msgstr "No se pudo conectar con el servidor ActiveBPEL"
 
-#: idg/proyecto.py:519
-msgid "Buscando dependencias"
-msgstr ""
+#: idg/proyecto.py:454
+msgid "idg.proyect.activebpel.server.response.code"
+msgstr "Código de respuesta del servidor ActiveBPEL: "
 
-#: idg/proyecto.py:523
-msgid "Crear Proyecto: Error al crear ficheros de proyecto"
-msgstr ""
+#: idg/proyecto.py:466
+msgid "idg.proyect.activebpel.server.status"
+msgstr "Estado del servidor ActiveBPEL: "
 
-#: idg/proyecto.py:527
-msgid "Proyecto creado correctamente"
-msgstr ""
+#: idg/proyecto.py:514
+msgid "idg.proyect.analysis.already.running"
+msgstr "El análisis aún no ha terminado"
 
-#: idg/proyecto.py:544
-msgid "No existe el fichero: "
-msgstr ""
+#: idg/proyecto.py:518
+msgid "idg.proyect.analysis.running.command"
+msgstr "Ejecutando análisis: "
 
-#: idg/proyecto.py:554
-msgid "No se pudo abrir el fichero base-build.xml"
-msgstr ""
+#: idg/proyecto.py:542
+msgid "idg.proyect.cant.load.testcases.file"
+msgstr "No se pudo cargar el fichero de casos de prueba: "
 
-#: idg/proyecto.py:564
-msgid "No se ha podido configurar base-build.xml"
-msgstr ""
+#: idg/proyecto.py:563
+msgid "idg.proyect.testcase.file.dont.exist"
+msgstr "El fichero de casos de prueba parece no existir: "
 
-#: idg/proyecto.py:566
-msgid "Modificando fichero base-build.xml"
-msgstr ""
+#: idg/proyecto.py:587
+msgid "idg.proyect.cant.copy.file.to.proyect"
+msgstr "No se pudo copiar el fichero al proyecto: "
 
-#: idg/proyecto.py:572
-msgid "No se pudo escribir el fichero base-build.xml"
-msgstr ""
+#: idg/proyecto.py:616
+msgid "idg.proyect.cant.load.testfile"
+msgstr "No se pudo cargar fichero de casos de prueba: "
 
-#: idg/proyecto.py:578
-msgid "No se pudo abrir el fichero de casos de prueba general"
-msgstr ""
+#: idg/proyecto.py:644 idg/proyecto.py:729 idg/proyecto.py:774
+msgid "idg.proyect.cant.load.main.test.file"
+msgstr "No se pudo cargar fichero principal de casos de prueba."
 
-#: idg/proyecto.py:594
-msgid ""
-"No se pudo escribir el fichero de                                         "
-"casos de prueba"
-msgstr ""
+#: idg/proyecto.py:668
+msgid "idg.proyect.main.test.file.is.broken"
+msgstr "El fichero principal de casos de prueba está roto."
 
-#: idg/proyecto.py:599
-msgid ""
-"Hay dependencias rotas en el proyecto, solucione la             situación y "
-"realice una búsqueda o cree de nuevo el proyecto"
-msgstr ""
+#: idg/proyecto.py:670
+msgid "idg.proyect.adding.info.to.main.test.file.from.new.bpts.file"
+msgstr "Añadiendo información del nuevo bpts al fichero principal de casos de prueba."
 
-#: idg/proyecto.py:626 idg/proyecto.py:664
-msgid "Error en el fichero de configuración: "
-msgstr ""
+#: idg/proyecto.py:689 idg/proyecto.py:1133
+msgid "idg.proyect.cant.write.main.test.file"
+msgstr "No se pudo escribir el fichero principal de casos de prueba."
 
-#: idg/proyecto.py:639
-msgid ""
-"No se puede abrir el fichero de             configuración del proyecto: "
-msgstr ""
+#: idg/proyecto.py:699
+msgid "idg.proyect.cleaning.testcases.in.file"
+msgstr "Limpiando casos de prueba en el fichero: "
 
-#: idg/proyecto.py:711
-msgid "Error al guardar los datos del proyecto."
-msgstr ""
+#: idg/proyecto.py:704 idg/proyecto.py:800
+msgid "idg.proyect.cant.load.bpts.file"
+msgstr "No se puede cargar el fichero bpts de casos de prueba: "
 
-#: idg/proyecto.py:744
-msgid "Error al guardar las dependencias"
-msgstr ""
+#: idg/proyecto.py:715 idg/proyecto.py:842
+msgid "idg.proyect.cant.write.bpts.file"
+msgstr "No se puede escribir el fichero bpts: "
 
-#: idg/proyecto.py:754
-msgid "Escribiendo fichero de configuración : "
-msgstr ""
+#: idg/proyecto.py:735
+msgid "idg.proyect.testcase.not.found.in.main.test.file"
+msgstr "Caso de prueba no encontrado en el fichero principal de casos de prueba: "
 
-#: idg/proyecto.py:757
-msgid "No se puede abrir el fichero de configuración  del proyecto"
-msgstr ""
+#: idg/proyecto.py:814
+msgid "idg.proyect.testcase.already.in.main.test.file"
+msgstr "El caso de prueba ya se encuentra en el fichero principal de casos de prueba: "
 
-#: idg/proyecto.py:771
-msgid ""
-"No se pudo escribir el fichero de                                        "
-"configuración en: "
-msgstr ""
+#: idg/proyecto.py:827
+msgid "idg.proyect.testcase.not.found.in.bpts.file"
+msgstr "Caso de prueba no encontrado en el fichero bpts: "
 
-#: idg/proyecto.py:798
-msgid "Error al abrir proyecto.xml"
-msgstr ""
+#: idg/proyecto.py:1023
+msgid "idg.proyect.name.proyect.is.empty"
+msgstr "El nombre del proyecto está vacio."
 
-#: idgui/instrum.py:37
-msgid "Instrumentación correcta"
-msgstr ""
+#: idg/proyecto.py:1031
+msgid "idg.proyect.init.proyect"
+msgstr "Inicializando proyecto."
 
-#: idgui/instrum.py:39
-msgid "La instrumentación ha fallado."
-msgstr ""
+#: idg/proyecto.py:1035
+msgid "idg.proyect.init.proyect.error.using"
+msgstr "Error al inicializar proyecto usando: "
 
-#: idgui/main.py:21
-msgid "Test"
-msgstr "TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST TRADUCIDO"
+#: idg/proyecto.py:1042
+msgid "idg.proyect.looking.for.dependences"
+msgstr "Buscando dependencias."
 
-#: idgui/main.py:132
-msgid "Proyecto ya cargado, no se vuelve a cargar."
-msgstr ""
+#: idg/proyecto.py:1045
+msgid "idg.proyect.error.cant.import.dependences"
+msgstr "No ha sido posible importar las dependencias."
 
-#: idgui/main.py:168
-msgid "Seleccionado el proyecto: "
-msgstr ""
+#: idg/proyecto.py:1049
+msgid "idg.proyect.proyect.created.succesfully"
+msgstr "Proyecto creado con éxito."
 
-#: idgui/main.py:194
-msgid "El nombre del proyecto no puede estar vacío."
-msgstr ""
+#: idg/proyecto.py:1072
+msgid "idg.proyect.file.dont.exist"
+msgstr "El fichero no existe: "
 
-#: idgui/main.py:198
-msgid "Ya existe un proyecto con ese nombre."
-msgstr ""
+#: idg/proyecto.py:1083
+msgid "idg.proyect.cant.open.buildfile"
+msgstr "No se pudo abrir el fichero de ejecución ant"
 
-#: idgui/main.py:206
-msgid "El nombre del proyecto no puede contener el carácter: "
-msgstr ""
+#: idg/proyecto.py:1094
+msgid "idg.proyect.cant.find.buildfile"
+msgstr "No se pudo encontrar el fichero de ejecución ant: "
 
-#: idgui/main.py:211
-msgid "Fichero bpel no seleccionado"
-msgstr ""
+#: idg/proyecto.py:1110
+msgid "idg.proyect.cant.write.in.buildfile"
+msgstr "No se pudo escribir en el fichero de ejecución ant: "
 
-#: idgui/main.py:213
-msgid "El fichero bpel seleccionado no existe"
-msgstr ""
+#: idg/proyecto.py:1117
+msgid "idg.proyect.cant.open.main.test.file"
+msgstr "No se pudo abrir el fichero principal de casos de prueba."
 
-#: idgui/main.py:220
-msgid "Creando proyecto con el fichero bpel: "
-msgstr ""
+#: idg/proyecto.py:1137
+msgid "idg.proyect.found.broken.dependences.fix.and.search.again"
+msgstr "Se encontraron dependencias rotas. Arregle la situación y busque de nuevo."
 
-#: idgui/main.py:227
-msgid "Excepción al crear proyecto "
-msgstr ""
+#: idg/proyecto.py:1175 idg/proyecto.py:1206
+msgid "idg.proyect.error.in.config.file"
+msgstr "Error en el fichero de configuración: "
 
-#: idgui/proyecto.py:39
-msgid "Iniciando el proyecto"
-msgstr ""
+#: idg/proyecto.py:1187 idg/proyecto.py:1358
+msgid "idg.proyect.cant.open.config.file"
+msgstr "No se pudo abrir fichero de configuración: "
 
-#: idgui/proyecto.py:52
-msgid "Excepción irrecuperable al crear el proyecto"
-msgstr ""
+#: idg/proyecto.py:1253
+msgid "idg.proyect.cant.save.proyect.data"
+msgstr "No se pudo guardar el proyecto."
 
-#: idgui/proyecto.py:82
-msgid "Proyecto iniciado correctamente."
-msgstr ""
+#: idg/proyecto.py:1287
+msgid "idg.proyect.cant.save.dependences"
+msgstr "No se pudo guardar las dependencias."
 
-#: idgui/proyecto.py:161
-msgid "Dentro del proyecto"
-msgstr ""
+#: idg/proyecto.py:1313
+msgid "idg.proyect.cant.save.testcases"
+msgstr "No se pudo guardar los casos de prueba."
 
-#: idgui/proyecto.py:176
-msgid "Instrumentando..."
-msgstr ""
+#: idg/proyecto.py:1355
+msgid "idg.proyect.writing.config.file"
+msgstr "Escribiendo fichero de configuración."
 
-#: idgui/proyecto.py:183 idgui/proyecto.py:184
-msgid "Error al instrumentar."
-msgstr ""
+#: idg/proyecto.py:1371
+msgid "idg.proyect.cant.write.config.file"
+msgstr "No se pudo escribir fichero de configuración."
 
-#: idgui/proyecto.py:195
-msgid "Se ha producido un error durante la búsqueda."
-msgstr ""
+#: idgui/analisis.py:109
+msgid "idgui.analysis.completed.with.errors"
+msgstr "Análisis completado con errores."
 
-#: idgui/proyecto.py:198
-msgid "Dependencias encontradas: "
-msgstr ""
+#: idgui/analisis.py:117
+msgid "idgui.analysis.running.daikon"
+msgstr "Ejecutando análisis. Daikon"
 
-#: idgui/proyecto.py:209
-msgid "Proyecto guardado."
-msgstr ""
+#: idgui/clock.py:68
+msgid "idgui.clock.is.not.pause.cant.resume"
+msgstr "No se puede despausar un 'reloj' que no está en pausa."
 
-#: idgui/proyecto.py:261
-msgid "No existe el fichero en el proyecto"
-msgstr ""
+#: idgui/ejecucion.py:87
+msgid "idgui.tester.connecting"
+msgstr "Conectando..."
 
-#: idgui/proyecto.py:273
-msgid "Añadiendo fichero de casos de prueba"
-msgstr ""
+#: idgui/ejecucion.py:164
+msgid "idgui.tester.pass.case"
+msgstr "Caso de prueba pasado."
 
-#: idgui/proyecto.py:278
-msgid "Error al añadir fichero de casos de prueba"
-msgstr ""
+#: idgui/ejecucion.py:182
+msgid "idgui.tester.testing.succesfully"
+msgstr "Terminado correctamente."
 
-#: idgui/proyecto.py:281
-msgid "Añadido fichero bpts: "
-msgstr ""
+#: idgui/ejecucion.py:185
+msgid "idgui.tester.testing.error"
+msgstr "Error en la ejecución."
+
+#: idgui/instrum.py:31
+msgid "idgui.instrumenter.finished.successfully"
+msgstr "Instrumentación finalizada con éxito."
+
+#: idgui/instrum.py:33
+msgid "idgui.instrumenter.failed"
+msgstr "La instrumentación ha fallado: "
+
+#: idgui/main.py:138
+msgid "idgui.main.already.loaded.nothing.to.do"
+msgstr "El proyecto ya está cargado, no se carga de nuevo."
+
+#: idgui/main.py:176
+msgid "idgui.main.selected.proyect"
+msgstr "Proyecto seleccionado: "
+
+#: idgui/main.py:212
+msgid "idgui.main.proyect.name.cant.be.empty"
+msgstr "El nombre del proyecto no puede estar vacío: "
+
+#: idgui/main.py:216
+msgid "idgui.main.proyect.name.already.exists"
+msgstr "El nombre para el proyecto ya existe."
+
+#: idgui/main.py:224
+msgid "idgui.main.name.cant.contain.character"
+msgstr "El nombre del proyecto no puede contener el carácter: "
+
+#: idgui/main.py:229
+msgid "idgui.main.bpel.file.not.selected"
+msgstr "No hay un fichero bpel seleccionado."
+
+#: idgui/main.py:231
+msgid "idgui.main.selected.bpel.file.dont.exist"
+msgstr "El fichero bpel no existe: "
+
+#: idgui/main.py:238
+msgid "idgui.main.creating.proyect.with.bpel"
+msgstr "Creando proyecto usando el fichero bpel: "
+
+#: idgui/main.py:245
+msgid "idgui.main.exception.in.proyect.creation"
+msgstr "Excepción durante la creación del proyecto: "
+
+# Opciones
+#: idgui/opciones.py:58 idgui/opciones.py:77
+msgid "msg.help.opt.home"
+msgstr "Directorio de usuario donde se almacenarán tanto su configuración como sus proyectos."
+
+msgid "msg.help.opt.share"
+msgstr "Directorio de datos estáticos de la aplicación."
+
+msgid "msg.help.opt.takuan"
+msgstr "Directorio donde se encuentra instalado Takuan."
+
+msgid "msg.help.opt.bpelunit"
+msgstr "Directorio donde se encuentra instalado ActiveBPEL" 
+
+msgid "msg.help.opt.svr"
+msgstr "Url donde se encuentra el servidor ActiveBPEL"
+
+msgid "msg.help.opt.port"
+msgstr "Puerto de conexión con el servidor ActiveBPEL" 
+
+#: idgui/opciones.py:80
+msgid "idgui.options.cant.change.option"
+msgstr "No pudo cambiarse la opción: "
+
+#: idgui/proyecto.py:44
+msgid "idgui.proyect.init.proyect"
+msgstr "Creando proyecto."
+
+#: idgui/proyecto.py:57
+msgid "idgui.proyect.fatal.exception.at.proyect.creation"
+msgstr "Excepción irrecuperable durante la creación del proyecto"
+
+#: idgui/proyecto.py:91
+msgid "idgui.proyect.created.succesfully"
+msgstr "Proyecto creado con éxito."
+
+#: idgui/proyecto.py:191
+msgid "idgui.proyect.into.proyect"
+msgstr "Dentro del proyecto"
+
+#: idgui/proyecto.py:203
+msgid "idgui.proyect.running.instrumentation"
+msgstr "Ejecutando instrumentación..."
+
+#: idgui/proyecto.py:210 idgui/proyecto.py:211
+msgid "idgui.proyect.instrumentation.error"
+msgstr "Error durante la instrumentación."
+
+#: idgui/proyecto.py:221
+msgid "idgui.proyect.error.at.dependence.search"
+msgstr "Error durante la búsqueda de dependencias."
+
+#: idgui/proyecto.py:224
+msgid "idgui.proyect.founded.dependences"
+msgstr "Dependencias encontradas: "
+
+#: idgui/proyecto.py:232
+msgid "idgui.proyect.saved"
+msgstr "Proyecto guardado."
+
+#: idgui/proyecto.py:339
+msgid "idgui.proyect.file.dont.exist.into.proyect"
+msgstr "El fichero no existe dentro del proyecto: "
+
+#: idgui/proyecto.py:364
+msgid "idgui.proyect.marking.file.as.selected"
+msgstr "Marcando fichero como seleccionado: "
+
+#: idgui/proyecto.py:375
+msgid "\t add case: "
+msgstr "\t Añadiendo caso: "
+
+#: idgui/proyecto.py:402
+msgid "idgui.proyect.adding.testcase.file"
+msgstr "Añadiento fichero de casos de prueba: "
+
+#: idgui/proyecto.py:414
+msgid "idgui.proyect.error.adding.testcase.file"
+msgstr "Error al añadir el fichero de casos de prueba:"
+
+#: idgui/proyecto.py:417
+msgid "idgui.proyect.added.testcase.file"
+msgstr "Añadido fichero de casos de prueba: "
+
+#: idgui/proyecto.py:601
+msgid "idgui.proyect.testcase.not.in.treeview"
+msgstr "El caso de prueba no se encuentra en el treeview: "
+
+#: idgui/proyecto.py:606
+msgid "idgui.proyect.no.icon.for.this.level"
+msgstr "El proyecto no tiene icono para este nivel: "
+
+#: idgui/proyecto.py:696
+msgid "idgui.proyect.level.out.of.range"
+msgstr "Nivel fuera de rango: "
+
+#: idgui/proyecto.py:712
+msgid "idgui.proyect.cant.run.tests.if.server.is.offline"
+msgstr "No se pueden ejecutar los test si el servidor está caido."
+
+#: idgui/proyecto.py:713 idgui/proyecto.py:733
+msgid "idgui.proyect.run"
+msgstr "Ejecutar"
+
+#: idgui/proyecto.py:728
+msgid "idgui.proyect.test.canceled"
+msgstr "Cancelado"
+
+#: idgui/proyecto.py:730
+msgid "idgui.proyect.test.finished"
+msgstr "Terminado"
+
+#: idgui/proyecto.py:748 idgui/proyecto.py:789
+msgid "idgui.proyect.stop"
+msgstr "Detener"
+
+#: idgui/proyecto.py:780
+msgid "idgui.proyect.connection.with.abpel.server"
+msgstr "Conectando con el servidor ActiveBPEL..."
