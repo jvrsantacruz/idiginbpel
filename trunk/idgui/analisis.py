@@ -9,7 +9,7 @@ import gtk
 from threading import Thread
 
 import util.logger
-log = util.logger.getlog('idgui.analisis')
+log = util.logger.getlog('idgui.analysis')
 
 from idgui.clock import Clock
 
@@ -106,15 +106,15 @@ class Analisis(Thread):
                 #  y mensaje en el pie
                 self.estado = 'ko'
                 self.bar.set_fraction(1)
-                self.bar.set_text(_('Completed with errors'))
-                log.debug('Analisis done with errors')
+                self.bar.set_text(_("idgui.analysis.completed.with.errors"))
+                log.debug("idgui.analysis.completed.with.errors")
 
             elif name == 'daikon' :
                 # Poner la barra a 2/3
                 #  y mensaje en la barra
                 self.estado = 'daikon'
                 self.bar.set_fraction(2/3.0)
-                self.bar.set_text(_('Ejecutando Daikon'))
+                self.bar.set_text(_("idgui.analysis.running.daikon"))
                 log.debug('Daikon')
 
             elif name == 'exelog' :
