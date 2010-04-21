@@ -5,7 +5,7 @@ import gtk
 
 # Establecer el log
 import util.logger
-log = util.logger.getlog('idgui.opciones')
+log = util.logger.getlog('idgui.options')
 
 class OptUI(object):
     """Clase que permite manejar las opciones del programa desde la gui."""
@@ -77,7 +77,7 @@ class OptUI(object):
             self.list[path][3] = _('msg.help.opt.' + id)
         else:
             self.list[path][2] = self._NORMAL_ICON
-            log.error(_('cant.change.option') + id)
+            log.error(_('idgui.options.cant.change.option') + id)
             #  Indicar error
 
     def on_guardar(self, widget):
