@@ -11,7 +11,7 @@ import gtk
 
 import util.clock 
 import util.logger
-log = util.logger.getlog('idgui.proyecto')
+log = util.logger.getlog('idgui.proyect')
 
 from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
 ProyectoIrrecuperable
@@ -41,7 +41,7 @@ class ProyectoUI(object):
         self.opts = self.idg.opt
 
         # Estado de la barra inferior
-        idgui.estado(_("Iniciando el proyecto"))
+        idgui.estado(_("idgui.proyect.init.proyect"))
 
         # Crear el proyecto
         try:
@@ -54,7 +54,7 @@ class ProyectoUI(object):
             log.error(str(e))
             idgui.estado(e)
         except:
-            log.error(_("Excepción irrecuperable al crear el proyecto"))
+            log.error(_("idgui.proyect.fatal.exception.at.proyect.creation"))
             raise
 
         # Cargar el glade del proyecto
@@ -88,7 +88,7 @@ class ProyectoUI(object):
         self.proyecto_base.show()
 
         self.mensaje("")
-        idgui.estado(_("Proyecto iniciado correctamente."))
+        idgui.estado(_("idgui.proyect.created.succesfully"))
 
     def __del__(self):
         """@brief Destructor del Proyecto"""
@@ -188,7 +188,7 @@ class ProyectoUI(object):
             if d in self.proy.dep_miss:
                 l = [ roto , path.basename(d), d ]
             else:
-                l = [ buena, path.basename(d), _("Dentro del proyecto") ]
+                l = [ buena, path.basename(d), _("idgui.proyect.into.proyect") ]
             self.dep_list.append(l)
 
     ## @}
@@ -200,15 +200,15 @@ class ProyectoUI(object):
         """@brief Callback de pulsar el botón de instrumentar.
         @param widget Botón"""
 
-        self.idgui.estado(_("Instrumentando..."))
+        self.idgui.estado(_("idgui.proyect.running.instrumentation"))
         try:
             from idg.proyecto import ProyectoError
             self.proy.instrumentar()
             c = Comprobador(self.proy,self,2)
             c.start()
         except ProyectoError:
-            self.error(_("Error al instrumentar."))
-            self.idgui.estado(_("Error al instrumentar."))
+            self.error(_("idgui.proyect.instrumentation.error"))
+            self.idgui.estado(_("idgui.proyect.instrumentation.error"))
             #self.mensaje(_("Instrumentación correcta."))
 
     def on_proy_config_dep_search_button(self,widget):
@@ -218,10 +218,10 @@ class ProyectoUI(object):
             log.info("Bpel original: " + self.proy.bpel_o)
             self.proy.buscar_dependencias(self.proy.bpel_o)
         except ProyectoError:
-            self.error(_("Se ha producido un error durante la búsqueda."))
+            self.error(_("idgui.proyect.error.at.dependence.search"))
 
         self.actualizar_pantalla_config()
-        self.idgui.estado(_("Dependencias encontradas: ") + \
+        self.idgui.estado(_("idgui.proyect.founded.dependences") + \
                           str(len(self.proy.deps)))
 
     def on_proy_config_save_button(self,widget):
@@ -229,7 +229,7 @@ class ProyectoUI(object):
         configuración de un proyecto."""
         # Guardar el proyecto
         self.proy.guardar()
-        self.idgui.estado(_("Proyecto guardado."))
+        self.idgui.estado(_("idgui.proyect.saved"))
 
     ## @}
 
@@ -336,7 +336,7 @@ class ProyectoUI(object):
         @param count número de hijos marcados.
         """
         if fichero not in self.proy.casos :
-            self.error(_("No existe el fichero en el proyecto"))
+            self.error(_("idgui.proyect.file.dont.exist.into.proyect"))
         else:
             self.bpts_nombre_label.set_text(fichero)
             self.bpts_n_label.set_text(str(len(self.proy.casos[fichero])))
@@ -361,7 +361,7 @@ class ProyectoUI(object):
 
                 if lv == 0 :
                     fnom = m.get_value(iter, 0)    # Nombre del fichero
-                    log.debug(_("Marcando como seleccionado el fichero: ") + fnom)
+                    log.debug(_("idgui.proyect.marking.file.as.selected") + fnom)
 
                     # Si no estaba en casos, lo añadimos
                     if fnom not in casos :
@@ -372,7 +372,7 @@ class ProyectoUI(object):
                     fnom = m.get_value(parent, 0)   # Nombre del fichero
                     cnom = m.get_value(iter, 0)     # Nombre del caso
 
-                    log.debug(_("\t add el caso: ") + cnom)
+                    log.debug(_("\t add case: ") + cnom)
                     casos[fnom].append(cnom)
 
         # Recorremos el modelo árbol mirando que casos y ficheros están seleccionados
@@ -399,7 +399,7 @@ class ProyectoUI(object):
 
     def on_proy_cases_bpts_file(self,widget):
         """@brief Callback de seleccionar un fichero bpts."""
-        self.idgui.estado(_("Añadiendo fichero de casos de prueba"))
+        self.idgui.estado(_("idgui.proyect.adding.testcase.file"))
         if self.last_path :
             log.debug("Setting Last Path: " + self.last_path)
             self.bpts_fichero.set_current_folder(self.last_path)
@@ -411,10 +411,10 @@ class ProyectoUI(object):
             self.proy.vaciar_bpts(self.proy.test)
             self.proy.add_bpts(bpts)
         except(ProyectoRecuperable):
-            self.idgui.estado(_("Error al añadir fichero de casos de prueba"))
+            self.idgui.estado(_("idgui.proyect.error.adding.testcase.file"))
             log.error(str(sys.exc_type) + str(sys.exc_value))
         else:
-            self.idgui.estado(_("Añadido fichero bpts: ") + path.basename(bpts) )
+            self.idgui.estado(_("idgui.proyect.added.testcase.file") + path.basename(bpts) )
             self.bpts_fichero.set_filename("")
             self.cargar_bpts_tree()
 
@@ -598,12 +598,12 @@ class ProyectoUI(object):
         """
         # Comprobar que tenemos la ruta del caso
         if caso not in self.ejec_path_casos :
-            log.warning(_("El caso no está en el treeview: ") + caso)
+            log.warning(_("idgui.proyect.testcase.not.in.treeview") + caso)
             return
 
         # Comprobar que el nivel es el adecuado
         if nivel < 0 or  nivel >= len(self.ejec_iconos) :
-            log.warning(_("No existe icono para el nivel: ") + str(nivel))
+            log.warning(_("idgui.proyect.no.icon.for.this.level") + str(nivel))
             return 
 
         # Acortar el nombre del treeStore (modelo)
@@ -693,7 +693,7 @@ class ProyectoUI(object):
 
         # Comprobar el valor del nivel
         if 4 < nivel or 0 > nivel :
-            log.warning(_("Nivel para actualizar_ejec_iconos fuera de rango"))
+            log.warning(_("idgui.proyect.level.out.of.range"))
             return
 
         # Cambiar los iconos y los estados
@@ -709,8 +709,8 @@ class ProyectoUI(object):
 
     def ejec_conexion_error(self):
         """@brief Indica un error de conexión al intentar la ejecución."""
-        self.idgui.estado(_("No se puede ejecutar si el servidor no está activo"))
-        self.ejec_control_boton.set_label(_("Ejecutar"))
+        self.idgui.estado(_("idgui.proyect.cant.run.tests.if.server.is.offline"))
+        self.ejec_control_boton.set_label(_("idgui.proyect.run"))
         self.ejec_control_analisis.set_sensitive(True)
 
     def ejec_terminar(self):
@@ -725,12 +725,12 @@ class ProyectoUI(object):
 
         # Poner el estado en ejecución terminada
         if kill :
-            self.idgui.estado(_("Ejecucion cancelada"))
+            self.idgui.estado(_("idgui.proyect.test.canceled"))
         else:
-            self.idgui.estado(_("Ejecucion terminada"))
+            self.idgui.estado(_("idgui.proyect.test.finished"))
 
         # Pone el botón de Detener en Ejecutar
-        self.ejec_control_boton.set_label(_("Ejecutar"))
+        self.ejec_control_boton.set_label(_("idgui.proyect.run"))
         self.ejec_control_analisis.set_sensitive(True)
 
     def ejecutar(self):
@@ -745,7 +745,7 @@ class ProyectoUI(object):
             return
 
         # Cambiar el botón de ejecutar por el de cancelar
-        self.ejec_control_boton.set_label(_("Detener"))
+        self.ejec_control_boton.set_label(_("idgui.proyect.stop"))
         self.ejec_control_analisis.set_sensitive(False)
         # Colapsar todos los casos
         self.ejec_view.collapse_all()
@@ -777,7 +777,8 @@ class ProyectoUI(object):
 
         # Ponemos el mensaje en el label con el status
         self.ejec_estado_label.set_text(status)
-        self.idgui.estado( _("Conexión con el servidor Abpel: ") + status)
+        self.idgui.estado( _("idgui.proyect.connection.with.abpel.server") + \
+                          status)
 
         return status == "Online"
 
@@ -785,7 +786,7 @@ class ProyectoUI(object):
         """@brief Callback de pulsar el botón de ejecución en la pantalla de
         ejecución.
         """
-        if widget.get_label() == _("Detener") :
+        if widget.get_label() == _("idgui.proyect.stop") :
             self.ejec_terminar()
         else:
             self.ejecutar()
@@ -1177,7 +1178,7 @@ class ProyectoUI(object):
     def anl_actualizar_info(self):
         """Actualiza la información sobre el análisis"""
         self.anl_flat_label.set_text(self.proy.aplanado)
-        self.anl_sim_label.set_text(_(str(self.proy.simplify)))
+        self.anl_sim_label.set_text(str(self.proy.simplify))
 
     ## @}
 
