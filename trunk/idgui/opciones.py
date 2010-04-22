@@ -54,7 +54,11 @@ class OptUI(object):
         # Recorremos las opciones creando labels e inputs
         # con los valores y añadiéndolos a la tabla
         for id, (val, type) in self.opts.getall().items() :
-            self.list.append([id, val,
+            msg = _('msg.help.opt.' + id) 
+            # Add no-available message if necessary
+            if msg == 'msg.help.opt' + id :
+                msg = _('idgui.options.no.help.available') 
+            self.list.append([id, val,\
                               self._NORMAL_ICON, _('msg.help.opt.' + id)])
 
         # Volver a conectar el modelo y la vista
