@@ -104,7 +104,7 @@ class Opt(object):
             dom = et.ElementTree()
             root = dom.parse(self.config)
         except:
-            log.error(_("idg.options.cant.open.for.read") + self.config)
+            log.error(_("idg.options.cant.open.for.write") + self.config)
             return
         else:
             log.info(_("idg.options.writting.config.in") + self.config)
