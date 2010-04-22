@@ -425,6 +425,7 @@ class ProyectoUI(object):
         # Obtenemos el modelo y el iterador del tree
         model = self.bpts_tree
         it = model.get_iter_from_string(path)
+        count = 0
 
         # El comportamiento es:
         # Si se marca/desmarca un fichero, marcar/desmarcar todos sus casos
@@ -444,33 +445,34 @@ class ProyectoUI(object):
                 child = model.iter_children(it)
                 # Recorrer los casos y marcarlos igualmente, 
                 # contarlos si están marcados.
-                count = 0
                 while not child is None:
                     model.set_value(child, 2, val)
                     child = model.iter_next(child)
                     count += 1 if val else 0
-                self.info_bpts_fichero(model.get_value(it,0), count)
 
             # Si lo que estamos marcando/desmarcando es un caso
             else :
                 # Si lo marcamos y el padre estaba desmarcado, marcarlo
                 if val == True :
                     model.set_value(parent, 2, val)
-                # Si lo desmarcamos, y el fichero queda vacio, desmarcar padre 
-                else :
-                    vacio = True
-                    # Recorremos los hijos de parent mirando si hay alguno marcado
-                    child = model.iter_children(parent)
-                    while not child is None:
-                        # Si hay al menos 1 marcado, terminamos
-                        if model.get_value(child, 2) == True :
-                            vacio = False
-                            break
-                        child = model.iter_next(child) # Siguiente
+
+                # Desmarcar el padre si se queda vacio. Contar los casos.
+                vacio = True
+                # Recorremos los hijos de parent mirando si hay alguno marcado
+                child = model.iter_children(parent)
+                while child is not None:
+                    if model.get_value(child, 2):
+                        vacio = False
+                        count += 1
+                    child = model.iter_next(child) # Siguiente
 
                     # Si el fichero se ha quedado vacio, lo desmarcamos
-                    if vacio :
-                        model.set_value(parent, 2, False)
+                if vacio :
+                    model.set_value(parent, 2, False)
+
+            # Actualizar la información del fichero en la interfaz
+            fileiter = parent if parent is not None else it
+            self.info_bpts_fichero(model.get_value(fileiter, 0), count)
 
     def on_proy_cases_exec_anl_button(self, widget):
         # Pasamos a la página de la ejecución
