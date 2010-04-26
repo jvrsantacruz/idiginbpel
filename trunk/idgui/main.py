@@ -112,7 +112,7 @@ class Idgui(object):
         self.modelo_lista_proyectos.clear()
 
         # Introducir los datos en el ListStore obtenidos de idg
-        for p in self.idg.lista_proyectos :
+        for p in self.idg.get_proylist():
             if p not in self.modelo_lista_proyectos:
                 self.modelo_lista_proyectos.append( [p] )
 
@@ -212,7 +212,7 @@ class Idgui(object):
             error_str =  _("idgui.main.proyect.name.cant.be.empty") 
 
         # No debe estar usado
-        elif nombre in self.idg.lista_proyectos:
+        elif nombre in self.idg.get_proylist():
             error_str =  _("idgui.main.proyect.name.already.exists") 
 
          # Debe ser un nombre 'unix' válido

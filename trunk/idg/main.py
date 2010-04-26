@@ -49,17 +49,24 @@ class Idg(object):
     	self.path = path
 
         # Leer la lista de proyectos
-        self.obtener_lista_proyectos()
+        self.update_proylist()
 
-    def obtener_lista_proyectos(self):
-        """@brief Obtiene la lista de proyectos y comprueba posibles problemas."""
+    def get_proylist(self):
+        """@retval Returns the proyect list."""
+        return self._proylist
+
+    def update_proylist(self):
+        """@brief Update and returns the list of proyects.
+        @returns The list of proyects.
+        """ 
         # Leer los proyectos existentes en home/proy
         # Eliminar directorios ocultos.
         ## Lista con los nombres de los directorios con los proyectos
-        self.lista_proyectos = os.listdir(os.path.join(self.home,"proy"))
-        self.lista_proyectos = [p for p in self.lista_proyectos if p[0] != '.']
-        self.lista_proyectos.sort()
-        log.info(_("idg.main.available.proyects.list") + str(self.lista_proyectos))
+        self._proylist = os.listdir(os.path.join(self.home,"proy"))
+        self._proylist = [p for p in self._proylist if p[0] != '.']
+        self._proylist.sort()
+        log.info(_("idg.main.available.proyects.list") + str(self._proylist))
+        return self._proylist
 
     def comprobar_proyectos(self):
         """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
@@ -81,13 +88,12 @@ class Idg(object):
         log.info("Share: " + self.share)
         log.info("Takuan: " + self.takuan)
 
-    def exportar(self,nombre,ruta):
-        """@brief Realiza un paquete tar en bz2 del directorio del proyecto.
-        @param nombre Nombre del proyecto a exportar.
-        @param ruta Ruta en la que se intentará depositar la exportación del
-        proyecto."""
-
-        if nombre not in self.lista_proyectos:
+    def export(self, name, path):
+        """@brief Make a tar (bz2) package with a proyect directory.
+        @param name Name of proyect.
+        @param path Where the tarfile will be saved.
+        """
+        if name not in self._proylist:
             return False
 
         eruta = path.join(ruta,nombre + '.proy')
@@ -131,15 +137,16 @@ class Idg(object):
 
             # Comprobamos que el nombre del proyecto no esté ya usado
             i = 1
-            while nom in self.lista_proyectos:
+            while nom in self._proylist:
                 nom = "%s-%d" % (tar[0].name,i)
                 ++i
             # Descomprimimos
             tar.extractall(path.join(self.home,"proy"))
         except TarError:
             return False
-        # Actualizar la lista de proyectos
-        self.obtener_lista_proyectos()
+
+        # Update de proyects list.
+        self.update_proylist()
         return True
 
     def cerrar(self):
