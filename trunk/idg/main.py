@@ -33,7 +33,7 @@ class Idg(object):
                }
 
     ## Referencia al objeto Proyecto abierto actualmente
-    proyecto = None
+    proy = None
 
     def __init__(self,path,config):
         """@brief Inicializa idiginBPEL y mantiene los datos básicos para el

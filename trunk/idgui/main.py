@@ -133,8 +133,8 @@ class Idgui(object):
 
         # Comprobar que el proyecto actualmente cargado, si lo hay, 
         #  no es el mismo que pretendemos cargar.
-        if not self.idg.proyecto is None \
-           and self.idg.proyecto.nombre == nombre :
+        if not self.idg.proy is None \
+           and self.idg.proy .nombre == nombre :
             log.info(_("idgui.main.already.loaded.nothing.to.do"))
             # Mostrarlo en la interfaz
             self.proyecto.proyecto_base.reparent(self.proyecto.principal)

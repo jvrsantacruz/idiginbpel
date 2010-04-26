@@ -48,7 +48,7 @@ class ProyectoUI(object):
             error = ""
             ## Referencia a la instancia del Proyecto actual
             self.proy = Proyecto(nombre, idg, bpel)
-            self.idg.proyecto = self.proy
+            self.idg.proy = self.proy
         except (ProyectoRecuperable) as e:
             # Mostrar las recuperables en los errores en la interfaz.
             log.error(str(e))
@@ -202,7 +202,7 @@ class ProyectoUI(object):
 
         self.idgui.estado(_("idgui.proyect.running.instrumentation"))
         try:
-            from idg.proyecto import ProyectoError
+            from idg.proy import ProyectoError
             self.proy.instrumentar()
             c = Comprobador(self.proy,self,2)
             c.start()
