@@ -301,7 +301,7 @@ class Idgui(object):
 
     def on_main_ventana_destroy(self,widget):
         """@brief Callback de pulsar el cierre de la ventana."""
-        self.idg.cerrar()
+        self.idg.close()
         gtk.main_quit()
 
     def on_main_exportar(self, widget):

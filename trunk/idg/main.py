@@ -151,9 +151,8 @@ class Idg(object):
         self.update_proylist()
         return True
 
-    def cerrar(self):
-        """@brief Realiza comprobaciones y cierra ordenadamente"""
+    def close(self):
+        """@brief Closes the program properly."""
 
-        # Si hay un proyecto abierto lo cerramos antes de cerrar el programa.
-        if self.proyecto is not None :
-            self.proyecto.cerrar()
+        if self.proy is not None :
+            self.proy.cerrar()
