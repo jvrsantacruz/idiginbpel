@@ -7,6 +7,7 @@ import os.path as path
 import commands
 import shutil
 import gettext
+import tarfile
 from xml.dom import minidom as md
 
 # Establecer el log
@@ -88,7 +89,7 @@ class Idg(object):
         log.info("Share: " + self.share)
         log.info("Takuan: " + self.takuan)
 
-    def export(self, name, path):
+    def exportation(self, name, path):
         """@brief Make a tar (bz2) package with a proyect directory.
         @param name Name of proyect.
         @param path Where the tarfile will be saved.
@@ -96,51 +97,52 @@ class Idg(object):
         if name not in self._proylist:
             return False
 
-        eruta = path.join(ruta,nombre + '.proy')
-        if path.exists(eruta) or os.access(ruta, R_OK or W_OK):
+        # Check that the file doesn't exist and we can write there.
+        tar_path = path.join(path, name + '.proy')
+        if path.exists(tarname) or os.access(ruta, R_OK or W_OK):
             return False
 
-        # Comprimir el directorio del proyecto en tar
+        # Compress proyect directory
         try:
-            import tarfile
-            tar = tarfile.open(eruta, "w:bz2")
-            tar.add(path.join(self.home,"proy",nombre))
+            tar = tarfile.open(tar_path, "w:bz2")
+            tar.add(path.join(self.home, "proy", name))
             tar.close()
         except TarError:
-            return False
+            return None
 
         return True
 
-    def importar(self,ruta):
-        """@brief Importa un proyecto desde un paquete.
-        @param nombre Nombre del proyecto a exportar.
-        @retval True si todo va bien. False si no se ha podido importar."""
+    def importation(self, path):
+        """@brief Imports a proyect from an exported package.
+        @param path Path to the package.
+        @retval True if everything is ok. False if the proyect cannot be
+        imported.
+        """
 
-        # Si no existe o si no se puede leer, error
-        if not path.exists(ruta) or os.access(ruta,F_OK or R_OK):
+        # If path doesn't exist or cannot be accessed
+        if not path.exists(path) or os.access(path ,F_OK or R_OK):
             return False
 
         try:
             import tarfile
-            tar = tarfile.open(ruta, "r:bz2")
+            tar = tarfile.open(path, "r:bz2")
         except TarError:
             return False
 
         try:
-            # Si el primer elemento no es un directorio 
-            # es que el formato del proyecto está mal.
+            # If the first element isn't a directory, wrong format.
             if not tar[0].isdir():
                 return False
 
-            # El nombre del proyecto será el del 1º dir
+            # Proyect name will be extracted from the root directory
             nom = tar[0].name
 
-            # Comprobamos que el nombre del proyecto no esté ya usado
+            # Check the name of the new proyect and rename if needed
             i = 1
             while nom in self._proylist:
                 nom = "%s-%d" % (tar[0].name,i)
                 ++i
-            # Descomprimimos
+
             tar.extractall(path.join(self.home,"proy"))
         except TarError:
             return False
