@@ -22,17 +22,14 @@ log.warning(_('idg.main.not.installed.locales'))
 class Idg(object):
     """@brief Objeto principal, maneja el programa completo."""
 
-    # Rutas a los directorios con los datos 
-    # y la instalación de takuan
-    # Valores por defecto para cuando no hay config.xml
-    ## Ruta al directorio de usuario por defecto
-    home = "./home"
-    ## Ruta al directorio de datos por defecto
-    share = "./share"
-    ## Ruta al directorio de instalación de takuan por defecto
-    takuan = "~/takuan"
-    ## Ruta al directorio de BPELUnit
-    bpelunit = '~/AeBpelEngine'
+    ## Default values (useful when config.xml cannot be found)
+    _DEFAULTS = { 'home': ['~/.idiginbpel', 'src'],
+                'share': ['~/IdiginBPEL/share', 'src'],
+                'takuan': ['~/takuan', 'src'],
+                'bpelunit': ['~/bin/AeBpelEngine', 'src'],
+                'svr': ['localhost', 'value'],
+                'port': ['7777', 'value']
+               }
 
     ## Referencia al objeto Proyecto abierto actualmente
     proyecto = None
@@ -45,16 +42,8 @@ class Idg(object):
 
         # Leer parámetros de la configuración
         ## Ruta al fichero de configuración
-        self.config = config
-        ## Default values
-        defaults = { 'home': ['~/.idiginbpel', 'src'],
-                    'share': ['~/IdiginBPEL/share', 'src'],
-                    'takuan': ['~/takuan', 'src'],
-                    'bpelunit': ['~/bin/AeBpelEngine', 'src'],
-                    'svr': ['localhost', 'value'],
-                    'port': ['7777', 'value']
-                   }
-        self.set_config(defaults)
+        self._config = config
+        self.set_config(self._DEFAULTS)
 
 	## Ruta base de ejecución del programa
     	self.path = path
@@ -77,8 +66,10 @@ class Idg(object):
         pass
 
     def set_config(self, defaults={}):
-        """@brief Inicializa el sistema de opciones."""
-        self.opt = Opt(self.config, defaults)
+        """@brief Initialize opts system and basic variables.
+        @param defaults Dictionary with default values for options.
+        """
+        self.opt = Opt(self._config, defaults)
 
         # Basic options needed
         self.home = self.opt.get('home')
