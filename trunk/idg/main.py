@@ -3,7 +3,6 @@
 
 import os 
 import os.path as path
-
 import commands
 import shutil
 import gettext
@@ -11,10 +10,9 @@ import tarfile
 from xml.dom import minidom as md
 
 # Establecer el log
+from opciones import Opt
 import util.logger
 log = util.logger.getlog('idg.main')
-
-from opciones import Opt
 
 # Traducciones mediante gettext
 gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
@@ -32,7 +30,7 @@ class Idg(object):
                 'port': ['7777', 'value']
                }
 
-    ## Referencia al objeto Proyecto abierto actualmente
+    ## Reference to the current open proyect.
     proy = None
 
     def __init__(self,path,config):
@@ -41,15 +39,12 @@ class Idg(object):
            @param path ruta base de ejecución del programa.
            @param config ruta absoluta del fichero de configuración."""
 
-        # Leer parámetros de la configuración
-        ## Ruta al fichero de configuración
-        self._config = config
-        self.set_config(self._DEFAULTS)
 
-	## Ruta base de ejecución del programa
+        self._config = config
     	self.path = path
 
-        # Leer la lista de proyectos
+        # Set up configuration and proyect list.
+        self.set_config(self._DEFAULTS)
         self.update_proylist()
 
     def get_proylist(self):
@@ -68,11 +63,6 @@ class Idg(object):
         self._proylist.sort()
         log.info(_("idg.main.available.proyects.list") + str(self._proylist))
         return self._proylist
-
-    def comprobar_proyectos(self):
-        """TODO: @brief Comprueba el estado adecuado de un proyecto antes de incluirlo en la lista.""" 
-        pass
-
     def set_config(self, defaults={}):
         """@brief Initialize opts system and basic variables.
         @param defaults Dictionary with default values for options.
