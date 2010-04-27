@@ -19,7 +19,13 @@ gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar
 log.warning(_('idg.main.not.installed.locales'))
 
 class Idg(object):
-    """@brief Objeto principal, maneja el programa completo."""
+    """@brief Main application class
+
+    Opens and closes the program.
+    Holds the basis of the program as basic paths and options.
+    Loads the i18n system.
+    Manages proyects (list, importation, exportation).
+    """
 
     ## Default values (useful when config.xml cannot be found)
     _DEFAULTS = { 'home': ['~/.idiginbpel', 'src'],
@@ -33,12 +39,13 @@ class Idg(object):
     ## Reference to the current open proyect.
     proy = None
 
-    def __init__(self,path,config):
-        """@brief Inicializa idiginBPEL y mantiene los datos básicos para el
-        funcionamiento de la aplicación.
-           @param path ruta base de ejecución del programa.
-           @param config ruta absoluta del fichero de configuración."""
+    def __init__(self, path, config):
+        """@brief Initialize idiginBPEL
 
+        Reads config file, list available proyects and initialize options.
+        @param path Absolute path to python executable file in the system.
+        @param config Absolute path to the main config file.
+        """
 
         self._config = config
     	self.path = path
@@ -47,22 +54,6 @@ class Idg(object):
         self.set_config(self._DEFAULTS)
         self.update_proylist()
 
-    def get_proylist(self):
-        """@retval Returns the proyect list."""
-        return self._proylist
-
-    def update_proylist(self):
-        """@brief Update and returns the list of proyects.
-        @returns The list of proyects.
-        """ 
-        # Leer los proyectos existentes en home/proy
-        # Eliminar directorios ocultos.
-        ## Lista con los nombres de los directorios con los proyectos
-        self._proylist = os.listdir(os.path.join(self.home,"proy"))
-        self._proylist = [p for p in self._proylist if p[0] != '.']
-        self._proylist.sort()
-        log.info(_("idg.main.available.proyects.list") + str(self._proylist))
-        return self._proylist
     def set_config(self, defaults={}):
         """@brief Initialize opts system and basic variables.
         @param defaults Dictionary with default values for options.
@@ -78,6 +69,22 @@ class Idg(object):
         log.info("Home: " + self.home)
         log.info("Share: " + self.share)
         log.info("Takuan: " + self.takuan)
+
+    def get_proylist(self):
+        """@returns Returns the proyect list"""
+        return self._proylist
+
+    def update_proylist(self):
+        """@brief Update and returns the list of proyects
+        @returns The list of proyects
+        """
+        # List valid proyects in the user home.
+        self._proylist = os.listdir(os.path.join(self.opt.get('home'),"proy"))
+        self._proylist = [p for p in self._proylist if p[0] != '.']
+        self._proylist.sort()
+        log.info(_("idg.main.available.proyects.list") + str(self._proylist))
+
+        return self._proylist
 
     def exportation(self, name, path):
         """@brief Make a tar (bz2) package with a proyect directory.
