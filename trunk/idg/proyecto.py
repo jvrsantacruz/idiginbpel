@@ -138,7 +138,7 @@ class Proyecto(object):
         else:
             self.crear()
             self.guardar()
-            self.idg.obtener_lista_proyectos()
+            self.idg.update_proylist()
 
         # Proyecto instrumentado o no
         self.inst = path.exists(self.bpr)

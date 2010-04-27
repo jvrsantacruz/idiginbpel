@@ -102,9 +102,9 @@ class Opt(object):
         """
         try:
             dom = et.ElementTree()
-            root = dom.parse(self.config).getroot()
+            root = dom.parse(self.config)
         except:
-            log.error(_("idg.options.cant.open.for.read") + self.config)
+            log.error(_("idg.options.cant.open.for.write") + self.config)
             return
         else:
             log.info(_("idg.options.writting.config.in") + self.config)
@@ -112,8 +112,8 @@ class Opt(object):
         # For each option, find it in config or create it.
         for id, (val, type) in self._opts.items():
             e = root.find(id)
-            # Si no existe, crearlo
-            if e is None: e = et.SubElement(root, nom)
+            # if e don't exist, create it.
+            if e is None: e = et.SubElement(root, id)
             e.set(type, val)
 
         try:

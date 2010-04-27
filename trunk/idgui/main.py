@@ -44,7 +44,8 @@ class Idgui(object):
         self.opt = idg.opt
 
         ### Ventana principal
-        self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
+        self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
+                                             "ui/main.glade"))
         ## Objeto ventana
         self.main_ventana = self.builder.get_object("main_ventana")
         ## Contenedor Principal
@@ -55,7 +56,8 @@ class Idgui(object):
         # Cargar portada en principal
 
         # Cargar el glade de la portada
-        self.builder.add_from_file(path.join(self.idg.share,"ui/portada.glade"))
+        self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
+                                             "ui/portada.glade"))
         ## Portada de la aplicación con el dibujo de bienvenida
         self.web = webkit.WebView()
         #self.html.load_html_string("<p>HoHoHo</p>", "file:///")
@@ -92,7 +94,8 @@ class Idgui(object):
     def __init_pantalla_nuevo_proyecto(self):
         """@brief Inicializa la gui de la pantalla de nuevo proyecto."""
         # Cargar glade de pantalla de nuevo proyecto
-        self.builder.add_from_file(path.join(self.idg.share,"ui/nuevo_proyecto.glade"))
+        self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
+                                             "ui/nuevo_proyecto.glade"))
 
         # Filtro para el selector de ficheros
         filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel")
@@ -112,7 +115,7 @@ class Idgui(object):
         self.modelo_lista_proyectos.clear()
 
         # Introducir los datos en el ListStore obtenidos de idg
-        for p in self.idg.lista_proyectos :
+        for p in self.idg.get_proylist():
             if p not in self.modelo_lista_proyectos:
                 self.modelo_lista_proyectos.append( [p] )
 
@@ -133,8 +136,8 @@ class Idgui(object):
 
         # Comprobar que el proyecto actualmente cargado, si lo hay, 
         #  no es el mismo que pretendemos cargar.
-        if not self.idg.proyecto is None \
-           and self.idg.proyecto.nombre == nombre :
+        if not self.idg.proy is None \
+           and self.idg.proy .nombre == nombre :
             log.info(_("idgui.main.already.loaded.nothing.to.do"))
             # Mostrarlo en la interfaz
             self.proyecto.proyecto_base.reparent(self.proyecto.principal)
@@ -212,7 +215,7 @@ class Idgui(object):
             error_str =  _("idgui.main.proyect.name.cant.be.empty") 
 
         # No debe estar usado
-        elif nombre in self.idg.lista_proyectos:
+        elif nombre in self.idg.get_proylist():
             error_str =  _("idgui.main.proyect.name.already.exists") 
 
          # Debe ser un nombre 'unix' válido
@@ -301,7 +304,7 @@ class Idgui(object):
 
     def on_main_ventana_destroy(self,widget):
         """@brief Callback de pulsar el cierre de la ventana."""
-        self.idg.cerrar()
+        self.idg.close()
         gtk.main_quit()
 
     def on_main_exportar(self, widget):
