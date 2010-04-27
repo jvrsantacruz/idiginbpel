@@ -102,7 +102,7 @@ class Idg(object):
         # Compress proyect directory
         try:
             tar = tarfile.open(tar_path, "w:bz2")
-            tar.add(path.join(self.home, "proy", name))
+            tar.add(path.join(self.opt.get('home'), "proy", name))
             tar.close()
         except TarError:
             return None
