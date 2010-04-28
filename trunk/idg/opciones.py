@@ -7,6 +7,7 @@ from xml.etree import ElementTree as et
 # Establecer el log
 import util.logger
 log = util.logger.getlog('idg.options')
+from idg.file import XMLFile
 
 class Opt(object):
     """@brief Establece las opciones básicas leyendo el config.xml"""
@@ -27,19 +28,24 @@ class Opt(object):
             'port' : 'value'
            }
 
+    ## Configuration File
+    _config = None
+
     def __init__(self, config, defaults={}):
         """@brief Construye el objeto Opt con la configuración. 
         @param config La ruta al fichero de configuración.
         @paran defaults Opciones por defecto de forma {id: [value, type], ..}
         """
-        self.config = config
+        # Open and parse config file
+        self.config = XMLFile(config)
+        self.config.dom('et')
+
         self._defaults = defaults
 
-        # Expand urls (relative paths to abs paths, and expand ~)
+        # relative paths to abs paths, and expand ~
         for id, (val, type) in self._defaults.items() :
-            # Expand and check paths
             if type == 'src':
-                val = self.expand(val)
+                val = XMLFile.abspath(val)
                 if not self.check(val): continue
 
             # Insert into dictionary if is a valid one.
@@ -80,7 +86,7 @@ class Opt(object):
 
         # If type is src, check path.
         if type == 'src':
-            val = self.expand(val)
+            val = XMLFile.abspath(val)
             if not self.check(val): 
                 return None
 
@@ -100,14 +106,14 @@ class Opt(object):
         Escribe los cambios en el fichero config situado en opts[home], si no
         existe, lo crea.
         """
-        try:
-            dom = et.ElementTree()
-            root = dom.parse(self.config)
-        except:
-            log.error(_("idg.options.cant.open.for.write") + self.config)
+        dom = self.config.dom()
+        if dom is None:
+            log.error(_("idg.options.cant.open.for.write") + self.config.name())
             return
         else:
-            log.info(_("idg.options.writting.config.in") + self.config)
+            log.info(_("idg.options.writting.config.in") + self.config.name())
+
+        root = dom.getroot()
 
         # For each option, find it in config or create it.
         for id, (val, type) in self._opts.items():
@@ -116,21 +122,8 @@ class Opt(object):
             if e is None: e = et.SubElement(root, id)
             e.set(type, val)
 
-        try:
-            dom.write(self.config)
-        except:
-            log.error(_("idg.options.cant.write.file") + self.config)
-
-    def expand(self, val):
-        """@brief Expande una ruta y resuelve relativas.
-        @param val Ruta a expandir
-        """
-        try: 
-            val = path.abspath(path.realpath(path.expanduser(val)))
-        except:
-            pass
-
-        return val
+        if self.config.serialize() is None:
+            log.error(_("idg.options.cant.write.file") + self.config.name())
 
     def check(self, val):
         """@brief Comprueba que un argumento sea válido. 
@@ -138,20 +131,21 @@ class Opt(object):
         @retval Devuelve True si es válido, False si no lo es.
         """
         if val is None: return False
-        return path.exists(self.expand(val)) 
+        return path.exists(XMLFile.abspath(val))
 
         return True
 
     def read(self):
         """@brief Lee el fichero config."""
-        try: 
-            dom = et.ElementTree()
-            root = et.parse(self.config).getroot()
-        except:
-            log.error(_('idg.options.cant.parse.config.file') + self.config)
+        dom = self.config.dom()
+        if dom is None:
+            log.error(_('idg.options.cant.parse.config.file') +\
+                      self.config.name())
             return
         else:
-            log.info(_('idg.options.using.config.file') + self.config)
+            log.info(_('idg.options.using.config.file') + self.config.name())
+
+        root = dom.getroot()
 
         # Read all elements in config
         for e in root.getchildren() :
@@ -162,10 +156,10 @@ class Opt(object):
             type = 'src' if 'src' in e.attrib else 'value'
             val = e.get(type)
 
-            # If attribute is path, expand and it
+            # If attribute is path, and absolute it
             # If is a non-valid path, none.
             if type == 'src' : 
-                val = self.expand(val) if self.check(val) else None
+                val = XMLFile.abspath(val) if self.check(val) else None
 
             if val is None:
                 log.error(_('idg.options.not.valid.value') + id + ": " + str(e.get(type)))
