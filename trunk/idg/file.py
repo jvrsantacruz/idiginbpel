@@ -34,6 +34,10 @@ class File(object):
         """@returns The name of the file"""
         return self._name
 
+    def path(self):
+        """@returns The path of the file"""
+        return self._path
+
     def open(self, mode='r'):
         """@brief Opens the file descriptor
 
