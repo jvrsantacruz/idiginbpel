@@ -7,10 +7,10 @@ from xml.etree import ElementTree as et
 # Establecer el log
 import util.logger
 log = util.logger.getlog('idg.options')
-from idg.file import XMLFile
+from idg.file import ConfigFile
 
 class Opt(object):
-    """@brief Establece las opciones básicas leyendo el config.xml"""
+    """@brief Holds options and syncronize with a xml file"""
 
     ## Default options dictionary
     ## { id : [ value, type] }
@@ -32,14 +32,11 @@ class Opt(object):
     _config = None
 
     def __init__(self, config, defaults={}):
-        """@brief Construye el objeto Opt con la configuración. 
-        @param config La ruta al fichero de configuración.
-        @paran defaults Opciones por defecto de forma {id: [value, type], ..}
+        """@brief Initializes Option object with the configuration.
+        @param config Path to the config file.
+        @paran defaults Dict with default options in this form:
+            {id: [value, type], ..}
         """
-        # Open and parse config file
-        self.config = XMLFile(config)
-        self.config.dom('et')
-
         self._defaults = defaults
 
         # Check and fix paths in default options
@@ -59,24 +56,23 @@ class Opt(object):
         self.read()
 
     def get(self, id):
-        """@brief Devuelve una opción. 
-        @param id El nombre de la opción.
-        @retval El valor de la opción con nombre nom, o None si no existe.
+        """@brief Returns an option.
+        @param id The name of the option.
+        @returns The value of the option with the given id, None if not
+        present.
         """
         return self._opts.setdefault(id, [None])[0]
 
     def set(self, id, val, type=None):
-        """@brief Establece una opción.
-        @param id El nombre de la opción.
-        @param val El valor de la opción con nombre nom.
-        @param type (Opcional) El atributo en el que se guardará.
-        @retval True si se ha creado una opción nueva. False si se ha
-        actualizado una opción. None si no se ha modificado.
+        """@brief Set an option in the configuration.
+        @param id The option identifier.
+        @param val The value of the option with the identifier id
+        @param type (Optional) src if is a path.
+        @retval True a new option was created. False if a previous existing
+        option was updated. None in case of error.
 
-        Si la opción no estaba antes, hay que especificar type
-        obligatoriamente. En otro caso es opcional.
+        Note: When setting a new option, type is mandatory.
         """
-        # Añadirlo a las opciones si no estaba
         exists = id in self._opts
 
         # If type is not specified, try to find it
@@ -91,7 +87,7 @@ class Opt(object):
             if not self.check(val): 
                 return None
 
-        # Establecer la opción
+        # Set the option.
         self._opts[id] = [val, type]
 
         return exists
@@ -103,13 +99,8 @@ class Opt(object):
         self._opts.update(self._defaults)
 
     def write(self):
-        """@brief Escribe el fichero config.
-        Escribe los cambios en el fichero config situado en opts[home], si no
-        existe, lo crea.
-        """
-        dom = self.config.dom()
-        if dom is None:
-            log.error(_("idg.options.cant.open.for.write") + self.config.name())
+        """@brief Writes down the config file"""
+
         if self._config.save(self._opts)is None:
             log.error(_("idg.options.cant.open.for.write") + self._config.path())
             return
@@ -117,15 +108,16 @@ class Opt(object):
             log.info(_("idg.options.writting.config.in") + self._config.path())
 
     def check(self, val):
-        """@brief Comprueba que un argumento sea válido. 
-        @param val Valor del atributo.
-        @retval Devuelve True si es válido, False si no lo es.
+        """@brief Checks paths.
+
+        @param val Path to check.
+        @returns True if is a valid path, False otherwise.
         """
         if val is None: return False
         return path.exists(ConfigFile.abspath(val))
 
     def read(self):
-        """@brief Lee el fichero config."""
+        """@brief Reads options from the config file"""
 
         # Add options from config file.
         print self._config.get_all()
@@ -145,5 +137,5 @@ class Opt(object):
             log.info(_('idg.options.using.config.file') + self._config.path())
 
     def getall(self):
-        """@brief Devuelve todas las opciones disponibles. """
+        """@brief Returns all options into a dictionary"""
         return self._opts
