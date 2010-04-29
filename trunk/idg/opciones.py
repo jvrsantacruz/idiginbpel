@@ -42,11 +42,11 @@ class Opt(object):
 
         self._defaults = defaults
 
-        # relative paths to abs paths, and expand ~
+        # Check and fix paths in default options
         for id, (val, type) in self._defaults.items() :
             if type == 'src':
-                val = XMLFile.abspath(val)
-                if not self.check(val): continue
+                val = ConfigFile.abspath(val)
+                if not self.check(val): continue  # Don't use wrong paths
 
             # Insert into dictionary if is a valid one.
             self._defaults[id] = [val, type]
@@ -54,7 +54,8 @@ class Opt(object):
         # Add defaults to options.
         self._opts.update(self._defaults)
 
-        # Read configuration
+        # Open and read config file
+        self._config = ConfigFile(config)
         self.read()
 
     def get(self, id):
@@ -86,7 +87,7 @@ class Opt(object):
 
         # If type is src, check path.
         if type == 'src':
-            val = XMLFile.abspath(val)
+            val = ConfigFile.abspath(val)
             if not self.check(val): 
                 return None
 
@@ -109,21 +110,11 @@ class Opt(object):
         dom = self.config.dom()
         if dom is None:
             log.error(_("idg.options.cant.open.for.write") + self.config.name())
+        if self._config.save(self._opts)is None:
+            log.error(_("idg.options.cant.open.for.write") + self._config.path())
             return
         else:
-            log.info(_("idg.options.writting.config.in") + self.config.name())
-
-        root = dom.getroot()
-
-        # For each option, find it in config or create it.
-        for id, (val, type) in self._opts.items():
-            e = root.find(id)
-            # if e don't exist, create it.
-            if e is None: e = et.SubElement(root, id)
-            e.set(type, val)
-
-        if self.config.serialize() is None:
-            log.error(_("idg.options.cant.write.file") + self.config.name())
+            log.info(_("idg.options.writting.config.in") + self._config.path())
 
     def check(self, val):
         """@brief Comprueba que un argumento sea válido. 
@@ -131,46 +122,27 @@ class Opt(object):
         @retval Devuelve True si es válido, False si no lo es.
         """
         if val is None: return False
-        return path.exists(XMLFile.abspath(val))
-
-        return True
+        return path.exists(ConfigFile.abspath(val))
 
     def read(self):
         """@brief Lee el fichero config."""
-        dom = self.config.dom()
+
+        # Add options from config file.
+        print self._config.get_all()
+        for id, (val, type) in self._config.get_all().items():
+            if type == 'src' and not self.check(val):  # Don't use wrong paths
+                log.warning(_('idg.options.not.valid.use.default') + id +\
+                             " " + val)
+                continue
+            self._opts[id] = [val, type]
+
+        dom = self._config.dom()
         if dom is None:
             log.error(_('idg.options.cant.parse.config.file') +\
-                      self.config.name())
+                      self._config.path())
             return
         else:
-            log.info(_('idg.options.using.config.file') + self.config.name())
-
-        root = dom.getroot()
-
-        # Read all elements in config
-        for e in root.getchildren() :
-            #log.debug(e.tag)
-
-            # Config element from xml
-            id = e.tag
-            type = 'src' if 'src' in e.attrib else 'value'
-            val = e.get(type)
-
-            # If attribute is path, and absolute it
-            # If is a non-valid path, none.
-            if type == 'src' : 
-                val = XMLFile.abspath(val) if self.check(val) else None
-
-            if val is None:
-                log.error(_('idg.options.not.valid.value') + id + ": " + str(e.get(type)))
-                if id in self._defaults :
-                    log.warning(_('idg.options.using.default.value.for') + id)
-                    val = self._defaults[id] 
-                else:
-                    log.warning(_('idg.options.not.found.default.value.for') + id)
-
-            # Guardar en el diccionario los valores.
-            self._opts[id] = [val, type]
+            log.info(_('idg.options.using.config.file') + self._config.path())
 
     def getall(self):
         """@brief Devuelve todas las opciones disponibles. """
