@@ -143,6 +143,26 @@ class XMLFile(File):
         """@brief Returns the opened doms (md, et) or None"""
         return self._type
 
+    def open(self, type="md"):
+        """Convenience function to fit the File interface
+        Opens and returns a dom instance of minidom or etree.
+
+        @param type Select the type of dom. Values: md, et
+        @returns Opened minidom or ElementTree dom. None in case of error.
+        """
+        return self.dom(type)
+
+    def save(self):
+        """@brief Convenience function to fit the File interface
+
+        @returns True if all ok. None in case of error.
+        """
+        self.serialize()
+
+    def close(self):
+        """@brief Resets the open dom without write the changes"""
+        self._dom = None
+
     def dom(self, type="md"):
         """@brief Returns an opened dom of the specified type (md or et)
 
