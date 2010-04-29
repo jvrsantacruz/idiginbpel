@@ -219,3 +219,108 @@ class XMLFile(File):
             return True
         else:
             return None
+
+class ConfigFile(XMLFile):
+    """@brief Configuration file.
+
+    Manages options.
+    """
+
+    def __init__(self, path_):
+        """@brief Initializes and opens the config file.
+
+        Uses ElementTree for common operations and serialization.
+        """
+        XMLFile.__init__(self, path_)
+        # Open the file with ElementTree
+        self.open('et')
+
+    def save(self, dict={}):
+        """@brief Update the configuration file using the options in
+        dictionary
+
+        @param dict Dictionary in the form {id: [val, type]} with options to
+        add.
+        @returns True if no problem. None if the file couldn't be wroten.
+        Overrides File.save
+        """
+        root = self._dom.getroot()
+        for id, (val, type) in dict.items():
+            self.set(id, val, type)
+
+        return self.serialize()
+
+    def set(self, id, val, type=None):
+        """@brief Set a option in the file
+
+        @param id Identifier of the option.
+        @param val Value of the option.
+        @param type The type of the option.
+        @returns True if a new option was added. False if an old option was
+        updated. None in case of error.
+
+        Note: When adding a new option, type is mandatory (value/src).
+        """
+        root = self._dom.getroot()
+        e = root.find(id)
+
+        new = e is None
+
+        if new:
+            # Create new element.
+            e = et.SubElement(root, id)
+            if type is None: return  # New option --> type is mandatory
+
+        # If already exists and no type is given, use the same that already has.
+        elif type is None:
+            type = 'src' if 'src' in e.attrib else 'value'
+
+        e.clear()  # Reset old values and attributes.
+        e.set(type, val)
+
+        return new
+
+    def get(self, id):
+        """@brief Get the option from the file.
+
+        @returns (value, type), or None if the option isn't in the file.
+        """
+        root = self._dom.getroot()
+        e = root.find(id)
+        if e is None: return None
+
+        if e.get('src') is None:
+            return e.get('value'), 'value'
+        elif e.get('value') is not None:
+            return e.get('src'), 'src'
+        else:
+            return None
+
+    def get_all(self, ltype=""):
+        """@brief Returns all the options in a dictionary with the following
+        structure:
+            {id: [value, type], ..}
+
+        @param ltype Filter options by type. All by default.
+        @returns Dictionary with the options.
+
+        Expands absolute paths in src options. DON'T checks paths.
+        """
+        root = self._dom.getroot()
+
+        dict = {}
+
+        for e in root.getchildren():
+            id = e.tag
+            type = 'src' if 'src' in e.attrib else 'value'
+            # Filter by type
+            if ltype and ltype != type: continue
+
+            val = e.get(type)
+            if type == 'src':
+                val = ConfigFile.abspath(val)
+
+            if val is not None:
+                dict[id] = [val, type]
+
+        return dict
