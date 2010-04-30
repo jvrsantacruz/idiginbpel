@@ -58,8 +58,8 @@ class OptUI(object):
             # Add no-available message if necessary
             if msg == 'msg.help.opt' + id :
                 msg = _('idgui.options.no.help.available') 
-            self.list.append([id, val,\
-                              self._NORMAL_ICON, _('msg.help.opt.' + id)])
+            self.list.append([id, val, self._NORMAL_ICON,\
+                              _('msg.help.opt.' + id)])
 
         # Volver a conectar el modelo y la vista
         self.view.set_model(self.list)
