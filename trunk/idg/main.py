@@ -1,4 +1,4 @@
-# Clase Principal
+# Main class
 # -*- coding: utf-8 -*-
 
 import os 
@@ -9,13 +9,12 @@ import gettext
 import tarfile
 from xml.dom import minidom as md
 
-# Establecer el log
 from opciones import Opt
 import util.logger
 log = util.logger.getlog('idg.main')
 
-# Traducciones mediante gettext
-gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
+# /usr/share/local instead of ./locale
+gettext.install('idiginbpel', './locale', unicode=1) 
 log.warning(_('idg.main.not.installed.locales'))
 
 class Idg(object):
