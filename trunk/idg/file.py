@@ -220,6 +220,33 @@ class XMLFile(File):
         else:
             return None
 
+    def autodeclare(self):
+        """@brief Autodeclare namespaces"""
+        self._autodeclare(self._dom.fistChild)
+
+    def _autodeclare(self, parent):
+        """@brief Inline declaration for all namespaces references in the
+        document.
+
+        @param e Parent dom
+        @returns the same givn parent element.
+        """
+
+        # We'll use a queue to process the elements in document order
+        elms = [parent]
+        while elms:
+            e = elms.pop(0)
+            # Add inline declaration if they need it.
+            if e.namespaceURI:
+                if not e.prefix:
+                    e.previx = 'ns0'   # Avoid empty prefixes
+                e.setAttribute('xmlns:' + e.prefix, e.namespaceURI)
+
+            # Queue children
+            elms.extend(e.childNodes)
+
+        return parent
+
 class ConfigFile(XMLFile):
     """@brief Configuration file.
 
