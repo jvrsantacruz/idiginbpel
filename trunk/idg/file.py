@@ -247,6 +247,21 @@ class XMLFile(File):
 
         return parent
 
+    def _get_parent(self, e, name):
+        """@brief Finds the parent of the element with the given name.
+
+        @returns dom of parent element or None if couldn't be founded.
+        """
+        while e is not None and e.parentNode is not None:
+            # Namespaced elements tag is preceeded by "prefix:"
+            prefix = "" if not e.namespaceURI else e.prefix + ":"
+            if prefix + e.tagName == name: break # We found it!
+            e = e.parentNode # Next parent
+
+        return e
+
+
+
 class ConfigFile(XMLFile):
     """@brief Configuration file.
 
