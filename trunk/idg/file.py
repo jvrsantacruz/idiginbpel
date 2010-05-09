@@ -171,24 +171,26 @@ class XMLFile(File):
         """
         try:
             if self._dom is None:
-                if type == 'md': 
+                if type == 'md':
                     self._dom = md.parse(self._path)
-                if type == 'et': 
+                if type == 'et':
                     self._dom = et.ElementTree()
                     self._dom.parse(self._path)
-        except: 
+
+                self._type = type
+        except:
             log.error(_('idg.file.cannot.parse.file') + type + " " + self._path)
         finally:
             return self._dom
 
     def serialize(self, path=""):
         """@brief Writes the selected dom, previously opened
-        
+
         @param path Serialize in another file, not in _path.
-        @returns True if serialized correctly, None in case of error. 
+        @returns True if serialized correctly, None in case of error.
         """
         path = path if path else self._path
-        check = self._serialize_minidom(path) if type == 'md' else\
+        check = self._serialize_minidom(path) if self._type == 'md' else\
                 self._serialize_tree(path)
 
         if check is None:
