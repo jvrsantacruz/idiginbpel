@@ -204,8 +204,9 @@ class XMLFile(File):
         @returns True if serialized correctly. None in case of error.
         """
         if path.exists(path_) and self._dom is not None:
+            self.fix_none_tags()
             f = open(path_, 'w')
-            f.write(self._dom.toprettyxml('utf-8'))
+            f.write(self._dom.toxml(encoding="utf-8"))
             f.close()
             return True
         else:
@@ -221,6 +222,32 @@ class XMLFile(File):
             return True
         else:
             return None
+
+    def fix_none_tags(self):
+        """@brief Walks the dom looking for attributes with None for attribute
+        values.
+
+        Fixes minidom bug. Read http://bugs.python.org/issue5762
+
+        When a element attribute have None as value, minidom toxml fails.
+        Existent patches solves this problem by replacing None values with "" in
+        minidom internal functions.
+
+        The implemented fix walks the entire document looking for None values
+        into attributes and replacing it with empty strings.
+        """
+        elements = [self._dom]
+        while elements:
+            e = elements.pop(0)
+
+            if e.attributes:
+                for a,v in e.attributes.items():
+                    if v is None:
+                        #log.debug('None encontrado')
+                        #log.debug(e)
+                        #log.debug(a)
+                        e.attributes[a] = ""
+            elements.extend(e.childNodes)
 
     def autodeclare(self):
         """@brief Autodeclare namespaces"""
