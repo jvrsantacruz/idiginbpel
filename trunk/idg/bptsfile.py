@@ -1,7 +1,12 @@
 # BPTS File abstractions
 # -*- coding: utf-8 -*-
 
+import os.path as path
+
 from file import XMLFile
+import util.logger
+
+log = util.logger.getlog('idg.bptsfile')
 
 class BPTSFile(XMLFile):
     """@brief BPTS test case file common operations"""
@@ -21,12 +26,14 @@ class BPTSFile(XMLFile):
     ## get info copied flag.
     _copied_info = False
 
-    def __init__(self, path_):
+    def __init__(self, path_, normalize=False):
         """@brief Initialize and open the BPTS file."""
         XMLFile.__init__(self, path_)
         # Open the file with Minidom
         self.open('md')
         self._update_data()
+        if normalize:
+            self.normalize()
         self._update_cases()
 
     def normalize(self):
