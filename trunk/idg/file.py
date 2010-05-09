@@ -173,9 +173,11 @@ class XMLFile(File):
             if self._dom is None:
                 if type == 'md':
                     self._dom = md.parse(self._path)
-                if type == 'et':
+                elif type == 'et':
                     self._dom = et.ElementTree()
                     self._dom.parse(self._path)
+                else:
+                    raise ""
 
                 self._type = type
         except:
