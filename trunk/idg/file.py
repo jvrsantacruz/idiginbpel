@@ -12,9 +12,9 @@ log = util.logger.getlog('idg.file')
 
 class File(object):
     """@brief Base class for file management.
-    
+
     Implements basic common file operations whithin the application.
-    This a base class to inherit from. 
+    This a base class to inherit from.
     """
 
     ## Associed file descriptor.
@@ -61,7 +61,7 @@ class File(object):
         Just closes the file, do not write changes. Use save for that.
         Does nothing if the file isn't open.
         """
-        if self.is_open(): 
+        if self.is_open():
             self._file.close()
             self._file = None
 
@@ -87,7 +87,7 @@ class File(object):
 
     def get_abspath(self):
         """@brief Returns the absolute path of the file.
-        
+
         @returns Absolute and real path of the file.
         Expands ~ symbol to $HOME
         Uses the real path if symlinks are present
@@ -113,7 +113,7 @@ class File(object):
     def is_external(proy, path_):
         """@brief Check if the file is inside the given proyect
 
-        @param proy The proyect directory path 
+        @param proy The proyect directory path
         @param path_ Path to check.
         @returns True if the file is in the directory. False otherwise.
         """
@@ -124,7 +124,7 @@ class File(object):
     def external(self, proy):
         """@brief Check if the file is inside the given proyect
 
-        @param proy The proyect directory path 
+        @param proy The proyect directory path
         @returns True if the file is in the directory. False otherwise.
         """
         return File.external(proy, self._path)
@@ -300,7 +300,7 @@ class ConfigFile(XMLFile):
     """
 
     def __init__(self, path_):
-        """@brief Initializes and opens the config file.
+        """@brief Initialize and open the config file.
 
         Uses ElementTree for common operations and serialization.
         """
