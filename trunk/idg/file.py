@@ -368,3 +368,91 @@ class ConfigFile(XMLFile):
                 dict[id] = [val, type]
 
         return dict
+
+class ANTFile(XMLFile):
+    """@brief ANT file.
+
+    Manages ANT properties
+    """
+
+    def __init__(self, path_):
+        """@brief Initialize and open the ANT File.
+
+        Reads all properties an stores it in a dictionary.
+        """
+        XMLFile.__init__(self, path_)
+        self.open("md")
+
+        # Root element project
+        try:
+            self._project = self._dom.getElementsByTagName('project')[0]
+        except:
+            log.error(_('idg.file.antfile.missing.project.element'))
+            self.close()
+
+    def get(self, name, attr):
+        """@brief Returns the value of the selected attribute of the property
+        with the given name.
+
+
+        @param name The property name
+        @param attr The attribute name
+        @returns A string with the value, False if the attribute doesn't exist
+        or None if the property doesn't exist.
+        """
+        property = self._get_property(name)
+
+        if property is None:
+            return None
+        elif not property.hasAttribute(attr):
+            return False
+        else:
+            return property.getAttribute(attr)
+
+    def set(self, name, attr, val):
+        """@brief Set the attribute of the property referenced with name.
+        Creates the property if doesn't previously exist.
+
+        @param name The property name
+        @param attr The property attribute
+        @param val The value to set the property attribute
+        @returns True if a new property was created. False otherwise.
+        """
+        property = self._get_property(name)
+        new = False
+        if property is None:
+            new = True
+            property = self._create_property(name)
+
+        property.setAttribute(attr, val)
+
+        return new
+
+    # @name Internal
+    # @{
+
+    def _get_property(self, name):
+        """@returns the dom element of a property with the given name. None if
+        the property doesn't exist.
+
+        @param name The property name.
+        """
+
+        try:
+            return [p for p in self._dom.getElementsByTagName('property')\
+                    if p.getAttribute('name') == name][0]
+        except:
+            return None
+
+    def _create_property(self, name):
+        """@brief Creates a new property with the given name, inserts it in the
+        tree and returns its dom object.
+
+        @param name The property name.
+        """
+        property = self._dom.createElement('property')
+        property.setAttribute('name', name)
+        self._project.appendChild(property)
+        return property
+
+    # @}
