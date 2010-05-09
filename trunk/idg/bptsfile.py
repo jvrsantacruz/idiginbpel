@@ -43,7 +43,7 @@ class BPTSFile(XMLFile):
         Changes the name of the cases up to 'file:case'
         """
         for case in self._dom.getElementsByTagNameNS(self._NS, 'testCase'):
-            name = self.getAttributeNS(self._NS, 'name').replace(':','.')
+            name = case.getAttributeNS(self._NS, 'name').replace(':','.')
             case.setAttributeNS(self._NS, 'name', self._name + ':' + name)
 
     def get_cases(self, mode="long"):
@@ -150,7 +150,7 @@ class BPTSFile(XMLFile):
             case_name = case_name.split(':')
             if len(case_name) != 2 :
                 case_name = "".join(case_name)
-                log.warning(_('idg.file.bpts.case.name.incorrect.normalize') +
+                log.warning(_('idg.bptsfile.bpts.case.name.incorrect.normalize') +
                             case_name)
             else:
                 case_name = case_name[0]
