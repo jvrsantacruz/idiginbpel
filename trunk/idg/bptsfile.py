@@ -111,14 +111,14 @@ class BPTSFile(XMLFile):
         @param dep_dir Name of the dependences directory in the proyect
         """
         # Set wsdl and partners and declare new namespaces found in other.
-        self.set_wsdl(other.get_wsdl())
+        self._set_dom_wsdl(other._get_dom_wsdl())
         self._set_dom_partners(other._get_dom_partners(), dep_dir)
         self._set_dom_namespaces(other._get_dom_namespaces())
 
     def save(self):
         """@brief Overload the inherit save. Syncs the dom and the object and
         serializes the bpts."""
-        self._syc_data()
+        self._sync_data()
         self.serialize()
 
     ## @name Internal
@@ -183,7 +183,7 @@ class BPTSFile(XMLFile):
     def _sync_data(self):
         """@brief Syncs the object state with the dom object"""
         self._set_dom_name(self._bpts_name)
-        self._set_bpts_url(self._bpts_url)
+        self._set_dom_url(self._bpts_url)
 
 
     def _get_dom_testSuite_son(self, name):
@@ -239,7 +239,7 @@ class BPTSFile(XMLFile):
         @param value The wsdl value with the pat to the wsdl dependence.
         """
         self._get_dom_testSuite().\
-                getElementsByTagNameNS(self._NS, 'wsdl')[0].nodeValue = wsdl
+                getElementsByTagNameNS(self._NS, 'wsdl')[0].nodeValue = value
 
 
     def _get_dom_partners(self):
@@ -254,7 +254,7 @@ class BPTSFile(XMLFile):
         @parma Name of the dependences dir in the proyect.
         """
         deploy = self._get_dom_testSuite().\
-                getElementsByTagNameNS(self._NS, 'deploy')[0]
+                getElementsByTagNameNS(self._NS, 'deployment')[0]
 
         for p in partners:
             # Add the namespace prefix manually --------vv
