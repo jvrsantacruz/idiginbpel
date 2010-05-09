@@ -268,10 +268,14 @@ class BPTSFile(XMLFile):
     def _get_dom_namespaces(self):
         """@brief Returns a dict with the prefixes and namespaces
         { pre: uri, ..}
+
+        Omits namespaces with "" or None as prefix or uri.
         """
         dict = {}
-        [dict.setdefault(prefix, uri) for prefix, uri in\
-         self._get_dom_testSuite().attributes.items()]
+        [dict.setdefault(prefix, uri) for prefix, uri
+         in self._get_dom_testSuite().attributes.items()
+         if uri and prefix]
+
         return dict
 
     def _set_dom_namespaces(self, dict):
