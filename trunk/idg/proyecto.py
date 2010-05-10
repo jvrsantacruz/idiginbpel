@@ -14,6 +14,7 @@ import re
 import glob
 import time
 
+from file import ANTFile
 from instrum import Instrumentador
 import util.xml
 import util.logger
@@ -1073,43 +1074,16 @@ class Proyecto(object):
                 log.error(e)
                 raise ProyectoIrrecuperable(e)
 
-        # Comprobar y escribir en base-build la ruta base a la instalación de takuan si es
-        # incorrecta.
+        # Write data to base-build file
+        # takuan installation and analyzer flags
         log.info("Modificando fichero base-build.xml")
-        try:
-            bbuild =  et.ElementTree()
-            root = bbuild.parse(path.join(self.dir,'base-build.xml'))
-        except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.open.buildfile"))
-
-        # Buscar el atributo y comprobarlo
-        # dnms = root.find("./property[@name='takuan']")
-        dnmsall = bbuild.findall('property')
-        dnms = [d for d in dnmsall 
-                if 'name' in d.attrib and d.get('name') == 'takuan']
-
-        # Si es distinto del que tenemos en memoria, modificarlo.
-        if dnms[0].get('location') != self.takuan:
-            if len(dnms) == 0 :
-                log.error(_("idg.proyect.cant.find.buildfile"))
-            else:
-                dnms[0].attrib['location'] =  self.takuan
-
-        # Buscar y establecer simplify y el aplanado
-        anlflags = [d for d in dnmsall
-                    if 'name' in d.attrib and d.get('name') == 'analyzer.flags']
-
-        anlflags = anlflags[0]
+        bbuild = ANTFile(path.join(self.dir, 'base-build.xml'))
         flags = '--metrics --' + self.aplanado
         if self.simplify : flags += ' --simplify'
-        anlflags.set('value', flags)
+        bbuild.set('takuan', 'location', self.takuan)
+        bbuild.set('analyzer.flags', 'value', flags)
+        bbuild.save()
 
-        try:
-            bbuild.write(path.join(self.dir,'base-build.xml'))
-        except:
-            raise ProyectoError(_("idg.proyect.cant.write.in.buildfile"))
-
-        
         try:
             # Abrir el test.bpts y comprobar la configuración del servidor 
             bpts = md.parse(self.test)
