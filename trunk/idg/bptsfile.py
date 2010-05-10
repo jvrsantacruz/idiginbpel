@@ -43,8 +43,8 @@ class BPTSFile(XMLFile):
         Changes the name of the cases up to 'file:case'
         """
         for case in self._dom.getElementsByTagNameNS(self._NS, 'testCase'):
-            name = case.getAttributeNS(self._NS, 'name').replace(':','.')
-            case.setAttributeNS(self._NS, 'name', self._name + ':' + name)
+            name = case.getAttribute('name').replace(':','.')
+            case.setAttribute('name', self._name + ':' + name)
 
     def get_cases(self, mode="long"):
         """@brief Returns the cases inside the BPTS
@@ -146,7 +146,7 @@ class BPTSFile(XMLFile):
 
         # Find cases
         for case in dom_cases:
-            case_name = case.getAttributeNS(self._NS, 'name')
+            case_name = case.getAttribute('name')
             case_name = case_name.split(':')
             if len(case_name) != 2 :
                 case_name = "".join(case_name)
@@ -159,12 +159,12 @@ class BPTSFile(XMLFile):
 
         # Find send elements with delaySequence attributes
         #   and add it to the dict.
-        for s in self._dom.getElementsByTagNameNS(self._NS, 'send'):
-            if s.hasAttributeNS(self._NS, 'delaySequence'):
-                delay = s.getAttributeNS(self._NS, 'delaySequence')
+        for s in self._dom.getElementsByTagName('send'):
+            if s.hasAttribute('delaySequence'):
+                delay = s.getAttribute('delaySequence')
                 p = self._get_parent(s, 'testCase')
                 if p is not None:
-                    name = p.getAttributeNS(self._NS, 'name')
+                    name = p.getAttribute('name')
                     self._round_cases[name] = delay
 
         # Find dataSource elements with attachments
@@ -173,8 +173,8 @@ class BPTSFile(XMLFile):
                                                           'dataSource')
         for a in dom_case_attach:
             case = self._get_parent(a, 'testCase')
-            src = a.getAttributeNS(self._NS, 'src')
-            type = a.getAttributeNS(self._NS, 'type')
+            src = a.getAttribute('src')
+            type = a.getAttribute('type')
             if case not in self._attach:
                 self._attach[case] = []
 
@@ -216,7 +216,7 @@ class BPTSFile(XMLFile):
         @param name The new bpts name.
         """
         self._dom.getElementsByTagNameNS(self._NS, 'name')[0].\
-                setAttributeNS(self._NS, 'name', name)
+                setAttribute('name', name)
 
 
     def _get_dom_url(self):
@@ -260,9 +260,8 @@ class BPTSFile(XMLFile):
             # Add the namespace prefix manually --------vv
             sub = self._dom.createElementNS(self._NS, 'tes:partner')
 
-            sub.setAttributeNS(self._NS, 'name', p.getAttribute('name'))
-            sub.setAttributeNS(self._NS, 'wsdl',\
-                               path.join(dep_dir, p.getAttribute('wsdl')))
+            sub.setAttribute('name', p.getAttribute('name'))
+            sub.setAttribute('wsdl',path.join(dep_dir, p.getAttribute('wsdl')))
             deploy.appendChild(sub)
 
     def _get_dom_namespaces(self):
