@@ -100,7 +100,10 @@ class BPTSFile(XMLFile):
         self.url = url
 
     def autodeclare(self):
-        """@brief Autodeclare namespaces for BPTS"""
+        """@brief Autodeclare namespaces for BPTS
+
+        Override XMLFile version
+        """
         self._autodeclare(self._dom.\
                           getElementsByTagNameNS(self._NS, 'testCases')[0])
 
@@ -154,7 +157,7 @@ class BPTSFile(XMLFile):
                 case_name = case_name[1]
             self._cases.append(case_name)
 
-        # Find send elements with delaySequence attributes
+        # Find cases with send elements with delaySequence attributes
         #   and add it to the dict.
         for s in self._dom.getElementsByTagName('send'):
             if s.hasAttribute('delaySequence'):
