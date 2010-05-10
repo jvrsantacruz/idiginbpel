@@ -53,8 +53,8 @@ class BPTSFile(XMLFile):
         name.
         @returns The cases inside the BPTS.
         """
-        prename = self._name if mode == "long" else ""
-        return [prename + ':' + case for case in self._cases]
+        prename = self._name + ':' if mode == "long" else ""
+        return [prename + case for case in self._cases]
 
     def get_round_cases(self, mode="long"):
         """@brief Returns a list with the cases with more than one execution.
@@ -144,17 +144,14 @@ class BPTSFile(XMLFile):
         dom_cases = self._dom.getElementsByTagNameNS(self._NS, 'testCase')
         dom_delays = []
 
-        # Find cases
+        # Find cases and get the real name
         for case in dom_cases:
             case_name = case.getAttribute('name')
             case_name = case_name.split(':')
-            if len(case_name) != 2 :
+            if len(case_name) != 2 or case_name[0] != self._name:
                 case_name = "".join(case_name)
-                log.warning(_('idg.bptsfile.bpts.case.name.incorrect.normalize') +
-                            case_name)
             else:
-                case_name = case_name[0]
-            case.setAttributeNS(self._NS, 'name', case_name)
+                case_name = case_name[1]
             self._cases.append(case_name)
 
         # Find send elements with delaySequence attributes
