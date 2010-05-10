@@ -1179,7 +1179,7 @@ class ProyectoUI(object):
 
     def anl_actualizar_info(self):
         """Actualiza la información sobre el análisis"""
-        self.anl_flat_label.set_text(self.proy.aplanado)
+        self.anl_flat_label.set_text(self.proy.get_flattening())
         self.anl_sim_label.set_text(str(self.proy.simplify))
 
     ## @}

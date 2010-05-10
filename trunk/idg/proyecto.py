@@ -241,7 +241,7 @@ class Proyecto(object):
         ## @{
         
         ## Tipo de aplanado
-        self.aplanado = 'index-flattening'
+        self.flattening = 'index-flattening'
         ## Simplify
         self.simplify = True
 
@@ -969,9 +969,16 @@ class Proyecto(object):
     ## @name Analisis
     ## @{
 
-    def set_aplanado(self, modo):
-        """@brief Establece el modo de aplanado"""
-        self.aplanado = modo
+    def get_flattening(self):
+        """@returns Analyzer flattening mode"""
+        return self.flattening
+
+    def set_flattening(self, mode):
+        """@brief Set the analyzer flattening mode
+
+        @param mode The flattening mode
+        """
+        self.flattening = mode
 
     def set_simplify(self, flag):
         """@brief Establece el modo de simplify"""
@@ -1078,7 +1085,7 @@ class Proyecto(object):
         # takuan installation and analyzer flags
         log.info("Modificando fichero base-build.xml")
         bbuild = ANTFile(path.join(self.dir, 'base-build.xml'))
-        flags = '--metrics --' + self.aplanado
+        flags = '--metrics --' + self.get_flattening()
         if self.simplify : flags += ' --simplify'
         bbuild.set('takuan', 'location', self.takuan)
         bbuild.set('analyzer.flags', 'value', flags)
@@ -1148,6 +1155,7 @@ class Proyecto(object):
         except:
             raise ProyectoError(_("idg.proyect.error.in.config.file") + \
                                    self.proy + " " + str(sys.exc_value))
+
     def cargar_proy(self):
         """@brief Lee e inicializa la clase leyendo de los ficheros de
         configuración."""
