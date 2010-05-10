@@ -15,6 +15,7 @@ import glob
 import time
 
 from file import ANTFile
+from bptsfile import BPTSFile
 from instrum import Instrumentador
 import util.xml
 import util.logger
@@ -552,146 +553,51 @@ class Proyecto(object):
         # Buscamos todos los casos de prueba y los devolvemos.
         return [c.get('name') for c in tCases.findall(ns + 'testCase')]
 
-    def add_bpts(self,ruta):
-        """@brief Añade un fichero con casos de prueba al proyecto.
-        @param ruta Ruta al fichero .bpts.
-        El primer bpts que se añade es el que nos proporcionará la información
-        referida al <put>.
-        Eleva ProyectoRecuperable en caso de error."""
+    def add_bpts(self, path_):
+        """@brief Add a new bpts to proyect.
 
+        @param path_ The path to the new bpts.
+
+        The new bpts will be copied into the proyect, procesed, normalized and
+        its connection info will be added to the main bpts file.
+        Raises ProyectoRecuperable
+        """
         # Comprobamos que exista y se pueda leer
-        if not path.exists(ruta) or not os.access(ruta, os.F_OK or os.R_OK):
+        if not path.exists(path_) or not os.access(path_, os.F_OK or os.R_OK):
             raise ProyectoRecuperable(_("idg.proyect.testcase.file.dont.exist"))
 
         # Nombre del fichero y directorio de la ruta
-        nom = path.basename(ruta)
-        dir = path.dirname(ruta)
+        name = path.basename(path_)
 
         # Escapamos los caracteres separadores ':' por '.'
-        pnom = nom.replace(':', '.')
+        # Add timestamp to name
+        name = name.replace(':', '.')
+        name += str(time.time())
 
-        # Lo copiamos al proyecto en casos_dir
-        # Aseguramos el nombre para no sobreescribir
-        i = 1
-        pruta = path.join(self.casos_dir,pnom)
+        p_path = path.join(self.casos_dir, name)
 
-        while path.exists(pruta):
-            pnom = "%s-%d" % (nom,i)
-            pruta = path.join(self.casos_dir,pnom)
-            i = i + 1
-            log.debug(pruta)
-
+        # Copy to the proyect
         try:
-            # Copiar de ruta a pruta (en el proyecto)
-            shutil.copy(ruta,pruta)
+            shutil.copy(path_, p_path)
         except:
             raise ProyectoRecuperable(_("idg.proyect.cant.copy.file.to.proyect") \
-                    + ruta)
+                    + path_)
 
-        # Añadimos el fichero a fcasos
-        self.fcasos.append(pnom)
+        # Add file to the case file list
+        self.fcasos.append(name)
 
-        # Añadimos los casos del nuevo bpts (escapando : por . )
-        self.casos[pnom] = [n.replace(':', '.') for n in self.list_bpts(pruta)]
+        # Open the proyect copy of the bpts file and process it
+        bpts = BPTSFile(p_path, normalize=True)
+        bpts.autodeclare()
+        bpts.save()
 
-        # Actualizamos la información de test.bpts con la del proyecto
-        self.add_bpts_info(pruta)
+        # Add new cases to cases dict (short version, just case name)
+        self.casos[name] = bpts.get_cases('short')
 
-    def bpts_find_delays(self, bpts):
-        """@brief Toma un bpts y renombra cada caso añadiéndole entre
-        paréntesis el número de rounds que realiza en base a sus delaySequences
-        @bpts Ruta al bpts o el DOM minidom abierto.
-        """
-        pass
-
-    def add_bpts_info(self,bpts_path):
-        """@brief Añade al bpts general del proyecto la información necesaria
-        para la ejecución. La primera vez que se añade un bpts incluye información extra. 
-        También declara inline los elementos de los casos de test.
-        @param path Ruta al bpts."""
-
-        # Abrirlo
-        try:
-            bpts = md.parse(bpts_path)
-        except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.load.testfile") + bpts_path)
-
-        # Elementos del fichero nuevo que añadimos
-        testSuite = bpts.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
-        deploy = bpts.getElementsByTagNameNS(self.test_url, 'deployment')[0]
-        partners = deploy.getElementsByTagNameNS(self.test_url, 'partner')
-        put = deploy.getElementsByTagNameNS(self.test_url, 'put')[0]
-        wsdl = deploy.getElementsByTagNameNS(self.test_url, 'wsdl')[0]
-
-        # Declarar los namespaces huerfanos
-        # Esto es una acción bastante pesada y puede llevar un rato.
-        log.info('Processing bpts namespaces. This may take a while')
-        cases_dom = bpts.getElementsByTagNameNS(self.test_url, 'testCases')[0]
-        util.xml.minidom_namespaces(cases_dom)
-
-        # Guardamos el bpts tras la modificación
-        try:
-            file = open(bpts_path, "w")
-            file.write(bpts.toxml('utf-8'))
-        except:
-            raise ProyectoRecuperable('No se ha podido escribir el bpts nuevo \
-                                      %s ' % bpts_path)
-
-        # Abrimos el fichero general .bpts de casos de prueba
-        # Lo abrimos con minidom para conservar namespaces.
-        try:
-            test = md.parse(self.test)
-        except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.load.main.test.file") + self.test )
-
-        # Buscamos los elementos en el test.bpts
-        ttestSuite = test.getElementsByTagNameNS(self.test_url, 'testSuite')[0]
-        tdeploy = test.getElementsByTagNameNS(self.test_url, 'deployment')[0]
-        tput = tdeploy.getElementsByTagNameNS(self.test_url, 'put')[0]
-        twsdl = tput.getElementsByTagNameNS(self.test_url, 'wsdl')[0]
-
-        # Añadimos al testSuite de test.bpts las declaraciones 
-        # de espacios de nombres del .bpts nuevo
-        for prefix, uri in testSuite.attributes.items() :
-            if not ttestSuite.hasAttribute(prefix) :
-                ttestSuite.setAttribute(prefix, uri)
-
-        # Le ponemos al wsdl el valor del que hemos abierto wsdl
-        try:
-            if wsdl.hasChildNodes :
-                #log.debug(wsdl.firstChild.data) #DEBUG
-                if twsdl.firstChild :
-                    twsdl.removeChild(twsdl.firstChild) # Eliminar el nodo texto
-                # Añadir nuevo
-                twsdl.appendChild(test.createTextNode(path.join(self.dep_nom, 
-                                                                wsdl.firstChild.data))) 
-        except:
-            raise ProyectoRecuperable(_("idg.proyect.main.test.file.is.broken"))
-
-        log.debug(_("idg.proyect.adding.info.to.main.test.file.from.new.bpts.file"))
-
-        # Copiar el wsdl y los partner
-        # Hay que añadirles el dependencias/ para la ruta.
-        # Solo lo hacemos la primera vez
-        if not self.hay_casos :
-            for p in partners:
-                sub = test.createElementNS(self.test_url, 'tes:partner')
-                # Se le añade el prefijo manualmente ------^^^
-                sub.setAttributeNS(self.test_url, 'name', p.getAttribute('name'))
-                sub.setAttributeNS(self.test_url, 'wsdl', path.join(self.dep_nom, p.getAttribute('wsdl')))
-                tdeploy.appendChild(sub)
-                #log.debug(sub) #DEBUG
-
-        try:
-            file = open(self.test,'w')
-            file.write(test.toxml('utf-8'))
-        except:
-            raise ProyectoRecuperable(\
-                    _("idg.proyect.cant.write.main.test.file") + self.test)
-
-        #log.debug(tdeploy.toxml('utf-8')) #DEBUG
-
-        self.hay_casos = True
+        # Open the main bpts file and copy new information
+        test = BPTSFile(self.test)  # FIX, should be already open
+        test.copy_info(bpts, self.dep_nom)
+        test.save()
 
     def vaciar_bpts(self, ruta):
         """@brief Elimina todos los casos de un bpts
