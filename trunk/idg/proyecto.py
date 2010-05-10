@@ -1031,14 +1031,16 @@ class Proyecto(object):
                 self.instrumentar()
 
     def cargar_casos(self):
-        """@brief Carga los casos de prueba que hay disponibles.
+        """@brief Load available test cases into cases dict.
         """
-        # self.casos es un diccionario del tipo 'fichero' : ['caso', 'caso']
-
-        # Recorremos todos los ficheros bpts que tenemos y los parseamos.
+        # self.casos is a dict with the given form {'file' : ['case', ..]}
         for f in os.listdir(self.casos_dir):
-            if f[0] != '.' :  # No queremos ocultos
-                self.casos[f] = self.list_bpts( path.join(self.casos_dir, f) )
+            if f[0] != '.' :   # Dont parse hidden files
+                try:
+                    bpts = BPTSFile(path.join(self.casos_dir, f))
+                    self.casos[f] = bpts.get_cases('short')
+                except:
+                    log.error(_('idg.proyect.cant.load.bpts.file') + f)
 
         log.debug(str(self.casos))
 
