@@ -8,6 +8,120 @@ import util.logger
 
 log = util.logger.getlog('idg.bptsfile')
 
+class TestCase(object):
+    """@brief Test case representation"""
+
+    ## Name of the case (long)
+    _name = ""
+    ## List with the path to related files [ (path, type), ...]
+    _attachs = []
+    ## String with the case delays sequence
+    _delays = ""
+
+    def __init__(self, bpts, dom):
+        """@brief Initialize the case.
+
+        @param bpts BPTSFile parent of the case.
+        @param dom TestCase dom object with the case (minidom).
+        """
+        # Check dom element
+        if not dom.hasAttribute('name') or not dom.localName == 'testCase':
+            log.error(_('idg.bptsfile.test.case.invalid.dom'))
+            raise ""
+
+        self._dom = dom
+        self._bpts = bpts
+
+        # Get name, attachs and delays
+        self._name = dom.getAttribute('name')
+        self._find_attachs()
+        self._find_delays()
+
+        # If normalized, we only get the test case name
+        if self.is_normalized():
+            self._name = self._name.split(':')[1]
+
+    def is_normalized(self):
+        """@brief Check if the case name is already normalized
+
+        @returns Fale if the format is wrong. None if the file name prefix is
+        wrong.
+        """
+        name = self._dom.getAttribute('name').split(':')
+        if len(name) != 2:
+            return False
+
+        if name[0] != self.bpts.name():
+            return None
+
+    def normalize(self):
+        """@brief Normalize the test case name using proyect conventions
+
+        The test case names have a long format FILE:CASE instead of just CASE
+        The function will check if the names are already normalized. In that
+        case, will do nothing.
+        """
+        norm = self.is_normalized()
+        if norm is False:
+            self._name.replace(':', '.')
+
+        if norm is None:
+            self._name = self._name.split(':')[1]
+
+        self._dom.setAttribute('name', self.bpts.name() + ':' + self._name)
+
+    def name(self, mode="long"):
+        """@returns The name of the test case.
+
+        @param mode long/short mode if the case name is normalized.
+        """
+        return (self.bpts.name() if mode == "long" else "") + self._name
+
+    def has_attachs(self):
+        """@returns If the test case have attachments"""
+        return len(self._attachs) != 0
+
+    def get_attachs(self):
+        """@returns The list of attachments [(path, type), ..]"""
+        return self._attachs
+
+    def has_delays(self):
+        """@returns If the test case have delay sequence."""
+        return self._delays != ""
+
+    def get_delays(self):
+        """@returns A string with the delay sequence."""
+        return self._delays
+
+    ## @name Internal
+    ## @{
+
+    def _find_attachs(self):
+        """@brief Internal function that finds attachs paths"""
+
+        # Clear attach list
+        self._attachs = []
+
+        # Find dataSource elements with attachments
+        dom_attachs = self._dom.getElementsByTagNameNS(BPTSFile._NS,\
+                                                          'dataSource')
+        for att in dom_attachs:
+            src = att.getAttribute('src')
+            type = att.getAttribute('type')
+            self._attachs.append((src, type))
+
+    def _find_delays(self):
+        """@brief Internal function that finds delaySequences"""
+        # Find cases with send elements with delaySequence attributes
+        #   and add it to the dict.
+        send = self._dom.getElementsByTagNameNS(BPTSFile._NS, 'send')
+        if send and send[0].hasAttribute('delaySequence'):
+            self._delays = send[0].getAttribute('send')
+        else:
+            self._delays = ""
+
+    ## @}
+
 class BPTSFile(XMLFile):
     """@brief BPTS test case file common operations"""
 
