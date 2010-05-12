@@ -128,11 +128,11 @@ class BPTSFile(XMLFile):
     ## Cases list (short case names)
     _cases = []
 
-    ## Round cases dict {case: rounds, ..}
-    _round_cases = {}
+    ## Round Test Cases list (cases with rounds)
+    _round_cases = []
 
-    ## Related files dict {case: [ (src, type), ..], ..}
-    _attach = {}
+    ## Test Cases with Related files list
+    _attach_cases = []
 
     ## BPTS Namespace
     _NS ='http://www.bpelunit.org/schema/testSuite'
@@ -140,14 +140,15 @@ class BPTSFile(XMLFile):
     ## get info copied flag.
     _copied_info = False
 
-    def __init__(self, path_, normalize=False):
-        """@brief Initialize and open the BPTS file."""
+    def __init__(self, path_):
+        """@brief Initialize and open the BPTS file.
+
+        @param path_ The path to the bpts file.
+        """
         XMLFile.__init__(self, path_)
         # Open the file with Minidom
         self.open('md')
         self._update_data()
-        if normalize:
-            self.normalize()
         self._update_cases()
 
     def normalize(self):
@@ -156,19 +157,14 @@ class BPTSFile(XMLFile):
 
         Changes the name of the cases up to 'file:case'
         """
-        for case in self._dom.getElementsByTagNameNS(self._NS, 'testCase'):
-            name = case.getAttribute('name').replace(':','.')
-            case.setAttribute('name', self._name + ':' + name)
+        [case.normalize() for case in self._cases]
+        #for case in self._dom.getElementsByTagNameNS(self._NS, 'testCase'):
+        #    name = case.getAttribute('name').replace(':','.')
+        #    case.setAttribute('name', self._name + ':' + name)
 
-    def get_cases(self, mode="long"):
-        """@brief Returns the cases inside the BPTS
-
-        @param mode long case identifier (file:case) or short, with just the
-        name.
-        @returns The cases inside the BPTS.
-        """
-        prename = self._name + ':' if mode == "long" else ""
-        return [prename + case for case in self._cases]
+    def get_cases(self):
+        """@returns Returns the test cases inside the BPTS"""
+        return self._cases
 
     def get_round_cases(self, mode="long"):
         """@brief Returns a list with the cases with more than one execution.
@@ -176,23 +172,7 @@ class BPTSFile(XMLFile):
         @param mode long case identifier (file:case) or short, with just the
         name.
         """
-        prename = self._name if mode == "long" else ""
-        return [prename + ':' + case for case in self._round_cases.keys]
-
-    def get_case_delay(self, name, mode="long"):
-        """@brief Returns the delay sequence of a given case.
-
-        @param mode The type of the given case name.
-        long case identifier (file:case) or short, with just the
-        name.
-        @returns A string with the delay sequence of the given case or None if
-        the case doesn't exists or not have delaySequence element.
-        """
-        name += "" if mode == "long" else self._name
-        try:
-            return self._round_cases[name]
-        except KeyError:
-            return None
+        return self._round_cases
 
     def get_bpts_name(self):
         """@returns Returns the bpts name"""
@@ -254,45 +234,17 @@ class BPTSFile(XMLFile):
 
         Initializes internal lists with cases, round cases and attachs.
         """
-        self._cases = []
-        self._round_cases.clear()
-        self._attach.clear()
+        domcase = self._dom.getElementsByTagNameNS(self._NS, 'testCase')
+        try:
+            case = TestCase(self, domcase[0])
+        except:
+            log.error('EXCEPTIOOONRL!!!!!!')
+            traceback.print_exc()
 
-        dom_cases = self._dom.getElementsByTagNameNS(self._NS, 'testCase')
-        dom_delays = []
-
-        # Find cases and get the real name
-        for case in dom_cases:
-            case_name = case.getAttribute('name')
-            case_name = case_name.split(':')
-            if len(case_name) != 2 or case_name[0] != self._name:
-                case_name = "".join(case_name)
-            else:
-                case_name = case_name[1]
-            self._cases.append(case_name)
-
-        # Find cases with send elements with delaySequence attributes
-        #   and add it to the dict.
-        for s in self._dom.getElementsByTagName('send'):
-            if s.hasAttribute('delaySequence'):
-                delay = s.getAttribute('delaySequence')
-                p = self._get_parent(s, 'testCase')
-                if p is not None:
-                    name = p.getAttribute('name')
-                    self._round_cases[name] = delay
-
-        # Find dataSource elements with attachments
-        #  and add it to the dict.
-        dom_case_attach = self._dom.getElementsByTagNameNS(self._NS,\
-                                                          'dataSource')
-        for a in dom_case_attach:
-            case = self._get_parent(a, 'testCase')
-            src = a.getAttribute('src')
-            type = a.getAttribute('type')
-            if case not in self._attach:
-                self._attach[case] = []
-
-            self._attach[case].append((src, type))
+        self._cases = [TestCase(self, domcase) for domcase in\
+                           self._dom.getElementsByTagNameNS(self._NS, 'testCase')]
+        self._round_cases = [c for c in self._cases if c.has_delays()]
+        self._attach_cases = [c for c in self._cases if c.has_attachs()]
 
     def _sync_data(self):
         """@brief Syncs the object state with the dom object"""
