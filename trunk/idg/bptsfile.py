@@ -192,6 +192,14 @@ class BPTSFile(XMLFile):
         """@returns Returns the test cases inside the BPTS"""
         return self._cases
 
+    def add_case(self, dom):
+        """@brief Adds a new case to the bpts"""
+        self._cases.append(TestCase(self, dom))
+
+        # Remove from old tree and add to this bpts
+        #dom.parentNode.removeChild(dom)
+        self._get_dom_testcases.appendChild(dom)
+
     def get_round_cases(self, mode="long"):
         """@brief Returns a list with the cases with more than one execution.
 
