@@ -592,59 +592,25 @@ class Proyecto(object):
         bpts.autodeclare()
         bpts.save()
 
-        # Add new cases to cases dict (short version, just case name)
-        self.casos[name] = bpts.get_cases('short')
+        # Add file to proyect BPTSFile list
+        self.bptsfiles[bpts.name()] = bpts
 
-        # Open the main bpts file and copy new information
-        test = BPTSFile(self.test)  # FIX, should be already open
-        test.copy_info(bpts, self.dep_nom)
-        test.save()
+        # copy new information from bpts to main bpts file
+        self.test.copy_info(bpts, self.dep_nom)
+        self.test.save()
 
-    def vaciar_bpts(self, ruta):
-        """@brief Elimina todos los casos de un bpts
-        @param ruta La ruta al bpts a vaciar."""
-
-        log.debug(_("idg.proyect.cleaning.testcases.in.file") + ruta)
-
+    def get_bpts(self, name):
+        """@brief Returns the bpts with the given name or None if doesn't
+        exists"""
         try:
-            test_dom = md.parse(ruta)
-        except:
-            e =  _("idg.proyect.cant.load.bpts.file") + ruta
-            log.error(e)
-            raise ProyectoRecuperable(e)
+            return [c for c in self.bptsfiles if c.name() == name][0]
+        except IndexError:
+            return None
 
-        for caso in test_dom.getElementsByTagNameNS(self.test_url, 'testCase'):
-            caso.parentNode.removeChild(caso)
-
-        try:
-            file = open(self.test, 'w')
-            file.write(test_dom.toxml('utf-8'))
-        except:
-            e =  _("idg.proyect.cant.write.bpts.file") + ruta
-            log.error(e)
-            raise ProyectoRecuperable(e)
-
-    def rm_caso(self, btps, caso):
-        """@brief Elimina un caso de prueba del test.bpts.
-        @param bpts Nombre del fichero bpts del caso.
-        @param caso Nombre del caso dentro del bpts a borrar."""
-
-        nombre = "%s:%s" % (bpts,caso)
-
-        try:
-            test_dom = md.parse(self.test)
-        except:
-            e =  _("idg.proyect.cant.load.main.test.file") + self.test
-            log.error(e)
-            raise ProyectoRecuperable(e)
-
-        caso_dom = [f for f in test_dom.getElementsByTagNameNS(self.test_url, 'testCase') if f.getAttribute('name') == nombre]
-        if len(caso_dom) == 0 :
-            log.warning(_("idg.proyect.testcase.not.found.in.main.test.file") + nombre)
-            return
-        caso_dom  = caso_dom[0]
-
-        test_dom.removeChild( caso_dom )
+    def empty_test(self):
+        """@brief Removes all cases in the main bpts file."""
+        self.test.rm_all()
+        self.test.save()
 
     def add_casos(self, casos):
         """@brief Añade un caso de prueba en un bpts al test.bpts.
@@ -1031,19 +997,19 @@ class Proyecto(object):
             if self.inst == False :
                 self.instrumentar()
 
-    def cargar_casos(self):
+    def _load_bptsfiles(self):
         """@brief Load available test cases into cases dict.
         """
         # self.casos is a dict with the given form {'file' : ['case', ..]}
-        for f in os.listdir(self.casos_dir):
-            if f[0] != '.' :   # Dont parse hidden files
-                try:
-                    bpts = BPTSFile(path.join(self.casos_dir, f))
-                    self.casos[f] = bpts.get_cases('short')
-                except:
-                    log.error(_('idg.proyect.cant.load.bpts.file') + f)
+        ## Load BPTSFiles into proyect
+        for bptsname in os.listdir(self.casos_dir):
+            try:
+                bpts = BPTSFile(path.join(self.casos_dir, bptsname))
+                self.bptsfiles[bpts.name()] = bpts
+            except:
+                log.error(_("idg.proyect.cant.load.bpts.file") + bptsname)
 
-        log.debug(str(self.casos))
+        #log.debug(str([f.get_cases() for f in self.bptsfiles.values()]))
 
     def cargar_deps(self,dom):
         """@brief Carga las dependencias del proyecto leyendo el fichero de
@@ -1087,15 +1053,12 @@ class Proyecto(object):
             # Bpel Original
             e = root.find('bpel_o')
             self.bpel_o = e.get('src')
-
-            # Cargar Dependencias
-            self.cargar_deps(tree)
-            # Cargar Casos
-            self.cargar_casos()
-
         except:
             raise ProyectoError(_("idg.proyect.error.in.config.file") + \
                                 self.proy + " " + str(sys.exc_value))
+        # Cargar Dependencias
+        self.cargar_deps(tree)
+
     ## @}
 
     ## @name Guardar y Configurar
@@ -1197,9 +1160,10 @@ class Proyecto(object):
             # Lo creamos otra vez y añadimos los casos
             e = et.SubElement(root, 'cases')
 
-            for file, cases in self.casos.items() :
-                efile = et.SubElement(e, 'testfile')
-                [et.SubElement(efile, 'testcase').set('name',n) for n in cases]
+            for name, bpts in self.bptsfiles.items():
+                sub = et.SubElement(e, 'testfile')
+                [et.SubElement(sub, 'testcase').set('name',str(c))\
+                 for c in bpts.get_cases()]
         except:
             raise ProyectoError(_("idg.proyect.cant.save.testcases"))
 
