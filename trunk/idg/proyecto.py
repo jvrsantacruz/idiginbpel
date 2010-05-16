@@ -112,6 +112,7 @@ class Proyecto(object):
         defecto para las rutas del proyecto.  
         Crea el proyecto si se le indica la ruta a un bpel Lee la configuración
         del proyecto ya creado si no Comprueba que el proyecto esté bien 
+
         @param nombre Nombre del proyecto a cargar/crear.  
         @param idg Instancia de la clase de control .  
         @param bpel Ruta al bpel original.  
@@ -162,10 +163,11 @@ class Proyecto(object):
 
         ## Lista con los ficheros en el proyecto
         self.fichs  =   os.listdir(self.dir)
+
         ## Lista con los ficheros de las trazas
-        self.ftrazas=   os.listdir( self.trazas_dir )
+        self.ftrazas=   os.listdir(self.trazas_dir)
         ## Lista con los ficheros de invariantes
-        self.finvr  =   os.listdir( self.invr_dir )  
+        self.finvr  =   os.listdir(self.invr_dir)
         ## @}
 
         # Set have cases flag
@@ -360,7 +362,7 @@ class Proyecto(object):
                 else:
                     ruta = path.basename(ruta)
 
-                log.debug(ruta)
+                #log.debug(ruta)
 
                 # Modificar el atributo con la ruta correcta
                 i.setAttribute(attr, ruta)
@@ -420,7 +422,7 @@ class Proyecto(object):
             return
 
         # Ruta logs bpelunit
-        log.debug(self.bpelunit)
+        #log.debug(self.bpelunit)
         BUpath = path.join(self.bpelunit, 'process-logs')
 
         # Borrar los logs antiguos bpelunit
@@ -896,7 +898,7 @@ class Proyecto(object):
     ## @{
 
     def crear(self):
-        """@brief Crea el proyecto desde 0 la primera vez."""
+        """@brief Crea el proyecto desde 0 por primera vez."""
 
         try:
             # Comprobar el nombre
