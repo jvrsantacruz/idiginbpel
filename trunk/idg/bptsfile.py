@@ -155,14 +155,8 @@ class TestCase(object):
 class BPTSFile(XMLFile):
     """@brief BPTS test case file common operations"""
 
-    ## Cases list (short case names)
+    ## Test Cases list
     _cases = []
-
-    ## Round Test Cases list (cases with rounds)
-    _round_cases = []
-
-    ## Test Cases with Related files list
-    _attach_cases = []
 
     ## BPTS Namespace
     _NS ='http://www.bpelunit.org/schema/testSuite'
@@ -264,17 +258,9 @@ class BPTSFile(XMLFile):
 
         Initializes internal lists with cases, round cases and attachs.
         """
-        domcase = self._dom.getElementsByTagNameNS(self._NS, 'testCase')
-        try:
-            case = TestCase(self, domcase[0])
-        except:
-            log.error('EXCEPTIOOONRL!!!!!!')
-            traceback.print_exc()
 
         self._cases = [TestCase(self, domcase) for domcase in\
-                           self._dom.getElementsByTagNameNS(self._NS, 'testCase')]
-        self._round_cases = [c for c in self._cases if c.has_delays()]
-        self._attach_cases = [c for c in self._cases if c.has_attachs()]
+                self._dom.getElementsByTagNameNS(self._NS, 'testCase')]
 
     def _sync_data(self):
         """@brief Syncs the object state with the dom object"""
