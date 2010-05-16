@@ -271,7 +271,7 @@ class ProyectoUI(object):
 
     def marcar_bpts_tree(self):
         """@brief Marca o desmarca la selección con respecto a los casos metidos en test.bpts"""
-        casos = self.proy.list_bpts(self.proy.test)
+        casos = self.proy.list_bpts(self.proy.test_path)
 
         def aux_foreach(m, path, iter, casos) :
             """@brief Función auxiliar para recorrer el modelo marcándolo"""
@@ -315,18 +315,21 @@ class ProyectoUI(object):
         # Limpiar el modelo
         self.bpts_tree.clear()
 
-        items = self.proy.casos.items()
-        items.sort( lambda x,y : cmp(x[0],y[0]) )
+        # Get Bptsfiles and sort it by file name
+        bptsfiles = self.proy.bptsfiles.values()
+        bptsfiles.sort(lambda a, b : cmp(a.name(), b.name()))
 
-        # Añadir los casos
-        for fich,casos in items :
-            #log.info('Fichero bpts seleccionado: ' + fich)
-            iter = self.bpts_tree.append(None, [ fich, gtk.STOCK_OPEN, True])
-            for c in casos :
-                #log.info('\tCaso: ' + c)
-                self.bpts_tree.append(iter, [ c , gtk.STOCK_FILE, True])
+        # Add files and cases to the treestore
+        for bpts in bptsfiles:
+            # Add parent row with the name of the file
+            parent = self.bpts_tree.append(None,\
+                                         [bpts.name(), gtk.STOCK_OPEN, True])
+            # Add cases
+            for case in bpts.get_cases():
+                self.bpts_tree.append(parent, [case.name('short'),\
+                                               gtk.STOCK_FILE, True])
 
-        # Conectar la vista de nuevo
+        # Connect the view with the model again
         self.bpts_view.set_model(self.bpts_tree)
 
     def info_bpts_fichero(self, fichero, count):
@@ -335,11 +338,13 @@ class ProyectoUI(object):
         @param iter iterador al fichero de prueba en el modelo
         @param count número de hijos marcados.
         """
-        if fichero not in self.proy.casos :
+        bpts = self.proy.get_bpts(name)
+
+        if bpts is None:
             self.error(_("idgui.proyect.file.dont.exist.into.proyect"))
         else:
-            self.bpts_nombre_label.set_text(fichero)
-            self.bpts_n_label.set_text(str(len(self.proy.casos[fichero])))
+            self.bpts_nombre_label.set_text(bpts.name())
+            self.bpts_n_label.set_text(str(len(bpts.get_cases())))
             self.bpts_nsel_label.set_text(str(count))
 
     def add_casos(self):
@@ -400,15 +405,17 @@ class ProyectoUI(object):
     def on_proy_cases_bpts_file(self,widget):
         """@brief Callback de seleccionar un fichero bpts."""
         self.idgui.estado(_("idgui.proyect.adding.testcase.file"))
+
         if self.last_path :
-            log.debug("Setting Last Path: " + self.last_path)
             self.bpts_fichero.set_current_folder(self.last_path)
+
         bpts = self.bpts_fichero.get_filename()
         self.last_path = path.dirname(bpts)
+
         log.debug("Last Path: " + self.last_path)
         try:
             # Vaciamos primero el test.bpts general para evitar casos repetidos
-            self.proy.vaciar_bpts(self.proy.test)
+            self.proy.empty_test()
             self.proy.add_bpts(bpts)
         except(ProyectoRecuperable):
             self.idgui.estado(_("idgui.proyect.error.adding.testcase.file"))
@@ -544,7 +551,12 @@ class ProyectoUI(object):
 
         # Obtenemos los casos que están en el test.bpts para ejecutarse
         # En un diccionario tipo dict[file] = [case1, case2 ..]
-        casos = self.lista_casos_dict(self.proy.list_bpts(self.proy.test))
+        filecases = {}
+        for case in self.proy.test.get_cases():
+            file = case.name('file')
+            if file not in filecases:
+                filecases[file] = []
+            filecases[file].append(case)
 
         # Desconectamos el modelo treestore del treeview
         self.ejec_view.set_model( None )
@@ -559,13 +571,14 @@ class ProyectoUI(object):
         # Mantendremos un map con paths para acceder a los ficheros 
         # fácilmente en self.ejec_path_casos[fnom:cnom] = path
         self.ejec_path_casos = {}
-        for fnom in casos :
-            parent = m.append( None, [fnom, gtk.STOCK_OPEN, 0] )
+        for file in filecases.keys():
+            parent = m.append( None, [file, gtk.STOCK_OPEN, 0] )
+
             # Añadir sus casos hijos
-            for cnom in casos[fnom]:
-                child = self.ejec_tree.append(parent, [cnom, gtk.STOCK_FILE, 0] )
+            for case in filecases[file]:
+                child = self.ejec_tree.append(parent, [case.name('short'), gtk.STOCK_FILE, 0] )
                 # Almacenar el path
-                self.ejec_path_casos["%s:%s" % (fnom, cnom)] = m.get_path(child) 
+                self.ejec_path_casos[str(case)] = m.get_path(child)
 
         # Conectamos de nuevo el treeview con el treestore
         self.ejec_view.set_model( self.ejec_tree )
