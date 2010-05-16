@@ -100,8 +100,8 @@ class Proyecto(object):
     inst   =   False 
     ## Flag de modificado el proyecto
     mod    =   False 
-    ## Flag de si hay casos de prueba incluidos
-    hay_casos = False
+    ## Exists cases flag
+    have_cases = False
     # @}
 
     ## @name Inicialización 
@@ -142,6 +142,12 @@ class Proyecto(object):
             self.guardar()
             self.idg.update_proylist()
 
+        # Load BPTSFiles
+        self._load_bptsfiles()
+
+        # Load Main bpts file (test)
+        self.test = BPTSFile(self.test_path)
+
         # Proyecto instrumentado o no
         self.inst = path.exists(self.bpr)
 
@@ -155,17 +161,15 @@ class Proyecto(object):
         ## @{
 
         ## Lista con los ficheros en el proyecto
-        self.fichs  =   os.listdir( self.dir )
-        ## Lista con los ficheros de casos de prueba (.bpts)
-        self.fcasos =   os.listdir( self.casos_dir )
+        self.fichs  =   os.listdir(self.dir)
         ## Lista con los ficheros de las trazas
         self.ftrazas=   os.listdir( self.trazas_dir )
         ## Lista con los ficheros de invariantes
         self.finvr  =   os.listdir( self.invr_dir )  
         ## @}
 
-        # Número de casos
-        self.hay_casos = len(self.casos) > 0
+        # Set have cases flag
+        self.have_cases = len([b.get_cases() for b in self.bptsfiles.values()]) > 0
 
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
@@ -190,15 +194,15 @@ class Proyecto(object):
         ## @{
 
         ## Ruta al bpel importado, se emplea para ejecutar etc...
-        self.bpel   =   path.join(self.dir, self.bpel_nom)  # bpel
+        self.bpel = path.join(self.dir, self.bpel_nom)
         ## Ruta al fichero de configuración  del proyecto.
-        self.proy   =   path.join(self.dir, self.proy_nom)  # config proy
+        self.proy = path.join(self.dir, self.proy_nom)
         ## Ruta al fichero ant para realizar las ejecuciones.
-        self.build  =   path.join(self.dir, self.build_nom) # ant proy
+        self.build_path = path.join(self.dir, self.build_nom)
         ## Ruta al fichero bpts que contiene los casos de prueba.
-        self.test   =   path.join(self.dir, self.test_nom)  # test.bpts
+        self.test_path = path.join(self.dir, self.test_nom)
         ## Ruta al fichero bpr que se genera en la instrumentación.
-        self.bpr    =   path.join(self.dir, self.bpr_nom)   # instrument
+        self.bpr = path.join(self.dir, self.bpr_nom)
         ## @}
 
         ## @name Rutas Directorios 
@@ -225,8 +229,8 @@ class Proyecto(object):
         self.deps = []
         ## Lista con las rutas de las dependencias no encontradas del bpel
         self.dep_miss = []
-        ## Lista con los casos de prueba disponibles "fichero:nom_caso"
-        self.casos = {}
+        ## BPTSFiles dict with the bpts by name
+        self.bptsfiles = {}
         ## @}
 
         ## @name Ejecución
@@ -426,7 +430,7 @@ class Proyecto(object):
             log.error(_("idg.proyect.cant.remove.old.bpelunit.logs" + BUpath))
 
         # Ejecutar el ant en un subproceso aparte
-        cmd = ("ant", "-f", self.build, "test")
+        cmd = ("ant", "-f", self.build_path, "test")
         log.info(_("idg.proyect.test.running.command") + str(cmd) )
         # Escribimos en una tubería desde la cual podremos leer el log
         # Sin expansión de argumentos por shell
@@ -516,7 +520,7 @@ class Proyecto(object):
             log.warning(_("idg.proyect.analysis.already.running"))
             return
 
-        cmd = ["ant", "-f", self.build, "analyze"]
+        cmd = ["ant", "-f", self.build_path, "analyze"]
         log.info(_("idg.proyect.analysis.running.command") + str(cmd))
         # Abrimos un proceso y leeremos de su salida estandar.
         # Redireccionamos la salida de errores a la estandar.
@@ -583,11 +587,8 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("idg.proyect.cant.copy.file.to.proyect") \
                     + path_)
 
-        # Add file to the case file list
-        self.fcasos.append(name)
-
-        # Open the proyect copy of the bpts file and process it
-        bpts = BPTSFile(p_path, normalize=True)
+                # Open the proyect copy of the bpts file and process it
+        bpts = BPTSFile(p_path)
         bpts.autodeclare()
         bpts.save()
 
@@ -676,9 +677,9 @@ class Proyecto(object):
         # Abrir el fichero de test general 
         # Con minidom para no perder los namespaces.
         try:
-            test_dom = md.parse(self.test)
+            test_dom = md.parse(self.test_path)
         except:
-            e =  _("idg.proyect.cant.load.main.test.file") + self.test
+            e =  _("idg.proyect.cant.load.main.test.file") + self.test_path
             log.error(e)
             raise ProyectoRecuperable(e)
 
@@ -743,7 +744,7 @@ class Proyecto(object):
 
         # Escribir el fichero test
         try:
-            file = open(self.test,'w')
+            file = open(self.test_path, 'w')
             file.write(test_dom.toxml('utf-8'))
         except:
             e = _("idg.proyect.cant.write.bpts.file") + bpts
@@ -978,8 +979,8 @@ class Proyecto(object):
 
         # Comprobar existencia de la estructura y de los
         # ficheros más importantes: proy,dir,text,bpel
-        required = (self.dir, self.bpel, self.proy, self.build,
-                    self.test, self.casos_dir, self.trazas_dir, self.invr_dir)
+        required = (self.dir, self.bpel, self.proy, self.build_path,
+                    self.test_path, self.casos_dir, self.trazas_dir, self.invr_dir)
 
         for f in required:
             if not path.exists( f ):
@@ -999,7 +1000,7 @@ class Proyecto(object):
 
         try:
             # Abrir el test.bpts y comprobar la configuración del servidor 
-            bpts = md.parse(self.test)
+            bpts = md.parse(self.test_path)
         except:
             raise ProyectoRecuperable(_("idg.proyect.cant.open.main.test.file"))
 
@@ -1014,7 +1015,7 @@ class Proyecto(object):
 
         # Guardarlo
         try:
-            file = open(self.test, 'w')
+            file = open(self.test_path, 'w')
             file.write(bpts.toxml('utf-8'))
         except:
             raise ProyectoRecuperable(_("idg.proyect.cant.write.main.test.file"))
