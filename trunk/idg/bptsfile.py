@@ -200,6 +200,15 @@ class BPTSFile(XMLFile):
         #dom.parentNode.removeChild(dom)
         self._get_dom_testcases.appendChild(dom)
 
+    def rm_case(self, name):
+        """@brief Removes a case from the bpts"""
+        cases = [case for case in self._cases if str(name) == name]
+
+        # Remove from dom and delete from cases
+        for c in cases:
+            c._dom.parentNode.removeChild(c)
+            del c
+
     def get_round_cases(self, mode="long"):
         """@brief Returns a list with the cases with more than one execution.
 
