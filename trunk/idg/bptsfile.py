@@ -209,6 +209,10 @@ class BPTSFile(XMLFile):
             c._dom.parentNode.removeChild(c)
             del c
 
+    def rm_all(self):
+        """@brief Removes all cases from the bpts"""
+        [self.rm_case(str(c)) for c in self._cases]
+
     def get_round_cases(self, mode="long"):
         """@brief Returns a list with the cases with more than one execution.
 
