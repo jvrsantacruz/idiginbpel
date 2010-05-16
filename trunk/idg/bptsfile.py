@@ -17,6 +17,8 @@ class TestCase(object):
     _attachs = []
     ## String with the case delays sequence
     _delays = ""
+    ## Asociated BPTSFile
+    _bpts = None
 
     def __init__(self, bpts, dom):
         """@brief Initialize the case.
@@ -41,6 +43,13 @@ class TestCase(object):
         if self.is_normalized():
             self._name = self._name.split(':')[1]
 
+    def __str__(self):
+        """@returns The long name of the case"""
+        if self.is_normalized is None:
+            return self._name
+        else:
+            return self._bpts.name() + ':' + self._name
+
     def is_normalized(self):
         """@brief Check if the case name is already normalized
 
@@ -51,7 +60,7 @@ class TestCase(object):
         if len(name) != 2:
             return False
 
-        if name[0] != self.bpts.name():
+        if name[0] != self._bpts.name():
             return None
 
     def normalize(self):
@@ -68,14 +77,35 @@ class TestCase(object):
         if norm is None:
             self._name = self._name.split(':')[1]
 
-        self._dom.setAttribute('name', self.bpts.name() + ':' + self._name)
+        self._dom.setAttribute('name', self._bpts.name() + ':' + self._name)
 
     def name(self, mode="long"):
         """@returns The name of the test case.
 
-        @param mode long/short mode if the case name is normalized.
+        @param mode long/short/file mode if the case name is normalized.
+
+        Formats:
+            short namecase
+            file  namefile
+            long  namefile:namecase
         """
-        return (self.bpts.name() if mode == "long" else "") + self._name
+        # If the case was previously normalized in another file but not in this
+        # file, is_normalized will return None
+        norm = self.is_normalized() is not None
+        spname = self._name.split(':')
+        filename = self._bpts.name() if norm else spname[0]
+        casename = self._name if norm else spname[1]
+
+        if mode == "long":
+            return filename + casename
+        elif mode == "file":
+            return filename
+        else:
+            return casename
+
+    def file(self):
+        """@returns The bpts file"""
+        return self._bpts
 
     def has_attachs(self):
         """@returns If the test case have attachments"""
