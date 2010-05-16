@@ -309,10 +309,8 @@ class ProyectoUI(object):
     def cargar_bpts_tree(self):
         """@brief Carga el contenido del diccionario de casos  en el tree store
         de casos"""
-        # Desconectar la vista
+        # Disconnect the view from the model and clear the model.
         self.bpts_view.set_model(None)
-
-        # Limpiar el modelo
         self.bpts_tree.clear()
 
         # Get Bptsfiles and sort it by file name
@@ -332,10 +330,11 @@ class ProyectoUI(object):
         # Connect the view with the model again
         self.bpts_view.set_model(self.bpts_tree)
 
-    def info_bpts_fichero(self, fichero, count):
+    def info_bpts_fichero(self, name, count):
         """@brief Establece la información sobre un fichero de casos de prueba
         seleccionado.
-        @param iter iterador al fichero de prueba en el modelo
+
+        @param name Nombre del fichero bpts
         @param count número de hijos marcados.
         """
         bpts = self.proy.get_bpts(name)
@@ -402,8 +401,8 @@ class ProyectoUI(object):
     ## @name Callbacks Casos
     ## @{
 
-    def on_proy_cases_bpts_file(self,widget):
-        """@brief Callback de seleccionar un fichero bpts."""
+    def on_proy_cases_bpts_file(self, widget):
+        """@brief Callback for select a bpts file."""
         self.idgui.estado(_("idgui.proyect.adding.testcase.file"))
 
         if self.last_path :
@@ -559,12 +558,10 @@ class ProyectoUI(object):
             filecases[file].append(case)
 
         # Desconectamos el modelo treestore del treeview
-        self.ejec_view.set_model( None )
-
         # Acortar el nombre del modelo
-        m = self.ejec_tree
-
         # Limpiamos lo que hay en el store (modelo)
+        self.ejec_view.set_model( None )
+        m = self.ejec_tree
         m.clear()
 
         # Los introducimos en el tree_store de la parte de ejecución
@@ -581,7 +578,7 @@ class ProyectoUI(object):
                 self.ejec_path_casos[str(case)] = m.get_path(child)
 
         # Conectamos de nuevo el treeview con el treestore
-        self.ejec_view.set_model( self.ejec_tree )
+        self.ejec_view.set_model(self.ejec_tree)
 
         # Expandirlo todo todo
         self.ejec_view.expand_all()
