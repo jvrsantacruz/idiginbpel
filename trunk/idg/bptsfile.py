@@ -171,7 +171,9 @@ class BPTSFile(XMLFile):
         """
         XMLFile.__init__(self, path_)
         # Open the file with Minidom
-        self.open('md')
+        dom = self.open('md')
+        if dom is None:
+            raise ""
         self._update_data()
         self._update_cases()
 
