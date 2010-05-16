@@ -245,8 +245,7 @@ class BPTSFile(XMLFile):
 
         Override XMLFile version
         """
-        self._autodeclare(self._dom.\
-                          getElementsByTagNameNS(self._NS, 'testCases')[0])
+        self._autodeclare(self._get_dom_testcases())
 
     def copy_info(self, other, dep_dir):
         """@brief Copy connection info from other BPTSFile
@@ -345,6 +344,10 @@ class BPTSFile(XMLFile):
         """
         self._get_dom_testSuite().\
                 getElementsByTagNameNS(self._NS, 'wsdl')[0].nodeValue = value
+
+    def _get_dom_testcases(self):
+        """@returns the dom testCases"""
+        return self._dom.getElementsByTagNameNS(self._NS, 'testCases')[0]
 
 
     def _get_dom_partners(self):
