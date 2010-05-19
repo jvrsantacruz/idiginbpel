@@ -314,14 +314,13 @@ class BPTSFile(XMLFile):
         """@returns Returns the name value of the name attribute"""
         return self._dom.getElementsByTagNameNS(self._NS, 'name')[0].nodeValue
 
-    def _set_dom_name(self, name):
+    def _set_dom_name(self, value):
         """@brief Establishes the name attribute of the bpts
 
-        @param name The new bpts name.
+        @param value The new bpts name.
         """
-        self._dom.getElementsByTagNameNS(self._NS, 'name')[0].\
-                setAttribute('name', name)
-
+        name = self._dom.getElementsByTagNameNS(self._NS, 'name')[0]
+        self._set_text(name, value)
 
     def _get_dom_url(self):
         """@returns the complete url for connection"""
@@ -342,8 +341,9 @@ class BPTSFile(XMLFile):
 
         @param value The wsdl value with the pat to the wsdl dependence.
         """
-        self._get_dom_testSuite().\
-                getElementsByTagNameNS(self._NS, 'wsdl')[0].nodeValue = value
+        wsdl = self._get_dom_testSuite().\
+                getElementsByTagNameNS(self._NS, 'wsdl')[0]
+        self._set_text(wsdl, value)
 
     def _get_dom_testcases(self):
         """@returns the dom testCases"""
