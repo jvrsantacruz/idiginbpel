@@ -605,8 +605,8 @@ class Proyecto(object):
         """@brief Returns the bpts with the given name or None if doesn't
         exists"""
         try:
-            return [c for c in self.bptsfiles if c.name() == name][0]
-        except IndexError:
+            return self.bptsfiles[name]
+        except KeyError:
             return None
 
     def empty_test(self):
