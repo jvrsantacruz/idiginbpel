@@ -291,7 +291,18 @@ class XMLFile(File):
 
         return e
 
+    def _set_text(self, e, text):
+        """@brief Sets the child text node of e with text
 
+        @param e Element to append a new child text node
+        @param text Text to set the child text node
+
+        Note: removes all e childrens, so be careful.
+        """
+        while e.hasChildNodes():
+            e.removeChild(e.firstChild)
+
+        e.appendChild(self._dom.createTextNode(text))
 
 class ConfigFile(XMLFile):
     """@brief Configuration file.
