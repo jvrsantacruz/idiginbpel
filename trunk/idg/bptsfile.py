@@ -316,6 +316,40 @@ class BPTSFile(XMLFile):
         self._sync_data()
         self.serialize()
 
+    def export(self, to, notcases, notattachs):
+        """@brief Overload the inherit export. Writes the bpts in another
+        place, and takes care of the attached data.
+
+        @param to Path to the exported bpts file.
+        @param cases List with the short names of the cases to NOT export.
+        @param attachs List with the attach paths to NOT export.
+
+        Note: If an attach is NOT exported, its src attribute will be changed
+        with the absolute path of its actual content.
+        """
+        # Copy object
+        # Remove undesired cases
+        # Copy attachs and put rel path if have to.
+        #   else put the abs path to attachment.
+        # Serialize to
+        outbpts = copy.copy(self)
+        [outbpts.rm_case(str(c))\
+         for c in outbpts.get_cases()\
+         if str(case) in notcases]
+
+        for case in outbpts.get_cases():
+            paths = case.get_attachs()
+            for src, type in paths:
+                if src not in notattachs:
+                    #shutil.copy(filename:casename:attachname)
+                    pass
+                else:
+                    src = BPTSFile.abspath(path)
+                    #case.
+                    # set new path to case attachment
+
+        outbpts.serialize(to)
+
     ## @name Internal
     ## @{
 

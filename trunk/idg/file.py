@@ -129,6 +129,13 @@ class File(object):
         """
         return File.external(proy, self._path)
 
+    def export(self, to):
+        """@brief Saves the file to another place
+
+        @brief param to Path of the new file.
+        """
+        raise NotImplementedError
+
 class XMLFile(File):
     """@brief Base class for XML files.
 
@@ -158,6 +165,13 @@ class XMLFile(File):
         @returns True if all ok. None in case of error.
         """
         self.serialize()
+
+    def export(self, to):
+        """@brief Convenience function to fit the File interface.
+
+        @returns True if all goes ok.
+        """
+        self.serialize(to)
 
     def close(self):
         """@brief Resets the open dom without write the changes"""
