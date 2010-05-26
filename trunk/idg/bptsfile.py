@@ -236,9 +236,6 @@ class BPTSFile(XMLFile):
         Changes the name of the cases up to 'file:case'
         """
         [case.normalize() for case in self._cases]
-        #for case in self._dom.getElementsByTagNameNS(self._NS, 'testCase'):
-        #    name = case.getAttribute('name').replace(':','.')
-        #    case.setAttribute('name', self._name + ':' + name)
 
     def get_cases(self):
         """@returns Returns the test cases inside the BPTS"""
