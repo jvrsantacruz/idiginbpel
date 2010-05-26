@@ -1109,7 +1109,7 @@ class ProyectoUI(object):
 
     def on_trz_opt_flat_combo(self, widget):
         """@brief Callback de cambiar la selección del combo."""
-        self.proy.set_aplanado(self.anl_aplanado_combo.get_active_text())
+        self.proy.set_flattening(self.anl_aplanado_combo.get_active_text())
 
     def on_trz_opt_simplify_check(self, widget):
         """@brief Callback de cambiar el check de simplify."""
