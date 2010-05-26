@@ -2,18 +2,62 @@
 # -*- coding: utf-8 -*-
 
 import os.path as path
+import copy
 
 from file import XMLFile
 import util.logger
 
 log = util.logger.getlog('idg.bptsfile')
 
+class Attach(object):
+    """@brief File attached to a TestCase"""
+
+    ## Properties of the attached file.
+    _properties = {}
+    ## Path to the attached file.
+    _path = None
+    ## Attach type
+    _type = None
+    ## Dom representation
+    _dom = None
+    ## Related Test Case
+    _case = None
+
+    def __init__(self, dom, case):
+        """@brief Initialize an attach
+
+        @param dom The minidom dataSource node
+        @param case TestCase instance
+        """
+        self._dom = dom
+        self._path = dom.getAttribute('src')
+        self._type = dom.getAttribute('type')
+
+        for prop in dom.getElementsByTagNameNS(BPTSFile._NS, 'property'):
+            self._properties[prop.getAttribute('name')] = prop.nodeValue
+
+    def rm(self):
+        """@brief Remove the attach from dom"""
+        self._dom.parentNode.removeChild(self._dom)
+
+    def src(self):
+        """@brief Returns attach src"""
+        return self._path
+
+    def type(self):
+        """@brief Returns attach type"""
+        return self._type
+
+    def properties(self):
+        """@brief Returns attach properties into a dict {name: value}"""
+        return self._properties
+
 class TestCase(object):
     """@brief Test case representation"""
 
     ## Name of the case (long)
     _name = ""
-    ## List with the path to related files [ (path, type), ...]
+    ## List with Attach objects
     _attachs = []
     ## String with the case delays sequence
     _delays = ""
@@ -33,6 +77,9 @@ class TestCase(object):
 
         self._dom = dom
         self._bpts = bpts
+
+        # Find dom attributes
+        self._send_dom = dom.getElementsByTagNameNS(BPTSFile._NS, 'send')
 
         # Get name, attachs and delays
         self._name = dom.getAttribute('name')
@@ -112,7 +159,7 @@ class TestCase(object):
         return len(self._attachs) != 0
 
     def get_attachs(self):
-        """@returns The list of attachments [(path, type), ..]"""
+        """@returns The list of attachments"""
         return self._attachs
 
     def has_delays(self):
@@ -132,13 +179,18 @@ class TestCase(object):
         # Clear attach list
         self._attachs = []
 
-        # Find dataSource elements with attachments
-        dom_attachs = self._dom.getElementsByTagNameNS(BPTSFile._NS,\
-                                                          'dataSource')
-        for att in dom_attachs:
-            src = att.getAttribute('src')
-            type = att.getAttribute('type')
-            self._attachs.append((src, type))
+        for a in self._dom.getElementsByTagNameNS(BPTSFile._NS, 'dataSource'):
+            self._attachs.append(Attach(a,self))
+
+    def _set_attach(self, attach):
+        """@brief Append a new attachment to the case
+
+        @param attach Attach object to add.
+        """
+        # Append a new attachment
+        a_dom = attach._dom.cloneNode()
+        self._send_dom.appendChild(a_dom)
+        self._attachs.append(Attach(a_dom))
 
     def _find_delays(self):
         """@brief Internal function that finds delaySequences"""
