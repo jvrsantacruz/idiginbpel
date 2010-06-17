@@ -247,6 +247,15 @@ class BPTSFile(XMLFile):
         """@returns Returns the test cases inside the BPTS"""
         return self._cases
 
+    def get_case(self, name):
+        """@brief Get a TestCase object by original name. None if the case cant
+        be found
+        """
+        try:
+            return [c for c in self._cases if c.name() == name][0]
+        except IndexError:
+            return None
+
     def add_case(self, case):
         """@brief Adds a new case to the bpts
 
