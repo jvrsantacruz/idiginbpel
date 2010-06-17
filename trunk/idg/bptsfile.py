@@ -268,13 +268,21 @@ class BPTSFile(XMLFile):
         self._get_dom_testcases().appendChild(dom.cloneNode(True))
 
     def rm_case(self, name):
-        """@brief Removes a case from the bpts"""
-        cases = [case for case in self._cases if str(name) == name]
+        """@brief Removes a case from the bpts
+        @param name The long name of the case.
+        @returns The dom of the deleted case.
+        """
+        dom = None
+        try:
+            for case in [c for c in self._cases if c.name() == name]:
+                dom = case.get_dom()
+                dom.parentNode.removeChild(dom)
+                self._cases.remove(case)
+                del case
+        except IndexError:
+            dom = None
 
-        # Remove from dom and delete from cases
-        for c in cases:
-            c._dom.parentNode.removeChild(c)
-            del c
+        return dom
 
     def rm_all(self):
         """@brief Removes all cases from the bpts"""
