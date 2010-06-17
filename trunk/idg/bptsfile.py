@@ -247,8 +247,12 @@ class BPTSFile(XMLFile):
         """@returns Returns the test cases inside the BPTS"""
         return self._cases
 
-    def add_case(self, dom):
-        """@brief Adds a new case to the bpts"""
+    def add_case(self, case):
+        """@brief Adds a new case to the bpts
+
+        @param TestCase object
+        """
+        dom = case.get_dom()
         self._cases.append(TestCase(self, dom))
 
         # Clone new node and and add to this bpts
