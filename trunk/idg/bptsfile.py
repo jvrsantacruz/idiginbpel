@@ -172,6 +172,10 @@ class TestCase(object):
         """@returns A string with the delay sequence."""
         return self._delays
 
+    def get_dom(self):
+        """@returns The dom object of the TestCase"""
+        return self._dom
+
     ## @name Internal
     ## @{
 
