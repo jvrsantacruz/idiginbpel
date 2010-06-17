@@ -615,109 +615,58 @@ class Proyecto(object):
         self.test.save()
 
     def add_casos(self, casos):
-        """@brief Añade un caso de prueba en un bpts al test.bpts.
-           @param casos Diccionario de tipo casos[fichero] = [caso1, caso2 ..]
+        """@brief Adds Testcases to test.bpts
 
-           El parsear y añadir un nuevo caso al test.bpts es un proceso que
-           consume bastante tiempo y memoria. Cuando hay 200+ casos, la
-           aplicación puede llegar a quedarse congelada. El procedimiento
-           mejorado para añadir casos emplea: 
-           * Un dicc de casos casos[fichero] = [casos..] para pasar todos los
-              ficheros y casos a la vez y abrir solo una vez el test.bpts
+        @param casos A cases dictionary { nom_fichero: [nom_caso, ..], ..}
 
-           * Un  dicc de los dom de los casos que ya estaban en el test.bpts
-
-           El procedimiento consiste en:
-
-               1. Cachear en un diccionario el dom de todos los casos que habia
-                   en el test.bpts
-               2. Dejar el test.bpts vacío teóricamente desligando todos los
-                   casos que había.
-               3. Recorrer el diccionario de casos que recibe la función
-                   añadiendo casos.
-
-                 3.1 Si el caso ya estaba antes, se vuelve a ligar el dom
-                      cacheado.
-                 3.2 Si el caso es nuevo y no estaba antes en el test.bpts, se
-                      arreglan sus namespaces, y se añade al test.bpts
+        Opens every bpts file, get the listed cases and adds to the test.bpts
+        if not already in it.
         """
+        # Cases inside test.bpts
+        test_cases = self.test.get_cases()
+        test_names = [c.name() for c in test_cases]
 
-        # Abrir el fichero de test general 
-        # Con minidom para no perder los namespaces.
-        try:
-            test_dom = md.parse(self.test_path)
-        except:
-            e =  _("idg.proyect.cant.load.main.test.file") + self.test_path
-            log.error(e)
-            raise ProyectoRecuperable(e)
+        # TestCases marked to stay into the test.bpts
+        names_to_keep = []
 
-        # Encontrar el testCases de test.bpts
-        test_cases = test_dom.getElementsByTagNameNS(self.test_url, 'testCases')[0]
+        for fnom in casos:
+            long_names = [fnom + ':' + c for c in casos[fnom]]
 
-        # Buscar todos los nodos hijos
-        tests_doms = test_dom.getElementsByTagNameNS(self.test_url, 'testCase')
+            # Skip file if all cases are already stored in test.bpts
+            if len([c for c in test_cases if c not in long_names]) == 0\
+               and len(test_cases) != 0:
+                names_to_keep.extend(long_names)
+                continue
 
-        # Obtenemos sus nombres en un diccionario casos_test[nombre] = dom_elto
-        # Los desligamos del padre testCases Con esto dejamos el test.bpts
-        # vacío pero mantenemos el dom de los hijos que ya estaban cacheado en
-        # el diccionario, para no tener que introducirlo de nuevo si el caso se
-        # repite.
-        casos_test = {}
-        for tc in tests_doms :
-            casos_test[tc.getAttribute('name')] = tc
-            test_cases.removeChild(tc)
+            # Load the file with the cases and list the cases.
+            bpts = BPTSFile(path.join(self.casos_dir, fnom))
+            cases = bpts.get_cases()
+            name_cases = [c.name() for c in cases]
 
-        # Añadir los ficheros pasados
-        for fnom in casos :
-            # Abrir el fichero de casos
-            try:
-                bpts_dom = md.parse(path.join(self.casos_dir, fnom))
-            except:
-                e = _("idg.proyect.cant.load.bpts.file") + fnom
-                log.error(e)
-                raise ProyectoRecuperable(e)
+            for case in long_names:
 
-            # Añadir los casos de ese fichero
-            for caso in casos[fnom] :
-
-                # Formamos el nombre completo del caso fichero:caso
-                nombre = "%s:%s" % (fnom, caso)
-
-                # Comprobamos que el caso no esté en el test
-                #   si ya estaba en el casos_test, lo tenemos cacheado en el
-                #   diccionario y lo añadimos.
-                if nombre in casos_test :
-                    log.warning(_("idg.proyect.testcase.already.in.main.test.file") 
-                                + nombre )
-                    test_cases.appendChild( casos_test[nombre] )
+                # Check the case inside the bpts
+                if case not in name_cases:
+                    log.warning('idg.proyect.try.to.add.case.not.present')
                     continue
 
-                # Acortar el nombre de la función
-                bytag = bpts_dom.getElementsByTagNameNS  
+                # And mark it to do not delete from test.bpts
+                names_to_keep.append(case)
 
-                # Encontrar el caso en el bpts
-                caso_dom = [f for f in bytag(self.test_url, 'testCase') 
-                            if f.getAttribute('name') == caso]
+                # Skip if we already have in the test.bpts
+                if case in test_names:
+                    log.debug('ya está dentro del cases: ' + case)
+                    continue
 
-                if len(caso_dom) == 0 :
-                    log.warning(_("idg.proyect.testcase.not.found.in.bpts.file") + caso)
-                    continue 
-                caso_dom  = caso_dom[0]
+                # Effectively adding the case.
+                self.test.add_case(bpts.get_case(case))
 
-                # Ponerle el nuevo nombre fichero:caso
-                caso_dom.setAttribute('name', nombre)
+        # Delete cases not listed in casos
+        [self.test.rm_case(c) for c in test_names\
+         if c not in names_to_keep]
 
-                # Clonar el caso y sus hijos, y añadirlo al test
-                test_cases.appendChild( caso_dom.cloneNode(True) ) 
-
-        # Escribir el fichero test
-        try:
-            file = open(self.test_path, 'w')
-            file.write(test_dom.toxml('utf-8'))
-        except:
-            e = _("idg.proyect.cant.write.bpts.file") + bpts
-            log.error(e)
-            raise ProyectoRecuperable(e)
+        # Save changes
+        self.test.save()
 
     ## @}
 
