@@ -110,6 +110,8 @@ class TestCase(object):
         if name[0] != self._bpts.name():
             return None
 
+        return True
+
     def normalize(self):
         """@brief Normalize the test case name using proyect conventions
 
@@ -144,7 +146,7 @@ class TestCase(object):
         casename = self._name if norm else spname[1]
 
         if mode == "long":
-            return filename + casename
+            return filename + ':' + casename
         elif mode == "file":
             return filename
         else:
@@ -245,9 +247,8 @@ class BPTSFile(XMLFile):
         """@brief Adds a new case to the bpts"""
         self._cases.append(TestCase(self, dom))
 
-        # Remove from old tree and add to this bpts
-        #dom.parentNode.removeChild(dom)
-        self._get_dom_testcases.appendChild(dom)
+        # Clone new node and and add to this bpts
+        self._get_dom_testcases().appendChild(dom.cloneNode(True))
 
     def rm_case(self, name):
         """@brief Removes a case from the bpts"""
@@ -395,7 +396,8 @@ class BPTSFile(XMLFile):
 
     def _get_dom_name(self):
         """@returns Returns the name value of the name attribute"""
-        return self._dom.getElementsByTagNameNS(self._NS, 'name')[0].nodeValue
+        name = self._dom.getElementsByTagNameNS(self._NS, 'name')[0].nodeValue
+        return name if name is not None else ""
 
     def _set_dom_name(self, value):
         """@brief Establishes the name attribute of the bpts
