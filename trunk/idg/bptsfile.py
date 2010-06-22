@@ -329,7 +329,7 @@ class BPTSFile(XMLFile):
         @param dep_dir Name of the dependences directory in the proyect
         """
         # Set wsdl and partners and declare new namespaces found in other.
-        self._set_dom_wsdl(other._get_dom_wsdl())
+        self._set_dom_wsdl(path.join(dep_dir, other._get_dom_wsdl()))
         self._set_dom_partners(other._get_dom_partners(), dep_dir)
         self._set_dom_namespaces(other._get_dom_namespaces())
 
@@ -443,8 +443,9 @@ class BPTSFile(XMLFile):
 
     def _get_dom_wsdl(self):
         """@returns The wsdl dom object"""
-        return self._get_dom_testSuite().\
-                getElementsByTagNameNS(self._NS, 'wsdl')[0].nodeValue
+        wsdl = self._get_dom_testSuite().\
+                getElementsByTagNameNS(self._NS, 'wsdl')[0]
+        return wsdl.childNodes[0].nodeValue
 
     def _set_dom_wsdl(self, value):
         """@brief Sets the wsdl dom values
