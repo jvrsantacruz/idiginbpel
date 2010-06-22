@@ -316,6 +316,7 @@ class XMLFile(File):
         while e.hasChildNodes():
             e.removeChild(e.firstChild)
 
+        text = text if text is not None else ""
         e.appendChild(self._dom.createTextNode(text))
 
 class ConfigFile(XMLFile):
