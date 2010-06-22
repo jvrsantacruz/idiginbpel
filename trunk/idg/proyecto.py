@@ -598,9 +598,10 @@ class Proyecto(object):
             raise ProyectoRecuperable(_("idg.proyect.cant.copy.file.to.proyect") \
                     + path_)
 
-                # Open the proyect copy of the bpts file and process it
+        # Open the proyect copy of the bpts file and process it
         bpts = BPTSFile(p_path)
         bpts.autodeclare()
+        bpts.normalize()
         bpts.save()
 
         # Add file to proyect BPTSFile list
