@@ -760,7 +760,13 @@ class ProyectoUI(object):
         self.actualizar_ejec_iconos(1)
         # Poner el estado del servidor
         # Ejecutar los tests
-        self.proy.ejecutar()
+        try:
+            self.proy.ejecutar()
+        except ProyectoRecuperable, e:
+            self.error(str(e))
+            self.estado(str(e))
+            return
+
         # Thread de comprobación, lo hará cada segundo.
         e = Ejecucion(self.proy,self,1)
         e.start()
