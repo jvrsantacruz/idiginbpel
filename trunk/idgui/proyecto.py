@@ -119,7 +119,7 @@ class ProyectoUI(object):
         """@brief Actualiza la pestaña de trazas"""
         # Actualizar trazas al entrar en la pestaña de trazas
         if pagenum == 2 :
-            self.cargar_ejec_tree()
+            self.load_exe_tree()
         elif pagenum == 3 :
             self.actualizar_trazas()
         elif pagenum == 4 :
@@ -532,7 +532,7 @@ class ProyectoUI(object):
 
         ## Diccionario con los casos listados y sus rutas
         ## de la forma ejec_path_casos[fichero:caso] = path
-        self.ejec_path_casos = {}
+        self.exe_path_cases = {}
 
         ## Lista con los iconos para los diferentes niveles
         self.ejec_iconos = [ gtk.STOCK_OPEN, 
@@ -541,7 +541,7 @@ class ProyectoUI(object):
                             gtk.STOCK_YES,
                             gtk.STOCK_CANCEL ]
 
-    def cargar_ejec_tree(self):
+    def load_exe_tree(self):
         """@brief Lee los casos que van a entrar en ejecución y actualiza el
         tree de la parte de ejecución con ellos.
         """
@@ -565,15 +565,14 @@ class ProyectoUI(object):
         # Los introducimos en el tree_store de la parte de ejecución
         # Mantendremos un map con paths para acceder a los ficheros 
         # fácilmente en self.ejec_path_casos[fnom:cnom] = path
-        self.ejec_path_casos = {}
+        self.exe_path_cases = {}
         for file in filecases.keys():
             parent = m.append( None, [file, gtk.STOCK_OPEN, 0] )
 
             # Añadir sus casos hijos
             for case in filecases[file]:
                 child = self.ejec_tree.append(parent, [case.name('short'), gtk.STOCK_FILE, 0] )
-                # Almacenar el path
-                self.ejec_path_casos[str(case)] = m.get_path(child)
+                self.exe_path_cases[case.name('long')] = m.get_path(child)
 
         # Conectamos de nuevo el treeview con el treestore
         self.ejec_view.set_model(self.ejec_tree)
@@ -607,8 +606,8 @@ class ProyectoUI(object):
             4 Error
         """
         # Comprobar que tenemos la ruta del caso
-        if caso not in self.ejec_path_casos :
-            log.warning(_("idgui.proyect.testcase.not.in.treeview") + caso)
+        if caso not in self.exe_path_cases :
+            log.warning(_("idgui.proyect.testcase.not.found.in.treeview") + caso)
             return
 
         # Comprobar que el nivel es el adecuado
@@ -623,7 +622,7 @@ class ProyectoUI(object):
         # Icono correspondiente al nivel actual
         icono = self.ejec_iconos[nivel]
         # Iterador del caso en el TreeView a partir de la ruta
-        path = self.ejec_path_casos[caso]
+        path = self.exe_path_cases[caso]
         iter = m.get_iter(path)
 
         # Actualizar el valor del nivel
@@ -746,7 +745,7 @@ class ProyectoUI(object):
         # Añadimos los casos seleccionados
         self.add_casos()
         # Actualizamos el tree de la parte de ejecución
-        self.cargar_ejec_tree()
+        self.load_exe_tree()
 
         # Comprobar que el servidor Abpel esté en condiciones
         if not self.comprobar_servidor_abpel() :
