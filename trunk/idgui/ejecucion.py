@@ -295,15 +295,19 @@ class Ejecucion(Thread):
         try:
             # Take the first trace file listed in bpelunit logs directory
             src = os.path.join(BUpath, os.listdir(BUpath)[0])
+        except IndexError, e:
+            log.error(_("no.trace.was.generated.at.end_case"))
+            return
 
             log.debug("Lo que hay en process-logs: " + str(os.listdir(BUpath)))
 
-            # Compose the name: completecasename:timestamp.log
-            file = name + ":" + str(time.time()) + ".log"
-            dst = os.path.join(self.proy.trazas_dir, file)
+        # Compose the name: completecasename:timestamp.log
+        file = name + ":" + str(time.time()) + ".log"
+        dst = os.path.join(self.proy.trazas_dir, file)
 
             log.info('Moving log from: ' + src + ' to: ' + dst)
 
+        try:
             # Move into the proyecto
             shutil.move(src, dst)
         except:
