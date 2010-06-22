@@ -425,11 +425,20 @@ class Proyecto(object):
         #log.debug(self.bpelunit)
         BUpath = path.join(self.bpelunit, 'process-logs')
 
+        # Comprobar que existe la ruta a bpelunit
+        try:
+            os.listdir(BUpath)
+        except:
+            log.error(_("idg.proyect.cant.find.bpelunit.path"))
+
         # Borrar los logs antiguos bpelunit
         try:
             self.borrar_trazas(BUpath)
         except:
-            log.error(_("idg.proyect.cant.remove.old.bpelunit.logs" + BUpath))
+            e = ProyectoRecuperable(_("idg.proyect.cant.remove.old.bpelunit.logs"\
+                                      + BUpath))
+            e.what = BUpath
+            raise
 
         # Ejecutar el ant en un subproceso aparte
         cmd = ("ant", "-f", self.build_path, "test")
