@@ -292,8 +292,8 @@ class Ejecucion(Thread):
         BUpath = os.path.join(self.proy.bpelunit,'process-logs')
         src = ""
         dst = ""
+        # Take the first trace file listed in bpelunit logs directory
         try:
-            # Take the first trace file listed in bpelunit logs directory
             src = os.path.join(BUpath, os.listdir(BUpath)[0])
         except IndexError, e:
             log.error(_("no.trace.was.generated.at.end_case"))
@@ -305,7 +305,7 @@ class Ejecucion(Thread):
         file = name + ":" + str(time.time()) + ".log"
         dst = os.path.join(self.proy.trazas_dir, file)
 
-            log.info('Moving log from: ' + src + ' to: ' + dst)
+        log.info('Moving log from: ' + src + ' to: ' + dst)
 
         try:
             # Move into the proyecto
