@@ -367,6 +367,7 @@ class Ejecucion(Thread):
         # Control para el término del proceso
         # poll es None si el proceso no ha terminado aún.
         end = subproc is None or subproc.poll() is not None
+        end = end and self.ncasos > 0
 
         # Tiempo desde el comienzo de ejecución
         # Ejecuta cada segundo la función time en un thread aparte
