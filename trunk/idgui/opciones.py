@@ -66,7 +66,6 @@ class OptUI(object):
 
     def on_changed(self, cell, path, val):
         """@brief Callback de cuando se modifica una entrada."""
-        # Establecer las opciones como modificadas.
         log.debug("Modificado: " + self.list[path][0] + " de " +
                   self.list[path][1] + " a " + val)
 

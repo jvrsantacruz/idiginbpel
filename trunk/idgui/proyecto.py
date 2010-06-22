@@ -531,7 +531,7 @@ class ProyectoUI(object):
         self.comprobar_servidor_abpel()
 
         ## Diccionario con los casos listados y sus rutas
-        ## de la forma ejec_path_casos[fichero:caso] = path
+        ## de la forma exe_path_cases[fichero:caso] = path
         self.exe_path_cases = {}
 
         ## Lista con los iconos para los diferentes niveles
@@ -546,38 +546,37 @@ class ProyectoUI(object):
         tree de la parte de ejecución con ellos.
         """
 
-        # Obtenemos los casos que están en el test.bpts para ejecutarse
-        # En un diccionario tipo dict[file] = [case1, case2 ..]
+        # Group test.bpts cases by original file
+        # filecases[file] = [case1, case2 ..]
         filecases = {}
         for case in self.proy.test.get_cases():
             file = case.name('file')
+            log.debug('reading: ' + case.name())
             if file not in filecases:
                 filecases[file] = []
             filecases[file].append(case)
 
-        # Desconectamos el modelo treestore del treeview
-        # Acortar el nombre del modelo
-        # Limpiamos lo que hay en el store (modelo)
+        # Dissociate view/model and clean model
         self.ejec_view.set_model( None )
         m = self.ejec_tree
         m.clear()
 
-        # Los introducimos en el tree_store de la parte de ejecución
-        # Mantendremos un map con paths para acceder a los ficheros 
-        # fácilmente en self.ejec_path_casos[fnom:cnom] = path
+        # Insert cases by file into the treestore model
+        # Save case treeview paths into self.exe_path_cases[fnom:cnom] = path
         self.exe_path_cases = {}
         for file in filecases.keys():
+            # Insert file as parent row
             parent = m.append( None, [file, gtk.STOCK_OPEN, 0] )
 
-            # Añadir sus casos hijos
+            # Add children and save the case treeview path
             for case in filecases[file]:
                 child = self.ejec_tree.append(parent, [case.name('short'), gtk.STOCK_FILE, 0] )
                 self.exe_path_cases[case.name('long')] = m.get_path(child)
 
-        # Conectamos de nuevo el treeview con el treestore
+        # Connect again view/model
         self.ejec_view.set_model(self.ejec_tree)
 
-        # Expandirlo todo todo
+        # Expand all before execution
         self.ejec_view.expand_all()
 
     def lista_casos_dict(self, list):
