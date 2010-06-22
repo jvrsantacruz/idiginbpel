@@ -78,15 +78,13 @@ class Ejecucion(Thread):
         ## Período de comprobación
         self.t = tiempo
         ## Número de casos a ejecutar
-        self.ncasos = len(self.ui.ejec_path_casos)
+        self.ncasos = len(self.ui.exe_path_cases)
         ## Contador de los casos que llevamos
         self.i_case = 0
         ## Barra de progreso
         self.barra = self.ui.ejec_barra
         self.barra.set_fraction( 0.0 )
         self.barra.set_text( _("idgui.tester.connecting") )
-        ## Pulso de la barra de progreso
-        self.pulse = 0.95 / self.ncasos
 
         # Compilar expresiones para filtrar el log
         self.re_log = re.compile(self.re_str)
@@ -98,6 +96,12 @@ class Ejecucion(Thread):
         self.re_casoround = re.compile(self.re_casoround_str)
         self.re_passall = re.compile(self.re_passall_str)
         self.re_errorcaso = re.compile(self.re_errorcaso_str)
+
+        ## Pulso de la barra de progreso
+        if self.ncasos != 0:
+            self.pulse = 0.95 / self.ncasos
+        else:
+            self.pulse = 0
 
     ## @name Filtros
     ## @{
