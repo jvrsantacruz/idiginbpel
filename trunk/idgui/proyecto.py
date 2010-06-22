@@ -3,7 +3,6 @@
 
 import os.path as path
 import sys
-import shutil
 
 import pygtk
 pygtk.require("2.0")
@@ -202,7 +201,6 @@ class ProyectoUI(object):
 
         self.idgui.estado(_("idgui.proyect.running.instrumentation"))
         try:
-            from idg.proy import ProyectoError
             self.proy.instrumentar()
             c = Comprobador(self.proy,self,2)
             c.start()
@@ -632,7 +630,6 @@ class ProyectoUI(object):
         m.set_value(iter, 2, nivel)
         # Icono para el nivel 
         m.set_value(iter, 1, icono)
-
 
         # Obtenemos el padre del caso 
         padre = m.iter_parent(iter)
