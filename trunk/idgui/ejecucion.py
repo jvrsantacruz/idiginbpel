@@ -337,6 +337,19 @@ class Ejecucion(Thread):
 
     ## @}
 
+    def terminate(self):
+        """@brief Termina el proceso y cierra la ejecución al completo"""
+        # Poner que pasamos todo en la gui
+        self.pass_all()
+
+        # Parar el reloj
+        self.thread_timer.cancel()
+        # Asegurarnos de que se termina la ejecución
+        #  y actualizar la gui en consecuencia.
+        gtk.gdk.threads_enter()
+        self.ui.ejec_terminar()
+        gtk.gdk.threads_leave()
+
     def run(self):
         """
         @brief Consulta el proceso de ejecución de los testcases y obtiene
@@ -359,8 +372,8 @@ class Ejecucion(Thread):
         # Ejecuta cada segundo la función time en un thread aparte
         # Le pasamos el label que tiene que actualizar y lo arrancamos.
         #  también le pasamos el thread de ejecución para que quede ligado.
-        thread_timer = Clock(label=self.ui.ejec_control_tiempo_label, padre=subproc)
-        thread_timer.start()
+        self.thread_timer = Clock(label=self.ui.ejec_control_tiempo_label, padre=subproc)
+        self.thread_timer.start()
 
         # El subproceso debe existir y no haber terminado
         while not end:
@@ -392,11 +405,4 @@ class Ejecucion(Thread):
                 finally:
                     gtk.gdk.threads_leave()
 
-        # Parar el reloj
-        thread_timer.cancel()
-        # Asegurarnos de que se termina la ejecución 
-        #  y actualizar la gui en consecuencia.
-        gtk.gdk.threads_enter()
-        self.ui.ejec_terminar()
-        gtk.gdk.threads_leave()
-
+        self.terminate()
