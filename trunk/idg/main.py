@@ -7,6 +7,9 @@ import os.path as path
 import commands
 import shutil
 import gettext
+import tarfile
+import locale
+
 from xml.dom import minidom as md
 
 # Establecer el log
@@ -15,8 +18,22 @@ log = util.logger.getlog('idg.main')
 
 from opciones import Opt
 
-# Traducciones mediante gettext
-gettext.install('idiginbpel', './locale', unicode=1) # /usr/share/local en lugar de ./locale
+# /usr/share/local instead of ./locale
+app = 'idiginbpel'
+ldir = './locale'
+
+locale.setlocale(locale.LC_ALL, '')
+locale.bindtextdomain(app, ldir)
+
+gettext.bindtextdomain(app, ldir)
+gettext.textdomain(app)
+
+lang = gettext.translation(app, ldir)
+_ = lang.gettext
+
+gettext.install(app, ldir)
+gettext.install(app, ldir, unicode=1)
+
 log.warning(_('idg.main.not.installed.locales'))
 
 class Idg(object):

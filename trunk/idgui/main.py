@@ -43,6 +43,8 @@ class Idgui(object):
         ## Opciones de la configuración
         self.opt = idg.opt
 
+        self.builder.set_translation_domain('idiginbpel')
+
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.share,"ui/main.glade"))
         ## Objeto ventana
