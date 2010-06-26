@@ -23,7 +23,21 @@
             <child>
               <object class="GtkLabel" id="proy_exec_svr_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Estado del servidor Active Bpel:</property>
+                <property name="label" translatable="yes">Servidor ABpel:</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="padding">5</property>
+                <property name="pack_type">end</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="proy_exec_svr_start_boton">
+                <property name="label" translatable="yes">Iniciar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -50,9 +64,6 @@
               <object class="GtkLabel" id="proy_exec_svr-state_label">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">OK</property>
-                <attributes>
-                  <attribute name="foreground" value="#25cfbc3e0000"/>
-                </attributes>
               </object>
               <packing>
                 <property name="expand">False</property>
