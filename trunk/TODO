@@ -1,0 +1,18 @@
+FUTURO
+- Barra de carga al instrumentar
+- Ejecutar y Analizar
+- Configuración funcionando bien y con más valores comprobados
+
+TODO
+- bpts desplegados por defecto
+- Traducción Inglesa
+[OK] Traducciones GLADE
+- Seleccionar traducción
+[~]- Treeview tamaño mínimo para que no se achique.
+[~] Color rojo en check Active Bpel
+- Arrancar el servidor ActiveBPEL desde la aplicación (¿hilo nuevo?).
+- Eliminar botón analizar en la pantalla ejecución.
+- Usar python setup tools
+
+ERRORES
+[OK]- 0.95 / self.ncasos zero division 
