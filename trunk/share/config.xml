@@ -1,20 +1,20 @@
-<!-- Fichero de configuración por defecto 
+<!-- Default configuration file
 
-     Orden de búsqueda para la configuración:
+     The application looks for this file in the following order:
      1. ~/.idiginbpel/config.xml
      2. ./home/config.xml
      3. /usr/share/idiginbpel/config.xml -->
 <config>
-    <!-- Directorio del usuario -->
-    <home src="~/.idiginbpel"/>
-    <!-- Directorio de archivos de runtime-->
-    <share src="~/IdiginBPEL/share"/>
-    <!-- Directorio de takuan -->
-    <takuan src="~/takuan"/>
-    <!-- Directorio de BPELUnit -->
-    <bpelunit src="~/bin/AeBpelEngine"/>
-    <!-- Url servidor -->
-    <svr value="localhost" />
-    <!-- Puerto servidor -->
-    <port value="7777" />
+    <!-- User directory -->
+    <home src="~/.idiginbpel">"idg.help.home"</home>
+    <!-- Runtime directory -->
+    <share src="~/IdiginBPEL/share">"idg.help.share"</share>
+    <!-- takuan instalation -->
+    <takuan src="~/takuan">"idg.help.takuan"</takuan>
+    <!-- BPELUnit instalation -->
+    <bpelunit src="~/bin/AeBpelEngine">"idg.help.bpelunit"</bpelunit>
+    <!-- Server url -->
+    <svr value="localhost">"idg.help.svr"</svr>
+    <!-- Server port -->
+    <port value="7777">"idg.help.port"</port>
 </config>
