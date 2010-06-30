@@ -24,7 +24,7 @@
               <object class="GtkLabel" id="proy_cases_bpts_label">
                 <property name="visible">True</property>
                 <property name="xpad">15</property>
-                <property name="label" translatable="yes">A&#xF1;adir fichero</property>
+                <property name="label" translatable="yes">Add File</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -70,7 +70,7 @@
                     <property name="search_column">9</property>
                     <child>
                       <object class="GtkTreeViewColumn" id="proy_cases_column">
-                        <property name="title">Casos de prueba</property>
+                        <property name="title">Test Cases</property>
                         <child>
                           <object class="GtkCellRendererToggle" id="proy_cases_coumn_conmmute">
                             <signal name="toggled" handler="on_bpts_view_check_toggle"/>
@@ -126,7 +126,7 @@
                               <object class="GtkLabel" id="proy_cases_info_name-title_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">1</property>
-                                <property name="label" translatable="yes">Nombre de fichero:</property>
+                                <property name="label" translatable="yes">File:</property>
                                 <property name="justify">right</property>
                               </object>
                               <packing>
@@ -148,7 +148,7 @@
                               <object class="GtkLabel" id="proy_cases_info_n-title_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">1</property>
-                                <property name="label" translatable="yes">N&#xBA; de casos de prueba:</property>
+                                <property name="label" translatable="yes">Cases</property>
                               </object>
                               <packing>
                                 <property name="top_attach">1</property>
@@ -173,7 +173,7 @@
                               <object class="GtkLabel" id="proy_cases_info_nsel-title_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">Casos Seleccionados:</property>
+                                <property name="label" translatable="yes">Selected</property>
                               </object>
                               <packing>
                                 <property name="top_attach">2</property>
@@ -202,7 +202,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_cases_info_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Datos&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Data&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -218,7 +218,7 @@
                     <property name="homogeneous">True</property>
                     <child>
                       <object class="GtkButton" id="proy_cases_exec_button">
-                        <property name="label" translatable="yes">Ejecutar</property>
+                        <property name="label" translatable="yes">Execute</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -230,16 +230,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="proy_cases_exec_anl_button">
-                        <property name="label" translatable="yes">Ejecutar y Analizar</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <signal name="released" handler="on_proy_cases_exec_anl_button"/>
-                      </object>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>

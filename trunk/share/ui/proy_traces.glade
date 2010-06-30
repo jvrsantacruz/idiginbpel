@@ -60,7 +60,7 @@
                 <property name="search_column">0</property>
                 <child>
                   <object class="GtkTreeViewColumn" id="proy_trz_tree_column_traces">
-                    <property name="title">Trazas</property>
+                    <property name="title">Traces</property>
                     <child>
                       <object class="GtkCellRendererToggle" id="proy_trz_tree_cell_selected">
                         <signal name="toggled" handler="on_trz_tree_toggle"/>
@@ -116,7 +116,7 @@
                         <child>
                           <object class="GtkLabel" id="proy_trz_opt_flat_label">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Tipo de Aplanado</property>
+                            <property name="label" translatable="yes">Flattening Type</property>
                           </object>
                           <packing>
                             <property name="y_options">GTK_FILL</property>
@@ -174,7 +174,7 @@
                 <child type="label">
                   <object class="GtkLabel" id="proy_trz_opt_label">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Opciones&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Options&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -186,7 +186,7 @@
             </child>
             <child>
               <object class="GtkButton" id="proy_trz_anl_button">
-                <property name="label" translatable="yes">Ejecutar Daikon</property>
+                <property name="label" translatable="yes">Run Daikon</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>

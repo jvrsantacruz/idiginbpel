@@ -11,7 +11,7 @@
           <object class="GtkLabel" id="proy_error_label">
             <property name="visible">True</property>
             <property name="xalign">0.029999999329447746</property>
-            <property name="label" translatable="yes">Errores...</property>
+            <property name="label" translatable="yes">Errors</property>
             <attributes>
               <attribute name="foreground" value="#ac3b2e9b2e9b"/>
             </attributes>
@@ -37,7 +37,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_config_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Proyecto</property>
+                <property name="label" translatable="yes">Proyect</property>
                 <attributes>
                   <attribute name="weight" value="semibold"/>
                 </attributes>
@@ -60,7 +60,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_cases_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">1. Casos de Prueba</property>
+                <property name="label" translatable="yes">1. Test Cases</property>
               </object>
               <packing>
                 <property name="position">1</property>
@@ -81,7 +81,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_exec_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">2. Ejecuci&#xF3;n</property>
+                <property name="label" translatable="yes">2. Test Execution</property>
               </object>
               <packing>
                 <property name="position">2</property>
@@ -102,7 +102,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_trz_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">3. Trazas</property>
+                <property name="label" translatable="yes">3. Traces</property>
               </object>
               <packing>
                 <property name="position">3</property>
@@ -123,7 +123,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_anl_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">4. An&#xE1;lisis</property>
+                <property name="label" translatable="yes">4. Analysis</property>
               </object>
               <packing>
                 <property name="position">4</property>
@@ -144,7 +144,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_inv_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">5. Resultados</property>
+                <property name="label" translatable="yes">5. Results</property>
               </object>
               <packing>
                 <property name="position">5</property>

@@ -35,7 +35,7 @@
             <child type="label">
               <object class="GtkLabel" id="proy_inv_text_frame_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">&lt;b&gt;Invariantes&lt;/b&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;Invariants&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </object>
             </child>
@@ -65,7 +65,7 @@
                         <child>
                           <object class="GtkLabel" id="proy_inv_data_time_name">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Tiempo empleado:</property>
+                            <property name="label" translatable="yes">Elapsed Time</property>
                           </object>
                           <packing>
                             <property name="x_options"></property>
@@ -75,7 +75,6 @@
                         <child>
                           <object class="GtkLabel" id="proy_inv_data_time">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">1h 50m</property>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -127,7 +126,7 @@
             <child type="label">
               <object class="GtkLabel" id="proy_inv_data_frame_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">&lt;b&gt;Resumen Ejecuci&#xF3;n&lt;/b&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;Resume&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </object>
             </child>
