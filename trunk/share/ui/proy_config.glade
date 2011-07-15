@@ -20,7 +20,6 @@
         <child>
           <object class="GtkLabel" id="proy_config_name_label">
             <property name="visible">True</property>
-            <property name="label" translatable="yes">Nombre del Proyecto</property>
             <attributes>
               <attribute name="size" value="20000"/>
             </attributes>
@@ -50,7 +49,7 @@
                     <property name="search_column">1</property>
                     <child>
                       <object class="GtkTreeViewColumn" id="proy_config_dep_view_state_col">
-                        <property name="title">Estado</property>
+                        <property name="title">State</property>
                         <child>
                           <object class="GtkCellRendererPixbuf" id="proy_config_dep_view_state_renderpixbuf"/>
                           <attributes>
@@ -61,7 +60,7 @@
                     </child>
                     <child>
                       <object class="GtkTreeViewColumn" id="proy_config_dep_view_name_col">
-                        <property name="title">Nombre</property>
+                        <property name="title">Name</property>
                         <child>
                           <object class="GtkCellRendererText" id="proy_config_dep_view_state_rendertext"/>
                           <attributes>
@@ -72,7 +71,7 @@
                     </child>
                     <child>
                       <object class="GtkTreeViewColumn" id="proy_config_dep_view_path_col">
-                        <property name="title">Ruta</property>
+                        <property name="title">Path</property>
                         <child>
                           <object class="GtkCellRendererText" id="proy_config_dep_view_path_rendertext"/>
                           <attributes>
@@ -142,7 +141,7 @@
                               <object class="GtkLabel" id="proy_config_dep_broken-title_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">0.10000000149011612</property>
-                                <property name="label" translatable="yes">Rotas:</property>
+                                <property name="label" translatable="yes">Broken:</property>
                               </object>
                               <packing>
                                 <property name="top_attach">1</property>
@@ -173,7 +172,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_config_dep_frame_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Dependencias&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Dependences&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -204,7 +203,7 @@
                               <object class="GtkLabel" id="proy_config_action_search_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">Busca las dependencias</property>
+                                <property name="label" translatable="yes">Find dependences</property>
                               </object>
                               <packing>
                                 <property name="x_options"></property>
@@ -215,7 +214,7 @@
                               <object class="GtkLabel" id="proy_config_dep_inst_label">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">Instrumenta el proyecto</property>
+                                <property name="label" translatable="yes">Instrument proyect</property>
                               </object>
                               <packing>
                                 <property name="top_attach">1</property>
@@ -243,7 +242,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="proy_config_dep_inst_button">
-                                <property name="label" translatable="yes">Instrumentar</property>
+                                <property name="label" translatable="yes">Instrument</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -266,7 +265,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_config_dep_acc_frame_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Acciones&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Actions&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -295,7 +294,7 @@
             <property name="visible">True</property>
             <child>
               <object class="GtkButton" id="proy_config_save_button">
-                <property name="label" translatable="yes">Guardar</property>
+                <property name="label" translatable="yes">Save</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -309,7 +308,7 @@
             </child>
             <child>
               <object class="GtkButton" id="proy_config_next_button">
-                <property name="label" translatable="yes">Comenzar</property>
+                <property name="label" translatable="yes">Start</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>

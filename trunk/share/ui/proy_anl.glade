@@ -41,7 +41,7 @@
                             <property name="model">proy_anl_tree</property>
                             <child>
                               <object class="GtkTreeViewColumn" id="proy_anl_view_column">
-                                <property name="title">Trazas a analizar</property>
+                                <property name="title">Traces to Analize</property>
                                 <child>
                                   <object class="GtkCellRendererText" id="proy_anl_view_celltext"/>
                                   <attributes>
@@ -59,7 +59,7 @@
                 <child type="label">
                   <object class="GtkLabel" id="proy_anl_frame_label">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Trazas seleccionadas&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Selected Traces&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
@@ -93,7 +93,7 @@
                             <child>
                               <object class="GtkLabel" id="proy_anl_data_flat-title_label">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">Aplanado</property>
+                                <property name="label" translatable="yes">Flattening</property>
                               </object>
                               <packing>
                                 <property name="x_options"></property>
@@ -145,7 +145,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_anl_data_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Datos&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Data&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -190,7 +190,7 @@
                                   <object class="GtkLabel" id="proy_anl_control_time-title_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0.98000001907348633</property>
-                                    <property name="label" translatable="yes">Tiempo:</property>
+                                    <property name="label" translatable="yes">Time:</property>
                                   </object>
                                   <packing>
                                     <property name="position">0</property>
@@ -219,7 +219,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_anl_control_frame_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Control de Ejecuci&#xF3;n&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Execution Control&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -288,7 +288,7 @@
             </child>
             <child>
               <object class="GtkButton" id="proy_anl_exec_boton">
-                <property name="label" translatable="yes">Analizar</property>
+                <property name="label" translatable="yes">Analize</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>

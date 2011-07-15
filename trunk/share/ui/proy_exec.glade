@@ -21,28 +21,17 @@
           <object class="GtkHBox" id="proy_exec_up_hbox">
             <property name="visible">True</property>
             <child>
+              <placeholder/>
+            </child>
+            <child>
               <object class="GtkLabel" id="proy_exec_svr_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Servidor ABpel:</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="padding">5</property>
                 <property name="pack_type">end</property>
                 <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="proy_exec_svr_start_boton">
-                <property name="label" translatable="yes">Iniciar</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="pack_type">end</property>
-                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -100,7 +89,7 @@
                     <property name="level_indentation">1</property>
                     <child>
                       <object class="GtkTreeViewColumn" id="proy_exec_column">
-                        <property name="title">Casos de prueba</property>
+                        <property name="title">Test Cases</property>
                         <child>
                           <object class="GtkCellRendererPixbuf" id="proy_exec_cellpixbuf"/>
                           <attributes>
@@ -189,7 +178,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="proy_exec_control_title_label">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Control de Ejecuci&#xF3;n&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Execution Control&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
                     </child>
@@ -249,7 +238,7 @@
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkButton" id="proy_exec_control_anl_button">
-                        <property name="label" translatable="yes">Analizar</property>
+                        <property name="label" translatable="yes">Analize</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -264,7 +253,7 @@
                     </child>
                     <child>
                       <object class="GtkButton" id="proy_exec_control_exec_button">
-                        <property name="label" translatable="yes">Ejecutar</property>
+                        <property name="label" translatable="yes">Execute</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>

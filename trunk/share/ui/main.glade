@@ -22,7 +22,7 @@
             <child>
               <object class="GtkMenuItem" id="main_menu_archivo">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_Archivo</property>
+                <property name="label" translatable="yes">_File</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
                   <object class="GtkMenu" id="main_menu_archivo_submenu">
@@ -46,7 +46,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="main_menu_archivo_importar">
-                        <property name="label">Importar</property>
+                        <property name="label">Import</property>
                         <property name="visible">True</property>
                         <property name="image">image1</property>
                         <property name="use_stock">False</property>
@@ -55,8 +55,8 @@
                     <child>
                       <object class="GtkMenuItem" id="main_menu_preferencias">
                         <property name="visible">True</property>
-                        <property name="tooltip_text" translatable="yes">Editar las preferencias generales del programa.</property>
-                        <property name="label" translatable="yes">_Preferencias</property>
+                        <property name="tooltip_text" translatable="yes">Edit preferences</property>
+                        <property name="label" translatable="yes">_Preferences</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_opciones"/>
                       </object>
@@ -81,7 +81,7 @@
             <child>
               <object class="GtkMenuItem" id="Ay_uda">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Ay_uda</property>
+                <property name="label" translatable="yes">_Help</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
                   <object class="GtkMenu" id="menu3">
@@ -117,7 +117,7 @@
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkButton" id="main_nuevo_boton">
-                    <property name="label">Nuevo Proyecto</property>
+                    <property name="label" translatable="yes">New Project</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -145,7 +145,7 @@
                         <signal name="cursor_changed" handler="on_lista_proyectos_cursor_changed"/>
                         <child>
                           <object class="GtkTreeViewColumn" id="main_lista_proyectos_column">
-                            <property name="title">Proyectos</property>
+                            <property name="title">Proyects</property>
                             <child>
                               <object class="GtkCellRendererText" id="main_lista_proyectos_column_texrender"/>
                               <attributes>
