@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -23,7 +23,6 @@
     <child>
       <object class="GtkVBox" id="opt_contendor_v">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <object class="GtkLabel" id="idg.opt.title">
             <property name="visible">True</property>
@@ -103,6 +102,16 @@
           </packing>
         </child>
         <child>
+          <object class="GtkStatusbar" id="opt_statusbar">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkHBox" id="opt_container_buttons">
             <property name="visible">True</property>
             <child>
@@ -153,7 +162,7 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>

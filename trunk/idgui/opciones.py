@@ -36,6 +36,7 @@ class OptUI(object):
         # Añadir el glade
         gtk.add_from_file(path.join(opts.get('share'),"ui/opts.glade"))
         self.window = gtk.get_object('opt_window')
+        self.statusbar = gtk.get_object("opt_statusbar")
 
         # Vista 
         self.view = gtk.get_object('opt_treeview')
@@ -47,10 +48,8 @@ class OptUI(object):
 
         # Cargar la tabla
         self.cargar(self.opts.getall())
-
         # Conectar las señales que faltan
         gtk.connect_signals(self)
-
         # Abrir la ventana
         self.window.show_all()
 
@@ -87,16 +86,22 @@ class OptUI(object):
         # Modificarlo en las opciones
         id = self.list[path][0]
 
+        log.debug("checking: %s : %s" % (val, self.opts.check(id, val)))
+
         # Modificarlo en el treeview
         if self.opts.check(id, val):
             self.changes[id] = val
             self.list[path][1] = val
             self.list[path][2] = self._CHANGED_ICON
             self.list[path][3] = _('msg.help.opt.' + id)
+            self.statusbar.push(self.statusbar.get_context_id("error")
+                                ,_('idgui.options.successfully.changed') + id)
         else:
             self.list[path][2] = self._NORMAL_ICON
-            log.error(_('idgui.options.cant.change.option') + id)
-            # TODO: Indicar error
+            error_txt = _('idgui.options.cant.change.option') + id
+            log.error(error_txt)
+            self.statusbar.push(self.statusbar.get_context_id("error")
+                                ,error_txt)
 
     def on_guardar(self, widget):
         # TODO: preguntar
@@ -125,3 +130,6 @@ class OptUI(object):
                 item[2] = self._CHANGED_ICON
             else:
                 del self.changes[item[0]]
+
+        self.statusbar.push(self.statusbar.get_context_id("reset"),
+                            _('idgui.options.default.opts.setted'))
