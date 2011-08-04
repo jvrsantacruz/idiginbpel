@@ -8,7 +8,14 @@ import util.logger
 log = util.logger.getlog('idgui.options')
 
 class OptUI(object):
-    """Clase que permite manejar las opciones del programa desde la gui."""
+    """Clase que permite manejar las opciones del programa desde la gui.
+
+    En el treeview:
+        0 - Nombre
+        1 - Valor
+        2 - Icono
+        3 - Texto de Ayuda
+    """
 
     _CHANGED_ICON = gtk.STOCK_MEDIA_RECORD
     _NORMAL_ICON = gtk.STOCK_PROPERTIES
@@ -35,8 +42,11 @@ class OptUI(object):
         # Lista
         self.list = gtk.get_object('opt_list')
 
+        # map con los cambios nombre - valor
+        self.changes = {}
+
         # Cargar la tabla
-        self.cargar()
+        self.cargar(self.opts.getall())
 
         # Conectar las señales que faltan
         gtk.connect_signals(self)
@@ -44,7 +54,12 @@ class OptUI(object):
         # Abrir la ventana
         self.window.show_all()
 
-    def cargar(self):
+    def cargar(self, values):
+        """
+        @brief Recarga la lista de opciones
+        @param valores para recargarla en un diccionario
+                tipo { id : [valor, tipo] }
+        """
         # Desconectar la lista de la vista
         self.view.set_model(None)
 
@@ -53,7 +68,7 @@ class OptUI(object):
 
         # Recorremos las opciones creando labels e inputs
         # con los valores y añadiéndolos a la tabla
-        for id, (val, type) in self.opts.getall().items() :
+        for id, (val, type) in values.items() :
             msg = _('msg.help.opt.' + id) 
             # Add no-available message if necessary
             if msg == 'msg.help.opt' + id :
@@ -71,37 +86,42 @@ class OptUI(object):
 
         # Modificarlo en las opciones
         id = self.list[path][0]
-        self.mod = self.opts.set(id, val)
 
         # Modificarlo en el treeview
-        if self.mod is not None:
+        if self.opts.check(id, val):
+            self.changes[id] = val
             self.list[path][1] = val
             self.list[path][2] = self._CHANGED_ICON
             self.list[path][3] = _('msg.help.opt.' + id)
         else:
             self.list[path][2] = self._NORMAL_ICON
             log.error(_('idgui.options.cant.change.option') + id)
-            #  Indicar error
+            # TODO: Indicar error
 
     def on_guardar(self, widget):
-        if self.mod :
-            self.opts.write()
+        # TODO: preguntar
+        log.info(_('idgui.options.saving.options'))
+        for id,val in self.changes:
+            self.opts.set(id, val)
+
+        self.opts.write()
         self.window.destroy()
 
     def on_cancelar(self, widget):
-        if self.mod :
-            #preguntar
-            pass
+        # TODO: preguntar
+        log.info(_('idgui.options.closing.without.saving'))
         self.window.destroy()
 
     def on_reset(self, widget):
         """@brief Callback de pulsar el botón de resetear las opciones."""
-        antes = [ l[1] for l in self.list]
+        self.changes = dict([(l[0],l[1]) for l in self.list])
         self.mod = True
-        self.opts.reset()
-        self.cargar()
+
+        self.cargar(self.opts.get_defaults())
 
         # Poner iconos a los que se han modificado
-        for a,d in zip(antes,self.list):
-            if a != d[1] :
-                d[2] = self._CHANGED_ICON
+        for item in self.list:
+            if self.changes[item[0]] != item[1]:
+                item[2] = self._CHANGED_ICON
+            else:
+                del self.changes[item[0]]

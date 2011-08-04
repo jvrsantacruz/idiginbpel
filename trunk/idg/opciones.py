@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 """Clase que establece y maneja las opciones básicas del programa"""
 
-import os.path as path
-from xml.etree import ElementTree as et
-
 # Establecer el log
 import util.logger
 log = util.logger.getlog('idg.options')
 from idg.file import ConfigFile
 
 class Opt(object):
-    """@brief Holds options and syncronize with a xml file"""
+    """@brief Holds options and syncronize them with a xml file"""
 
     ## Default options dictionary
     ## { id : [ value, type] }
@@ -24,6 +21,7 @@ class Opt(object):
             'share' : 'src',
             'takuan' : 'src',
             'bpelunit': 'src',
+            'activebpel': 'src',
             'svr' : 'value',
             'port' : 'value'
            }
@@ -43,7 +41,7 @@ class Opt(object):
         for id, (val, type) in self._defaults.items() :
             if type == 'src':
                 val = ConfigFile.abspath(val)
-                if not self.check(val): continue  # Don't use wrong paths
+                if not self.check(id, val): continue  # Don't use wrong paths
 
             # Insert into dictionary if is a valid one.
             self._defaults[id] = [val, type]
@@ -75,22 +73,17 @@ class Opt(object):
         """
         exists = id in self._opts
 
-        # If type is not specified, try to find it
-        if type is None: 
-            if not exists: 
-                return None
-            type = self._opts[id][1]
+        if type is None:
+            type = self.get_type(id)
 
-        # If type is src, check path.
-        if type == 'src':
-            val = ConfigFile.abspath(val)
-            if not self.check(val): 
-                return None
+        if not self.check(id, val, type):
+            return None
 
         # Set the option.
         self._opts[id] = [val, type]
 
-        return exists
+        # Return whether is new
+        return not exists
 
     def reset(self):
         """@brief Reset to default value values in options wich have a default
@@ -107,14 +100,36 @@ class Opt(object):
         else:
             log.info(_("idg.options.writting.config.in") + self._config.path())
 
-    def check(self, val):
-        """@brief Checks paths.
-
-        @param val Path to check.
-        @returns True if is a valid path, False otherwise.
+    def get_type(self, id):
         """
-        if val is None: return False
-        return path.exists(ConfigFile.abspath(val))
+        @brief gets the type for a given id.
+        @param id The id to get the type.
+        @returns The type or None if it doesn't exists.
+        """
+        if id not in self._opts:
+            return None
+
+        return self._opts[id][1]
+
+    def check(self, id, val, type=None):
+        """@brief Checks paths and values.
+
+        @param id 
+        @param val Path to check.
+        @param type Type of the attribute.
+        @returns True if is a valid path or value, False otherwise.
+        """
+        # If type is not specified, try to find it
+
+        if type is None:
+            type = self.get_type(id)
+            if type is None:
+                return False
+
+        if type is "src":
+            return ConfigFile.abspath(val)
+        else:
+            return val is not None and val is not ""
 
     def read(self):
         """@brief Reads options from the config file"""
@@ -122,7 +137,7 @@ class Opt(object):
         # Add options from config file.
         print self._config.get_all()
         for id, (val, type) in self._config.get_all().items():
-            if type == 'src' and not self.check(val):  # Don't use wrong paths
+            if type == 'src' and not self.check(id, val):  # Don't use wrong paths
                 log.warning(_('idg.options.not.valid.use.default') + id +\
                              " " + val)
                 continue
@@ -139,3 +154,8 @@ class Opt(object):
     def getall(self):
         """@brief Returns all options into a dictionary"""
         return self._opts
+
+    def get_defaults(self):
+        """@returns All default options into a dictionary"""
+        return self._defaults
+

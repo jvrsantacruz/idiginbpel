@@ -11,10 +11,14 @@
     <!-- Importamos todas las variables de entorno existentes -->
     <property environment="env"/>
 
-    <!-- Ruta al JAR con la tarea Ant de autoinstrumentación -->
-    <path id="instr.classpath">
-        <pathelement location="${takuan}/bin/instrumentador_bpel.jar"/>
-    </path>
+<!-- URL for downloading the latest version of the BPEL instrumenter JAR -->
+  <property name="instr.jar.url"
+            value="https://neptuno.uca.es/nexus/service/local/artifact/maven/content?r=snapshots&amp;g=es.uca.webservices&amp;a=AntBPELInstrumenter&amp;v=LATEST&amp;c=jar-with-dependencies"/>
+
+
+
+  <!-- Location where the BPEL instrumenter JAR should be downloaded -->
+  <property name="instr.jar.location" location="${dir}/bpel_instrumenter.jar"/>
 
     <!-- Ruta a los guiones de análisis mediante Daikon -->
     <property name="analyzer.path"  location="${takuan}/src/analizadorDaikon/" />
@@ -45,15 +49,17 @@
 
     </target>
 
-    <typedef name="bpelunit" classname="org.bpelunit.framework.ui.ant.BPELUnit">
-        <classpath>
-            <fileset dir="${env.BPELUNIT_HOME}/lib"/>
-        </classpath>
-    </typedef>
+	<!-- Classpath for the tasks -->
+  <path id="lib.path">
+    <fileset dir="${env.BPELUNIT_HOME}/lib"/>
+    <pathelement path="${instr.jar.location}"/>
+  </path>
 
-    <taskdef name="instrument" 
-        classname="es.uca.webservices.bpel.ant.InstrumentBPELProcessTask" 
-        classpathref="instr.classpath"/>
+	<typedef
+      name="bpelunit"
+      classname="net.bpelunit.framework.ui.ant.BPELUnit"
+      classpathref="lib.path"
+      loaderref="lib.path.loader"/>
 
     <target name="abstract">
         <fail message="Este fichero Ant no se usa directamente, sino que ha de ser importado por otro"/>
@@ -104,9 +110,14 @@
             </fileset>
         </apply>
     </target>
+    <target depends="init,abstract" description="Crear el BPR para ActiveBPEL" name="build-bpr">
+	<!-- Download the BPEL instrumenter JAR -->
+    	<get src="${instr.jar.url}" dest="${instr.jar.location}" usetimestamp="true"/>
+    	<taskdef name="instrument"
+             classname="es.uca.webservices.bpel.ant.InstrumentBPELProcessTask"
+             classpath="${instr.jar.location}"/>
+    	<instrument bpel="${main.bpel}" bpr="${bprfile}"/>
 
-    <target name="build-bpr" description="Crear el BPR para ActiveBPEL" depends="init,abstract">
-        <instrument bpel="${main.bpel}" bpr="${bprfile}"/>
 	<echo>Moviendo ficheros de ${user.dir} a ${proy}</echo>
 	<!-- Movemos los ficheros temporales generados en el directorio
 	     de trabajo al directorio de proyecto desde el cual se
