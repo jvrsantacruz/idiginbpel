@@ -12,7 +12,9 @@
     <!-- takuan instalation -->
     <takuan src="~/takuan">"idg.help.takuan"</takuan>
     <!-- BPELUnit instalation -->
-    <bpelunit src="~/bin/AeBpelEngine">"idg.help.bpelunit"</bpelunit>
+    <bpelunit src="~/AeBpelEngine">"idg.help.bpelunit"</bpelunit>
+    <!-- ActiveBpel Daemon -->
+    <activebpel src="~/bin/ActiveBPEL.sh">"idg.help.activebpeldaemon"</bpelunit>
     <!-- Server url -->
     <svr value="localhost">"idg.help.svr"</svr>
     <!-- Server port -->

@@ -47,7 +47,8 @@ class Idg(object):
     _DEFAULTS = { 'home': ['~/.idiginbpel', 'src'],
                 'share': ['~/IdiginBPEL/share', 'src'],
                 'takuan': ['~/takuan', 'src'],
-                'bpelunit': ['~/bin/AeBpelEngine', 'src'],
+                'bpelunit': ['~/AeBpelEngine', 'src'],
+                'activebpel': ['~/bin/ActiveBPEL.sh', 'src'],
                 'svr': ['localhost', 'value'],
                 'port': ['7777', 'value']
                }
