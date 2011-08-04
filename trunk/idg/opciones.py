@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Clase que establece y maneja las opciones básicas del programa"""
 
+import os.path as path
+
 # Establecer el log
 import util.logger
 log = util.logger.getlog('idg.options')
@@ -127,7 +129,7 @@ class Opt(object):
                 return False
 
         if type is "src":
-            return ConfigFile.abspath(val)
+            return path.exists(ConfigFile.abspath(val))
         else:
             return val is not None and val is not ""
 
