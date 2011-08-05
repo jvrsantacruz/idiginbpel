@@ -80,12 +80,12 @@ class OptUI(object):
 
     def on_changed(self, cell, path, val):
         """@brief Callback de cuando se modifica una entrada."""
-        log.debug("Modificado: " + self.list[path][0] + " de " +
-                  self.list[path][1] + " a " + val)
 
-        # Modificarlo en las opciones
+        # Modificar solo cuando algo cambie
+        if self.list[path][1] == val:
+            return None
+
         id = self.list[path][0]
-
         log.debug("checking: %s : %s" % (val, self.opts.check(id, val)))
 
         # Modificarlo en el treeview
