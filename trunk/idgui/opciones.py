@@ -104,18 +104,38 @@ class OptUI(object):
                                 ,error_txt)
 
     def on_guardar(self, widget):
-        # TODO: preguntar
-        log.info(_('idgui.options.saving.options'))
-        for id,val in self.changes:
-            self.opts.set(id, val)
+        dialog = gtk.MessageDialog(parent=self.window,
+                                   type=gtk.MESSAGE_QUESTION,
+                                   buttons=gtk.BUTTONS_OK_CANCEL,
+                                   message_format=
+                                   _('idgui.options.save.dialog.text'))
 
-        self.opts.write()
-        self.window.destroy()
+        if dialog.run() == gtk.RESPONSE_OK:
+            log.info(_('idgui.options.saving.options'))
+
+            # Guardar y escribir solo si hay cambios.
+            if self.changes:
+                for id,val in self.changes.iteritems():
+                    self.opts.set(id, val)
+
+                self.opts.write()
+            self.window.destroy()
+
+        dialog.destroy()
 
     def on_cancelar(self, widget):
-        # TODO: preguntar
-        log.info(_('idgui.options.closing.without.saving'))
-        self.window.destroy()
+        dialog = gtk.MessageDialog(parent=self.window,
+                                   type=gtk.MESSAGE_QUESTION,
+                                   buttons=gtk.BUTTONS_OK_CANCEL,
+                                   message_format=
+                                   _('idgui.options.cancel.dialog.text'))
+
+        if dialog.run() == gtk.RESPONSE_OK:
+            log.info(_('idgui.options.closing.without.saving'))
+            dialog.destroy()
+            self.window.destroy()
+
+        dialog.destroy()
 
     def on_reset(self, widget):
         """@brief Callback de pulsar el botón de resetear las opciones."""
