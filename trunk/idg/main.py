@@ -1,13 +1,10 @@
-# Main class
+"""@namespace Main class"""
 # -*- coding: utf-8 -*-
 
 import os 
 import os.path as path
-import commands
 import shutil
-import gettext
 import tarfile
-import locale
 
 from xml.dom import minidom as md
 
@@ -15,24 +12,10 @@ import util.logger
 log = util.logger.getlog('idg.main')
 
 from opciones import Opt
+import idg_locale
 
-# /usr/share/local instead of ./locale
-app = 'idiginbpel'
-ldir = './locale'
 
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(app, ldir)
-
-gettext.bindtextdomain(app, ldir)
-gettext.textdomain(app)
-
-lang = gettext.translation(app, ldir)
-_ = lang.gettext
-
-gettext.install(app, ldir)
-gettext.install(app, ldir, unicode=1)
-
-log.warning(_('idg.main.not.installed.locales'))
+#log.warning(_('idg.main.not.installed.locales'))
 
 class Idg(object):
     """@brief Main application class
