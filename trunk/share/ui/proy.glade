@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -6,7 +6,6 @@
     <child>
       <object class="GtkVBox" id="proy_container">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <object class="GtkLabel" id="proy_error_label">
             <property name="visible">True</property>
@@ -37,7 +36,7 @@
             <child type="tab">
               <object class="GtkLabel" id="proy_nb_config_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Proyect</property>
+                <property name="label" translatable="yes">Project</property>
                 <attributes>
                   <attribute name="weight" value="semibold"/>
                 </attributes>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -15,7 +15,6 @@
     <child>
       <object class="GtkVBox" id="main_vbase">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <object class="GtkMenuBar" id="main_menu">
             <property name="visible">True</property>
@@ -31,6 +30,7 @@
                       <object class="GtkImageMenuItem" id="main_menu_archivo_nuevo">
                         <property name="label">gtk-new</property>
                         <property name="visible">True</property>
+                        <property name="related_action">menu_action_open_project</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
                         <signal name="activate" handler="nuevo_proyecto"/>
@@ -38,16 +38,17 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="main_menu_archivo_guardar">
-                        <property name="label">gtk-save</property>
+                        <property name="label">Save</property>
                         <property name="visible">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="image">image2</property>
+                        <property name="use_stock">False</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="main_menu_archivo_importar">
                         <property name="label">Import</property>
                         <property name="visible">True</property>
+                        <property name="related_action">menu_action_import_project</property>
                         <property name="image">image1</property>
                         <property name="use_stock">False</property>
                       </object>
@@ -114,7 +115,6 @@
             <child>
               <object class="GtkVBox" id="main_izq_barra">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkButton" id="main_nuevo_boton">
                     <property name="label" translatable="yes">New Project</property>
@@ -143,9 +143,10 @@
                         <property name="model">main_lista_proyectos</property>
                         <property name="level_indentation">1</property>
                         <signal name="cursor_changed" handler="on_lista_proyectos_cursor_changed"/>
+                        <signal name="button_release_event" handler="on_lista_proyectos_release"/>
                         <child>
                           <object class="GtkTreeViewColumn" id="main_lista_proyectos_column">
-                            <property name="title">Proyects</property>
+                            <property name="title">Projects</property>
                             <child>
                               <object class="GtkCellRendererText" id="main_lista_proyectos_column_texrender"/>
                               <attributes>
@@ -170,7 +171,6 @@
             <child>
               <object class="GtkVBox" id="principal">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -199,6 +199,50 @@
     </child>
   </object>
   <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="stock">gtk-redo</property>
+  </object>
+  <object class="GtkAction" id="menu_action_open_project">
+    <property name="label">Open Project</property>
+    <property name="short_label">Open</property>
+    <property name="tooltip">Open a projec to start working with it.</property>
+    <property name="stock_id">gtk-open</property>
+    <property name="always_show_image">True</property>
+    <signal name="activate" handler="on_action_open_activate"/>
+  </object>
+  <object class="GtkAction" id="menu_action_close_project">
+    <property name="label">Close Project</property>
+    <property name="short_label">Close</property>
+    <property name="tooltip">Close the project and return to the main window.</property>
+    <property name="stock_id">gtk-no</property>
+    <property name="always_show_image">True</property>
+    <signal name="activate" handler="on_action_close_activate"/>
+  </object>
+  <object class="GtkAction" id="menu_action_remove_project">
+    <property name="label">Remove Project</property>
+    <property name="short_label">Remove</property>
+    <property name="tooltip">Remove the project definetely.</property>
+    <property name="stock_id">gtk-delete</property>
+    <property name="always_show_image">True</property>
+    <signal name="activate" handler="on_action_rm_activate"/>
+  </object>
+  <object class="GtkAction" id="menu_action_export_project">
+    <property name="label">Export Project</property>
+    <property name="short_label">Export</property>
+    <property name="tooltip">Export the project to a .idg file.</property>
+    <property name="stock_id">gtk-redo</property>
+    <property name="always_show_image">True</property>
+    <signal name="activate" handler="on_action_export_activate"/>
+  </object>
+  <object class="GtkAction" id="menu_action_import_project">
+    <property name="label">Import Project</property>
+    <property name="short_label">Import</property>
+    <property name="tooltip">Import project into IdiginBPEL.</property>
+    <property name="stock_id">gtk-undo</property>
+    <property name="always_show_image">True</property>
+    <signal name="activate" handler="on_action_import_activate"/>
+  </object>
+  <object class="GtkImage" id="image2">
     <property name="visible">True</property>
     <property name="stock">gtk-floppy</property>
   </object>

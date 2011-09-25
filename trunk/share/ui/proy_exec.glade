@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -16,57 +16,6 @@
     <child>
       <object class="GtkVBox" id="proy_exec_container">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkHBox" id="proy_exec_up_hbox">
-            <property name="visible">True</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkLabel" id="proy_exec_svr_label">
-                <property name="visible">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="padding">5</property>
-                <property name="pack_type">end</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="proy_exec_svr_boton">
-                <property name="label" translatable="yes">Comprobar</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="released" handler="comprobar_servidor_abpel"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="padding">10</property>
-                <property name="pack_type">end</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="proy_exec_svr-state_label">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">OK</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="padding">10</property>
-                <property name="pack_type">end</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkHBox" id="proy_exec_down_hbox">
             <property name="visible">True</property>
@@ -114,7 +63,108 @@
             <child>
               <object class="GtkVBox" id="proy_exec_right_vbox">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkFrame" id="proy_exec_frame_abpel">
+                    <property name="visible">True</property>
+                    <property name="label_xalign">0</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkAlignment" id="proy_ejec_align1">
+                        <property name="visible">True</property>
+                        <property name="top_padding">10</property>
+                        <property name="bottom_padding">10</property>
+                        <property name="left_padding">10</property>
+                        <property name="right_padding">10</property>
+                        <child>
+                          <object class="GtkVBox" id="proy_ejec_abpel_vbox">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkHBox" id="proy_ejec_abpel_hbox">
+                                <property name="visible">True</property>
+                                <child>
+                                  <object class="GtkLabel" id="proy_exec_svr_label">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">State:</property>
+                                    <property name="use_markup">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="proy_exec_svr-state_label">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="label" translatable="yes">OK</property>
+                                  </object>
+                                  <packing>
+                                    <property name="padding">10</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkHButtonBox" id="proy_ejec_abpel_buttons">
+                                <property name="visible">True</property>
+                                <child>
+                                  <object class="GtkButton" id="proy_exec_svr_start_boton">
+                                    <property name="label" translatable="yes">Start</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <signal name="released" handler="on_proy_exec_svr_start_boton"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="proy_exec_svr_check_boton">
+                                    <property name="label" translatable="yes">Check</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <signal name="released" handler="on_proy_exec_svr_check_boton"/>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="padding">10</property>
+                                    <property name="pack_type">end</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel" id="proy_exec_abpel_title_label">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">&lt;b&gt;ActiveBpel Server&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
                 <child>
                   <object class="GtkFrame" id="proy_exec_frame">
                     <property name="visible">True</property>
@@ -130,7 +180,6 @@
                         <child>
                           <object class="GtkVBox" id="proy_exec_control_vbox">
                             <property name="visible">True</property>
-                            <property name="orientation">vertical</property>
                             <property name="spacing">2</property>
                             <child>
                               <object class="GtkProgressBar" id="proy_exec_control_bar">
@@ -149,7 +198,7 @@
                                   <object class="GtkLabel" id="proy_exec_control_time-title_label">
                                     <property name="visible">True</property>
                                     <property name="xalign">0.98000001907348633</property>
-                                    <property name="label" translatable="yes">Tiempo:</property>
+                                    <property name="label" translatable="yes">Time:</property>
                                   </object>
                                   <packing>
                                     <property name="position">0</property>
@@ -185,7 +234,7 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="position">0</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -271,7 +320,7 @@
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="pack_type">end</property>
-                    <property name="position">1</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </object>
@@ -281,7 +330,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </object>

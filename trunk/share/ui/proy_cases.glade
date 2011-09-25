@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -16,7 +16,6 @@
     <child>
       <object class="GtkVBox" id="proy_cases_container">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <object class="GtkHBox" id="proy_cases_up_hbox">
             <property name="visible">True</property>
@@ -103,7 +102,6 @@
             <child>
               <object class="GtkVBox" id="proy_cases_right_vbox">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkFrame" id="proy_cases_frame">
                     <property name="visible">True</property>
@@ -228,7 +226,16 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkButton" id="proy_cases_anl_button">
+                        <property name="label" translatable="yes">Analize</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <signal name="released" handler="on_proy_cases_anl_button"/>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>

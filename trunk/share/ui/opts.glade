@@ -131,7 +131,7 @@
             </child>
             <child>
               <object class="GtkButton" id="opt_reset">
-                <property name="label" translatable="yes">Default values</property>
+                <property name="label" translatable="yes">Reset Defaults</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
