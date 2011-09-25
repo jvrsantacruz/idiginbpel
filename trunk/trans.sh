@@ -1,4 +1,5 @@
 #!/bin/sh
+# Francisco Javier Santacruz López-Cepero (C)
 
 # Application name (used in filenames)
 APP=idiginbpel
@@ -22,9 +23,11 @@ PO_FILES=$LOCALE_DIR/*/$APP.po
 MO_FILES=$LOCALE_DIR/*/LC_MESSAGES/$APP.mo
 
 if [ ! $# -eq 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-	echo "Usage: $0 update|binary"
+	echo "Usage: $0 update|binary|context"
 	echo "          update: Update translation templates"
 	echo "          binary: Generate binary versions of templates"
+	echo "          clear: Removes all binary versions."
+	echo "          context: Generate msgid context to facilitate translation."
 	exit 1
 fi
 
@@ -74,4 +77,9 @@ elif [ "$1" = "binary" ]; then
 		mkdir -p $DIR_PO
 		msgfmt $PO -o $DIR_PO/LC_MESSAGES/$APP.mo
 	done
+elif [ "$1" = "context" ]; then
+	fgrep msgid $POT_FILE | cut -d" " -f 2 | sed -e "s/\"//g" | xargs -I \{\} fgrep -iHRn \{\} $PY_FILES -A 2 -B 2 --exclude *~ --exclude *.mo --exclude *.po --exclude *.pot --exclude *.swp --exclude *.pyc
+
+elif [ "$1" = "clear" ]; then
+	find $LOCALE_DIR -name "*.mo" -delete
 fi
