@@ -44,7 +44,7 @@ class Idgui(object):
         ## Opciones de la configuración
         self.opt = idg.opt
 
-        self.builder.set_translation_domain('idiginbpel')
+        self.builder.set_translation_domain(gettext.textdomain())
 
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
@@ -125,7 +125,7 @@ class Idgui(object):
                                              "ui/nuevo_proyecto.glade"))
 
         # Filtro para el selector de ficheros
-        filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel")
+        #filtro_fichero_bpel = self.builder.get_object("proyecto_filtro_fichero_bpel").add_pattern("*.bpel")
 
     ## @}
 
