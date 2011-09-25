@@ -1,4 +1,4 @@
-# Clase Proyecto
+"""@namespace Clase Proyecto"""
 # -*- coding: utf-8 -*-
 
 import os
@@ -14,9 +14,10 @@ import re
 import glob
 import time
 
-from file import ANTFile
-from bptsfile import BPTSFile
-from instrum import Instrumentador
+from idg.file import ANTFile
+from idg.bptsfile import BPTSFile
+from idg.invfile import InvFile
+from idg.instrum import Instrumentador
 import util.xml
 import util.logger
 
@@ -25,7 +26,8 @@ log = util.logger.getlog('idg.proyect')
 class ProyectoError(Exception):
     """@brief Clase excepción para la clase Proyecto"""
 
-    def __init__(self,msj):
+    def __init__(self, msj):
+        Exception.__init__(self)
         self.msj = msj
 
     def __str__(self):
@@ -107,7 +109,7 @@ class Proyecto(object):
     ## @name Inicialización 
     ## @{
 
-    def __init__(self,nombre,idg,bpel=""):
+    def __init__(self, nombre, idg, bpel=""):
         """@brief Constructor de la clase proyecto.  Establece los valores por
         defecto para las rutas del proyecto.  
         Crea el proyecto si se le indica la ruta a un bpel Lee la configuración
@@ -122,14 +124,10 @@ class Proyecto(object):
         ## Nombre del proyecto (se emplea en la ruta)
         self.nombre = nombre
 
-        ## Instancia del control del proyecto
-        self.idg = idg
-
-        ## Instancia del control de opciones
-        self.opts = idg.opt
-
         ## Ruta del bpel original (si está especificado)
         self.bpel_o =   path.abspath( bpel ) if bpel else ""
+
+        self.idg = idg
 
         # Variables internas, rutas, etc...
         self._set_vars()
@@ -155,29 +153,29 @@ class Proyecto(object):
         # Comprueba que la estructura del proyecto está bien
         try:
             self.check()
-        except (ProyectoRecuperable) as e:
-            log.error(_("idg.proyect.created.with.errors") + str(e))
+        except (ProyectoRecuperable) as exc:
+            log.error(_("idg.proyect.created.with.errors") + str(exc))
 
         ## @name Listas
         ## @{
 
         ## Lista con los ficheros en el proyecto
-        self.fichs  =   os.listdir(self.dir)
+        self.fichs = os.listdir(self.dir)
 
         ## Lista con los ficheros de las trazas
-        self.ftrazas=   os.listdir(self.trazas_dir)
+        self.ftrazas = os.listdir(self.trazas_dir)
         ## Lista con los ficheros de invariantes
-        self.finvr  =   os.listdir(self.invr_dir)
+        self.finvr = os.listdir(self.invr_dir)
         ## @}
 
         # Set have cases flag
-        self.have_cases = len([b.get_cases() for b in self.bptsfiles.values()]) > 0
+        self.have_cases = len([b.get_cases() for b 
+                               in self.bptsfiles.values()]) > 0
 
     def _set_vars(self):
         """@brief Establece las variables internas del objeto"""
 
-        idg = self.idg
-        opt = self.opts
+        opt = self.opts = self.idg.opt
 
         # Urls generales de proyecto
         self.home       =   opt.get('home')
@@ -189,7 +187,7 @@ class Proyecto(object):
         self.port       =   opt.get('port')
 
         ## Directorio del proyecto
-        self.dir        =   path.join(self.home,'proy',self.nombre) 
+        self.dir        =   path.join(self.home, 'proy', self.nombre)
         self.dir        =   path.abspath( self.dir )
 
         ## @name Rutas de Ficheros 
@@ -246,7 +244,7 @@ class Proyecto(object):
 
         ## @name Analisis
         ## @{
-        
+
         ## Tipo de aplanado
         self.flattening = 'index-flattening'
         ## Simplify
@@ -278,12 +276,13 @@ class Proyecto(object):
         ## Lista de rutas con las dependencias del bpel
         self.deps, self.dep_miss = self.__buscar_dependencias([bpel])
 
-        log.info("%i dependencias encontradas, %i dependencias rotas, %i dependencias totales" % \
-        (len(self.deps),len(self.dep_miss),len(self.dep_miss)+len(self.deps)) )
+        log.info("%i dependencias encontradas, %i dependencias rotas,"\
+                 "%i dependencias totales" % (len(self.deps),
+        len(self.dep_miss), len(self.dep_miss) + len(self.deps)))
 
         return True
 
-    def __buscar_dependencias(self,files,deps=set(),miss=set(),first=True):
+    def __buscar_dependencias(self, files, deps=set(), miss=set(), first=True):
         """@brief Busca las dependencias xsd y wsdl recursivamente en los
         ficheros y devuelve sus rutas completas. 
         Copia las dependencias al proyecto y las modifica para adaptar los
@@ -300,54 +299,55 @@ class Proyecto(object):
             miss = set()
 
         # Caso de parada de la función
-        if len(files) == 0 :
+        if len(files) == 0:
             return []
 
         local_deps = set()
 
         # Buscamos en todas las rutas de ficheros que recibamos
-        for f in files:
+        for fpath in files:
 
-            nom = path.basename(f) # Nombre del fichero
-            dir = path.dirname(f)  # Directorio del fichero
+            nom = path.basename(fpath) # Nombre del fichero
+            fdir = path.dirname(fpath)  # Directorio del fichero
             proy = path.join(self.dep_dir, nom) # Ruta dentro del proyecto
             if path.exists(proy):   # Si ya existe en el proyecto
-                miss.discard(dir)  # Quitamos de las dependencias rotas 
+                miss.discard(fdir)  # Quitamos de las dependencias rotas 
 
-            log.debug(_("idg.proyect.dependence.list") + nom)
+            #log.debug(_("idg.proyect.dependence.list") + nom)
 
             # Abrimos el fichero, obtenemos uss imports, modificamos las rutas 
             # y lo serializamos de nuevo pero dentro del proyecto.
 
             # Cargar fichero en memoria
             try:
-                xml = md.parse( f )
-            except:
+                xml = md.parse(fpath)
+            except IOError:
                 # Mostramos un error y añadimos 
                 # a las dependencias rotas
-                log.error(_("idg.proyect.parse.error") + f)
-                miss.add(f)
+                log.error(_("idg.proyect.parse.error") + fpath)
+                miss.add(fpath)
                 continue
 
             # Buscar los imports en el fichero
             # empleando los distintos namespaces
             imps_l = xml.getElementsByTagName('import')
-            imps_l += xml.getElementsByTagNameNS(self.bpel_url,'import')
-            imps_l += xml.getElementsByTagNameNS(self.wsdl_url,'import')
-            imps_l += xml.getElementsByTagNameNS(self.xsd_url,'import')
+            imps_l += xml.getElementsByTagNameNS(self.bpel_url, 'import')
+            imps_l += xml.getElementsByTagNameNS(self.wsdl_url, 'import')
+            imps_l += xml.getElementsByTagNameNS(self.xsd_url, 'import')
             imps = set(imps_l)
 
             # Modificar los import a rutas al mismo directorio
             # Obtener las rutas absolutas  meterlas en deps
             for i in imps:
-                attr = 'location' if i.hasAttribute('location') else 'schemaLocation'
+                attr = 'location' if i.hasAttribute('location')\
+                                  else 'schemaLocation'
                 # Si no está el atributo por alguna razón, pasar de el.
                 ruta = i.getAttribute(attr) 
                 if not ruta:
                     continue
 
                 # Ruta real de la dependencia encontrada
-                dep = path.abspath(path.join(dir, ruta))
+                dep = path.abspath(path.join(fdir, ruta))
 
                 # Añadir la dependencia al conjunto local y total
                 local_deps.add(dep)
@@ -362,8 +362,6 @@ class Proyecto(object):
                 else:
                     ruta = path.basename(ruta)
 
-                #log.debug(ruta)
-
                 # Modificar el atributo con la ruta correcta
                 i.setAttribute(attr, ruta)
 
@@ -372,12 +370,12 @@ class Proyecto(object):
                 # Serializar el xml a un fichero en el directorio self.dep_dir
                 # Con la ruta adecuada si es el bpel original. 
                 if first :
-                    file = open(self.bpel,'w')
+                    xmlfile = open(self.bpel, 'w')
                 else:
-                    file = open(path.join(self.dep_dir, nom), 'w')
+                    xmlfile = open(path.join(self.dep_dir, nom), 'w')
 
-                file.write(xml.toxml('utf-8'))
-            except:
+                xmlfile.write(xml.toxml('utf-8'))
+            except IOError:
                 # Si no se ha podido escribir la versión modificada del
                 # fichero, añadirlo a las dependencias rotas 
                 log.error(_("idg.proyect.cant.write") + nom)
@@ -414,30 +412,31 @@ class Proyecto(object):
             self.inst_thread.start()
 
     def ejecutar(self):
-        """@brief Ejecuta los casos de prueba del proyecto en el servidor ABpel. """
+        """@brief Ejecuta los casos de prueba 
+        del proyecto en el servidor ABpel. """
 
         # No crear otro subproceso si ya se está ejecutando uno.
-        if self.ejec_subproc is not None and self.ejec_subproc.poll() is None :
+        if self.ejec_subproc is not None and self.ejec_subproc.poll() is None:
             log.warning(_("idg.proyect.test.already.running"))
             return
 
         # Ruta logs bpelunit
         #log.debug(self.bpelunit)
-        BUpath = path.join(self.bpelunit, 'process-logs')
+        bupath = path.join(self.bpelunit, 'process-logs')
 
         # Comprobar que existe la ruta a bpelunit
         try:
-            os.listdir(BUpath)
-        except:
+            os.listdir(bupath)
+        except IOError:
             log.error(_("idg.proyect.cant.find.bpelunit.path"))
 
         # Borrar los logs antiguos bpelunit
         try:
-            self.borrar_trazas(BUpath)
+            self.borrar_trazas(bupath)
         except:
-            e = ProyectoRecuperable(_("idg.proyect.cant.remove.old.bpelunit.logs"\
-                                      + BUpath))
-            e.what = BUpath
+            exc = ProyectoRecuperable(\
+                _("idg.proyect.cant.remove.old.bpelunit.logs" + bupath))
+            exc.what = bupath
             raise
 
         # Ejecutar el ant en un subproceso aparte
@@ -462,21 +461,21 @@ class Proyecto(object):
 
         # Realizar la conexión
         try:
-            f = urllib.urlopen(url)
+            urlf = urllib.urlopen(url)
             log.info(_("idg.proyect.test.activebpel.server.connection") + url)
         except IOError:
             log.error(_("idg.proyect.cant.connect.activebpel.server") + url)
         else:
             # Comprobar el código http 
             log.debug(_("idg.proyect.activebpel.server.response.code") +\
-                      str(f.getcode()))
+                      str(urlf.getcode()))
 
             # Expresión regular para saber si está activo
             patron = re.compile('.*Running.*')
 
             active = False
             # leer el resultado
-            for line in f :
+            for line in urlf :
                 if patron.match(line) :
                     active = True
                     break
@@ -486,14 +485,54 @@ class Proyecto(object):
 
         return None
 
+    def exec_abpel_script(self, arg, getoutput=False):
+        """@brief Executes abpel script.
+        @param arg Argument for the script.
+        @param getoutput Returns the commands output.
+        @returns The command code or the commands output.
+        """
+        cmd = ("bash", self.opts.get("activebpel"), arg)
+        log.info(_("idg.proyect.test.running.command") + str(cmd) )
+
+        if getoutput:
+            return subproc.Popen(cmd, stdout=subproc.PIPE).communicate()[0]
+        else:
+            return subproc.call(cmd)
+
+    def check_abpel(self):
+        """@brief Checks the ActiveBpel server status through the daemon shell
+        script.
+        @returns True if running, False if not running.
+        """
+        output = self.exec_abpel_script("status", getoutput=True)
+
+        return output.find("Running") != -1\
+                and output.find("Not Running") == -1
+
+    def start_abpel(self):
+        """@brief Starts abpel server.
+           @returns True if successfull, False if couldn't start server.
+           """
+        self.exec_abpel_script("start")
+        return self.check_abpel()
+
+    def stop_abpel(self):
+        """@brief Stops abpel server.
+           @returns True if stopped successfully.
+           """
+        self.exec_abpel_script("stop")
+        return self.check_abpel()
+
     def cancelar_ejecucion(self):
         """@brief Termina la ejecución matando el proceso relacionado."""
         try:
             self.ejec_subproc.kill()
-        except:
+        except AttributeError:
             return False
-        else :
-            log.info("Subproceso de ejecución matado")
+        except OSError:
+            return False
+        else:
+            log.info(_('idg.execution.finished'))
             return True
 
     def seleccionar_trazas_analisis(self, trz):
@@ -516,9 +555,9 @@ class Proyecto(object):
 
         # Añadir la selección actual enlazando los ficheros desde su lugar en
         # self.trazas_dir
-        for file, cases in trz.items() :
+        for cfile, cases in trz.items() :
             for case, tfile in cases.items() :
-                os.link(path.join(tdir,tfile), path.join(anl_tdir, tfile))
+                os.link(path.join(tdir, tfile), path.join(anl_tdir, tfile))
 
     def analizar(self, trz):
         """@brief Ejecuta los scripts de aplanado y el motor Daikon sobre las
@@ -545,7 +584,7 @@ class Proyecto(object):
     ## @name Casos de prueba
     ## @{
 
-    def list_bpts(self,path):
+    def list_bpts(self, path_):
         """@brief Lista los casos de prueba que hay en un bpts.
            @param path Ruta del fichero
            @returns Una lista con los nombres de los casos."""
@@ -554,19 +593,20 @@ class Proyecto(object):
         # Abrirlo
         try:
             bpts = et.ElementTree()
-            bproot = bpts.parse(path)
+            bproot = bpts.parse(path_)
         except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.load.testcases.file") + path)
+            raise ProyectoRecuperable(\
+                _("idg.proyect.cant.load.testcases.file") + path_)
 
         # Construir los nombres con la uri es un peñazo
-        ns = "{%s}" % self.test_url
+        nsc = "{%s}" % self.test_url
 
         # Encontramos elementos básicos
-        testSuite = bproot
-        tCases = bproot.find(ns + 'testCases')
+        #testSuite = bproot
+        tcases = bproot.find(nsc + 'testCases')
 
         # Buscamos todos los casos de prueba y los devolvemos.
-        return [c.get('name') for c in tCases.findall(ns + 'testCase')]
+        return [case.get('name') for case in tcases.findall(nsc + 'testCase')]
 
     def add_bpts(self, path_):
         """@brief Add a new bpts to proyect.
@@ -595,8 +635,8 @@ class Proyecto(object):
         try:
             shutil.copy(path_, p_path)
         except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.copy.file.to.proyect") \
-                    + path_)
+            raise ProyectoRecuperable(\
+                    _("idg.proyect.cant.copy.file.to.proyect") + path_)
 
         # Open the proyect copy of the bpts file and process it
         bpts = BPTSFile(p_path)
@@ -683,12 +723,13 @@ class Proyecto(object):
     ## @name Trazas
     ## @{
 
-    def borrar_trazas(self, dir):
+    def borrar_trazas(self, tdir):
         """@brief Borra todas las trazas.log en un directorio.
         @param dir El directorio .
         """
         log.info('Cleaning old trace files from %s' % self.trazas_anl_dir)
-        [os.remove(path.join(dir,f)) for f in os.listdir(dir) if f.endswith('.log')]
+        [os.remove(path.join(tdir, f)) for f in os.listdir(tdir)\
+                                     if f.endswith('.log')]
 
     def trazas_disponibles(self):
         """@brief Devuelve las trazas disponibles en un diccionario
@@ -705,22 +746,28 @@ class Proyecto(object):
         antigua.
         """
         # Función que obtiene un float con el tiempo de la traza
-        n2f = lambda n : float(self.parse_traza(n)[2])
+        n2f = lambda n : float(Proyecto.parse_traza(n)[2])
 
-        def traza_time_cmp(x, y):
+        def traza_time_cmp(first, second):
+            """@brief compara tiempos de traza en texto para ordenarlas"""
             # Nombre a float 
             #(sacar el timestamp del nombre de la traza y convertirlo a float.)
             # Devolver la diferencia 
             try: 
-                return int(n2f(y) - n2f(x))
-            except :
+                return int(n2f(second) - n2f(first))
+            except TypeError:
+                return -1
+            except AttributeError:
+                return -1
+            except ValueError:
                 return -1
 
         # Ordenar las trazas por tiempo de ejecución
         trazas.sort(traza_time_cmp)
         return trazas
 
-    def parse_traza(self, traza):
+    @staticmethod
+    def parse_traza(traza):
         """@brief Toma el nombre de un fichero de traza y devuelve 3 valores,
         fichero, caso, time
         @param traza El nombre del fichero de traza.
@@ -732,10 +779,10 @@ class Proyecto(object):
         # El timestamp se encuentra en segundos y es obtenido con time.time()
         try:
             fich, caso, time = traza.split(':')
-            time = time.rsplit('.',1)[0]
+            time = time.rsplit('.', 1)[0]
         except:
             #log.warning(_("Hay una traza que no sigue el formato: " + traza))
-            return "","",""
+            return "", "", ""
 
         return fich, caso, time
 
@@ -762,7 +809,7 @@ class Proyecto(object):
         # Añadir las trazas al diccionario
         #  como están ordenadas, se añaden a las listas por orden.
         for f in tord :
-            fich, caso, time = self.parse_traza(f)
+            fich, caso, time = Proyecto.parse_traza(f)
 
             #log.debug("fichero %s , caso %s, time %s" % (fich,caso,time))
             if not fich or not caso or not time :
@@ -819,37 +866,53 @@ class Proyecto(object):
         self.simplify = flag
 
     def anl_copiar_inv(self):
-        """Copia el último invariante generado en la última ejecución a la carpeta
-        de invariantes. Renombrándolos convenientemente"""
-        log.info('Importando invariante generado')
+        """Copia el último invariante generado en la última ejecución a la
+        carpeta de invariantes. Renombrándolos convenientemente"""
+        log.info(_("idg.anl.copying.invariants"))
 
         # Importar el fichero de invariantes
         dirs = glob.glob(path.join(self.dir, 'daikon-out*'))
-        log.debug(path.join(self.dir, 'daikon-out*'))
+        #log.debug(path.join(self.dir, 'daikon-out*'))
         dirs.sort()
-        log.debug(dirs)
-        if dir :
+        if dirs:
             src = os.path.join(dirs[-1], 'procesoInspeccionado.out')
-            dst = os.path.join(self.invr_dir, 'invr-' + str(time.time()) + '.out')
-            shutil.move(src, dst)
+            dst = os.path.join(self.invr_dir, 'invr-' 
+                               + str(time.time()) + '.out')
+            try:
+                shutil.move(src, dst)
+            except shutil.Error:
+                log.error(_("idg.anl.error.copying.invariants"))
+            else:
+                shutil.rmtree(dirs[-1])
 
     ## @}
 
     ## @name Invariantes
     ## @{
 
-    def inv_ultimo(self):
-        """@brief Devuelve el último invariante
-        @retval La ruta completa al último invariante o None.
+    def inv_select(self, name):
+        """@brief retrieves the given invariant file and returns it.
+        @returns The InvFile opened. None in case of error.
         """
-        invs = glob.glob(path.join(self.invr_dir, 'invr-*'))
-        if invs :
+        for inv in glob.glob(path.join(self.invr_dir, 'invr-*')):
+            if name == path.basename(inv): 
+                return InvFile(inv)
+
+        return None
+
+    def inv_lastone(self):
+        "@returns the path to last invariant generated or None."
+        invs = self.inv_list()
+
+        if invs:
             invs.sort()
-            invs = invs[-1]
+            return invs[-1]
         else:
             return None
 
-        return invs
+    def inv_list(self):
+        "@returns the list of available invariants by name."
+        return glob.glob(path.join(self.invr_dir, 'invr-*'))
 
     ## @}
 
@@ -866,16 +929,17 @@ class Proyecto(object):
 
             # Comprobar el bpel original
             if not path.exists(self.bpel_o):
-                raise ProyectoError(_("idg.proyect.bpel.file.dont.exist") + self.bpel_o)
+                raise ProyectoError(\
+                        _("idg.proyect.bpel.file.dont.exist") + self.bpel_o)
 
             # Crear el directorio nuevo en data
             # Copiar los ficheros básicos de skel
             log.info(_("idg.proyect.init.proyect"))
             try:
-                shutil.copytree( path.join(self.share ,'skel') , self.dir )
+                shutil.copytree( path.join(self.share, 'skel') , self.dir )
             except:
-                raise ProyectoError(_("idg.proyect.init.proyect.error.using") + \
-                                    path.join(self.share,'skel'))
+                raise ProyectoError(_("idg.proyect.init.proyect.error.using") +\
+                                    path.join(self.share, 'skel'))
 
             # Buscar dependencias (y el bpel original modificándolo)
             # Si falla borramos el intento de proyecto 
@@ -907,7 +971,8 @@ class Proyecto(object):
         # Comprobar existencia de la estructura y de los
         # ficheros más importantes: proy,dir,text,bpel
         required = (self.dir, self.bpel, self.proy, self.build_path,
-                    self.test_path, self.casos_dir, self.trazas_dir, self.invr_dir)
+                    self.test_path, self.casos_dir, self.trazas_dir, 
+                    self.invr_dir)
 
         for f in required:
             if not path.exists( f ):
@@ -945,7 +1010,8 @@ class Proyecto(object):
             file = open(self.test_path, 'w')
             file.write(bpts.toxml('utf-8'))
         except:
-            raise ProyectoRecuperable(_("idg.proyect.cant.write.main.test.file"))
+            raise ProyectoRecuperable(\
+                    _("idg.proyect.cant.write.main.test.file"))
 
         # Si hay dependencias rotas, avisar.
         if len(self.dep_miss) != 0:
@@ -972,7 +1038,7 @@ class Proyecto(object):
 
         #log.debug(str([f.get_cases() for f in self.bptsfiles.values()]))
 
-    def cargar_deps(self,dom):
+    def cargar_deps(self, dom):
         """@brief Carga las dependencias del proyecto leyendo el fichero de
         configuración."""
 
@@ -1025,7 +1091,7 @@ class Proyecto(object):
     ## @name Guardar y Configurar
     ## @{
 
-    def guardar_datos(self,dom):
+    def guardar_datos(self, dom):
         """@brief Guarda los datos propios del proyecto en el fichero de
         configuración.
         @param dom ElementTree del proyecto abierto.
@@ -1048,8 +1114,8 @@ class Proyecto(object):
             # Modificación del nombre!  
             # Cuidado, la modificación del nombre puede hacerse desde la
             # realidad (self.nombre) hacia el proy.xml pero no al revés.  
-            # El nombre del proyecto está en la ruta física del mismo y su cambio
-            # implica el movimiento de directorios
+            # El nombre del proyecto está en la ruta física del mismo y su
+            # cambio implica el movimiento de directorios
             #if root.attrib['nombre'] != self.nombre:
             #    root.attrib['nombre'] = self.nombre
 
@@ -1067,7 +1133,7 @@ class Proyecto(object):
         except:
             raise ProyectoError(_("idg.proyect.cant.save.proyect.data"))
 
-    def guardar_deps(self,dom):
+    def guardar_deps(self, dom):
         """@brief Guarda las dependencias en el fichero de configuración.
         @param dom ElementTree del proyecto abierto.
         """
@@ -1092,7 +1158,7 @@ class Proyecto(object):
             for d in self.deps + self.dep_miss:
                 # Si no está, añadirlo
                 if not d in drutas:
-                    sub = et.SubElement(e,'dependencia')
+                    sub = et.SubElement(e, 'dependencia')
 
                     # Añadir/Actualizar los atributos
                     sub.attrib['nombre'] =  path.basename(d)
@@ -1123,7 +1189,7 @@ class Proyecto(object):
 
             for name, bpts in self.bptsfiles.items():
                 sub = et.SubElement(e, 'testfile')
-                [et.SubElement(sub, 'testcase').set('name',str(c))\
+                [et.SubElement(sub, 'testcase').set('name', str(c))\
                  for c in bpts.get_cases()]
         except:
             raise ProyectoError(_("idg.proyect.cant.save.testcases"))
@@ -1151,7 +1217,7 @@ class Proyecto(object):
                 efile = et.SubElement(e, 'file')
                 for case, tfiles in cases.items() :
                     ecase = et.SubElement(efile, 'case')
-                    [et.SubElement(ecase, 'tracefile').set('name',n) for n in \
+                    [et.SubElement(ecase, 'tracefile').set('name', n) for n in \
                      tfiles]
         finally:
             #raise ProyectoError(_("Error al guardar las trazas"))
