@@ -1,406 +1,533 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# IdiginBPEL
+# Copyright (C) 2011 Javier Santacruz
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Javier Santacruz <javier.santacruz@uca.es>, 2011.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-30 22:01+0200\n"
+"POT-Creation-Date: 2011-08-15 17:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Javier Santacruz <javier.santacruz@uca.es>\n"
+"Language-Team: English <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: idg/bptsfile.py:75
 msgid "idg.bptsfile.test.case.invalid.dom"
-msgstr ""
+msgstr "Invalid testcase. Missing 'name' attribute."
 
 #: idg/file.py:53
 msgid "idg.file.cant.open.file.for"
-msgstr ""
+msgstr "Couln't open file: "
 
 #: idg/file.py:198
 msgid "idg.file.cannot.parse.file"
-msgstr ""
+msgstr "Couldn't parse file: "
 
 #: idg/file.py:213
 msgid "idg.file.cant.serialize.xml"
-msgstr ""
+msgstr "Couldn't serialize file: "
 
 #: idg/file.py:445
 msgid "idg.file.antfile.missing.project.element"
-msgstr ""
+msgstr "Missing 'project' element in antfile."
 
 #: idg/instrum.py:38
 msgid "idg.instrum.running.command"
-msgstr ""
+msgstr "Running command: "
 
 #: idg/instrum.py:76
 msgid "idg.instrum.instrumentation.finished"
-msgstr ""
+msgstr "Instrumentation finished."
 
-#: idg/main.py:35
-msgid "idg.main.not.installed.locales"
-msgstr "THIS IS A TEEEEEEEST"
-
-#: idg/main.py:101
+#: idg/main.py:85
 msgid "idg.main.available.proyects.list"
-msgstr ""
+msgstr "Available proyects list: "
 
-#: idg/opciones.py:105
+#: idg/main.py:133
+msgid "idg.importation.wrong.format"
+msgstr "Wrong format for project. First element is not a directory. When importing: "
+
+#: idg/opciones.py:100
 msgid "idg.options.cant.open.for.write"
-msgstr ""
+msgstr "Couldn't open file for write: "
 
-#: idg/opciones.py:108
+#: idg/opciones.py:103
 msgid "idg.options.writting.config.in"
-msgstr ""
+msgstr "Writing config in: "
 
-#: idg/opciones.py:126
-#, fuzzy
+#: idg/opciones.py:143
 msgid "idg.options.not.valid.use.default"
-msgstr "THIS IS A TEEEEEEEST"
+msgstr "Not a valid option. Using default value: "
 
-#: idg/opciones.py:133
+#: idg/opciones.py:150
 msgid "idg.options.cant.parse.config.file"
-msgstr ""
+msgstr "Could'nt parse config file: "
 
-#: idg/opciones.py:137
+#: idg/opciones.py:154
 msgid "idg.options.using.config.file"
-msgstr ""
+msgstr "Using config file: "
 
-#: idg/proyecto.py:159
+#: idg/proyecto.py:156
 msgid "idg.proyect.created.with.errors"
-msgstr ""
+msgstr "Project created with errors."
 
-#: idg/proyecto.py:274 idg/proyecto.py:275 idg/proyecto.py:869
+#: idg/proyecto.py:270 idg/proyecto.py:271 idg/proyecto.py:918
 msgid "idg.proyect.bpel.file.dont.exist"
-msgstr ""
+msgstr "Bpel file doesn't exist: "
 
-#: idg/proyecto.py:317
+#: idg/proyecto.py:313
 msgid "idg.proyect.dependence.list"
-msgstr ""
+msgstr "Dependence list: "
 
-#: idg/proyecto.py:328
+#: idg/proyecto.py:324
 msgid "idg.proyect.parse.error"
-msgstr ""
+msgstr "Error when looking for dependences parsing: "
 
-#: idg/proyecto.py:383
+#: idg/proyecto.py:379
 msgid "idg.proyect.cant.write"
-msgstr ""
+msgstr "Cant write file into project: "
 
-#: idg/proyecto.py:421
+#: idg/proyecto.py:417
 msgid "idg.proyect.test.already.running"
-msgstr ""
+msgstr "Test execution is already running."
 
-#: idg/proyecto.py:432
+#: idg/proyecto.py:428
 msgid "idg.proyect.cant.find.bpelunit.path"
-msgstr ""
+msgstr "Can't find bpelunit file at: "
 
-#: idg/proyecto.py:438
+#: idg/proyecto.py:434
 msgid "idg.proyect.cant.remove.old.bpelunit.logs"
-msgstr ""
+msgstr "Can't remove old bpelunit logs in: "
 
-#: idg/proyecto.py:445
+#: idg/proyecto.py:441 idg/proyecto.py:492
 msgid "idg.proyect.test.running.command"
-msgstr ""
+msgstr "Running command: "
 
-#: idg/proyecto.py:466
+#: idg/proyecto.py:462
 msgid "idg.proyect.test.activebpel.server.connection"
-msgstr ""
+msgstr "Checking ActiveBPEL server connection: "
 
-#: idg/proyecto.py:468
+#: idg/proyecto.py:464
 msgid "idg.proyect.cant.connect.activebpel.server"
-msgstr ""
+msgstr "Cannot connect with ActiveBPEL server: "
 
-#: idg/proyecto.py:471
+#: idg/proyecto.py:467
 msgid "idg.proyect.activebpel.server.response.code"
-msgstr ""
+msgstr "ActiveBpel server response code: "
 
-#: idg/proyecto.py:483
+#: idg/proyecto.py:479
 msgid "idg.proyect.activebpel.server.status"
-msgstr ""
+msgstr "ActiveBpel server status: "
 
-#: idg/proyecto.py:531
+#: idg/proyecto.py:565
 msgid "idg.proyect.analysis.already.running"
-msgstr ""
+msgstr "Analysis is already running."
 
-#: idg/proyecto.py:535
+#: idg/proyecto.py:569
 msgid "idg.proyect.analysis.running.command"
-msgstr ""
+msgstr "Running command: "
 
-#: idg/proyecto.py:559
+#: idg/proyecto.py:593
 msgid "idg.proyect.cant.load.testcases.file"
-msgstr ""
+msgstr "Cannot load testcases file: "
 
-#: idg/proyecto.py:582
+#: idg/proyecto.py:616
 msgid "idg.proyect.testcase.file.dont.exist"
-msgstr ""
+msgstr "Testcase file doesn't exist: "
 
-#: idg/proyecto.py:598
+#: idg/proyecto.py:632
 msgid "idg.proyect.cant.copy.file.to.proyect"
-msgstr ""
+msgstr "Couldn't copy file to project: "
 
-#: idg/proyecto.py:865
-msgid "idg.proyect.name.proyect.is.empty"
-msgstr ""
+#: idg/proyecto.py:858
+msgid "idg.anl.copying.invariants"
+msgstr "Copying invariants."
 
-#: idg/proyecto.py:873
-msgid "idg.proyect.init.proyect"
-msgstr ""
-
-#: idg/proyecto.py:877
-msgid "idg.proyect.init.proyect.error.using"
-msgstr ""
-
-#: idg/proyecto.py:884
-msgid "idg.proyect.looking.for.dependences"
-msgstr ""
-
-#: idg/proyecto.py:887
-msgid "idg.proyect.error.cant.import.dependences"
-msgstr ""
-
-#: idg/proyecto.py:891
-msgid "idg.proyect.proyect.created.succesfully"
-msgstr ""
+#: idg/proyecto.py:870
+msgid "idg.anl.error.copying.invariants"
+msgstr "Error while copying invariants."
 
 #: idg/proyecto.py:914
+msgid "idg.proyect.name.proyect.is.empty"
+msgstr "Project name is empty."
+
+#: idg/proyecto.py:922
+msgid "idg.proyect.init.proyect"
+msgstr "Initializating project."
+
+#: idg/proyecto.py:926
+msgid "idg.proyect.init.proyect.error.using"
+msgstr "Error while initializating project using as base: "
+
+#: idg/proyecto.py:933
+msgid "idg.proyect.looking.for.dependences"
+msgstr "Looking for dependences."
+
+#: idg/proyecto.py:936
+msgid "idg.proyect.error.cant.import.dependences"
+msgstr "Cannot import dependences."
+
+#: idg/proyecto.py:940
+msgid "idg.proyect.proyect.created.succesfully"
+msgstr "Project created succesfully."
+
+#: idg/proyecto.py:963
 msgid "idg.proyect.file.dont.exist"
-msgstr ""
+msgstr "Project file doesn't exist: "
 
-#: idg/proyecto.py:932
+#: idg/proyecto.py:981
 msgid "idg.proyect.cant.open.main.test.file"
-msgstr ""
+msgstr "Cannot open main test file."
 
-#: idg/proyecto.py:948
+#: idg/proyecto.py:997
 msgid "idg.proyect.cant.write.main.test.file"
-msgstr ""
+msgstr "Cannot write main test file."
 
-#: idg/proyecto.py:952
+#: idg/proyecto.py:1001
 msgid "idg.proyect.found.broken.dependences.fix.and.search.again"
-msgstr ""
+msgstr "Broken dependences found. Fix paths and search again."
 
-#: idg/proyecto.py:971
+#: idg/proyecto.py:1020
 msgid "idg.proyect.cant.load.bpts.file"
-msgstr ""
+msgstr "Cannot load bpts file: "
 
-#: idg/proyecto.py:992 idg/proyecto.py:1018
+#: idg/proyecto.py:1041 idg/proyecto.py:1067
 msgid "idg.proyect.error.in.config.file"
-msgstr ""
+msgstr "Error in config file."
 
-#: idg/proyecto.py:1005 idg/proyecto.py:1174
+#: idg/proyecto.py:1054 idg/proyecto.py:1223
 msgid "idg.proyect.cant.open.config.file"
-msgstr ""
+msgstr "Cannot open config file: "
 
-#: idg/proyecto.py:1068
+#: idg/proyecto.py:1117
 msgid "idg.proyect.cant.save.proyect.data"
-msgstr ""
+msgstr "Couldn't save project data."
 
-#: idg/proyecto.py:1102
+#: idg/proyecto.py:1151
 msgid "idg.proyect.cant.save.dependences"
-msgstr ""
+msgstr "Couldn't save project dependences."
 
-#: idg/proyecto.py:1129
+#: idg/proyecto.py:1178
 msgid "idg.proyect.cant.save.testcases"
-msgstr ""
+msgstr "Couldn't save project test cases."
 
-#: idg/proyecto.py:1171
+#: idg/proyecto.py:1220
 msgid "idg.proyect.writing.config.file"
-msgstr ""
+msgstr "Writing config file."
 
-#: idg/proyecto.py:1187
+#: idg/proyecto.py:1236
 msgid "idg.proyect.cant.write.config.file"
-msgstr ""
+msgstr "Couldn't write config file"
 
 #: idgui/analisis.py:109
 msgid "idgui.analysis.completed.with.errors"
-msgstr ""
+msgstr "Analisys completed with errors."
 
 #: idgui/analisis.py:117
 msgid "idgui.analysis.running.daikon"
-msgstr ""
+msgstr "Running Daikon."
 
 #: idgui/clock.py:68
 msgid "idgui.clock.is.not.pause.cant.resume"
-msgstr ""
+msgstr "Clock is not paused, cannot resume."
 
 #: idgui/ejecucion.py:87
 msgid "idgui.tester.connecting"
-msgstr ""
+msgstr "Connecting..."
 
 #: idgui/ejecucion.py:168
 msgid "idgui.tester.pass.case"
-msgstr ""
+msgstr "Test case pass succesfully."
 
 #: idgui/ejecucion.py:186
 msgid "idgui.tester.testing.succesfully"
-msgstr ""
+msgstr "Test cases finished succesfully."
 
 #: idgui/ejecucion.py:189
 msgid "idgui.tester.testing.error"
-msgstr ""
+msgstr "Test cases finished with errors."
 
 #: idgui/ejecucion.py:299
 msgid "no.trace.was.generated.at.end_case"
-msgstr ""
+msgstr "No trace was generated after end of test case."
 
 #: idgui/instrum.py:31
 msgid "idgui.instrumenter.finished.successfully"
-msgstr ""
+msgstr "Instrumentation finished succesfully"
 
 #: idgui/instrum.py:33
 msgid "idgui.instrumenter.failed"
-msgstr ""
+msgstr "Instrumentation failed"
 
-#: idgui/main.py:143
+#: idgui/main.py:179
+msgid "idgui.main.error.loading.project"
+msgstr "Error while loading project"
+
+#: idgui/main.py:186
 msgid "idgui.main.already.loaded.nothing.to.do"
-msgstr ""
+msgstr "Project already loaded. Nothing to do."
 
-#: idgui/main.py:181
-msgid "idgui.main.selected.proyect"
-msgstr ""
-
-#: idgui/main.py:217
-msgid "idgui.main.proyect.name.cant.be.empty"
-msgstr ""
-
-#: idgui/main.py:221
-msgid "idgui.main.proyect.name.already.exists"
-msgstr ""
-
-#: idgui/main.py:229
-msgid "idgui.main.name.cant.contain.character"
-msgstr ""
-
-#: idgui/main.py:234
-msgid "idgui.main.bpel.file.not.selected"
-msgstr ""
-
-#: idgui/main.py:236
-msgid "idgui.main.selected.bpel.file.dont.exist"
-msgstr ""
-
-#: idgui/main.py:243
-msgid "idgui.main.creating.proyect.with.bpel"
-msgstr ""
+#: idgui/main.py:232
+msgid "idgui.main.select.import.title"
+msgstr "Select path for project importation."
 
 #: idgui/main.py:250
-msgid "idgui.main.exception.in.proyect.creation"
-msgstr ""
+msgid "idgui.main.project.imported.successfully"
+msgstr "Project imported succesfully."
 
-#: idgui/opciones.py:57 idgui/opciones.py:62 idgui/opciones.py:80
+#: idgui/main.py:252
+msgid "idgui.main.project.imported.error"
+msgstr "Error while importing project."
+
+#: idgui/main.py:263
+msgid "idgui.main.select.export.title"
+msgstr "Select path for project exportation."
+
+#: idgui/main.py:281
+msgid "idgui.main.project.exported.successfully"
+msgstr "Project exported succesfully."
+
+#: idgui/main.py:283
+msgid "idgui.main.project.exported.error"
+msgstr "Error while exporting project."
+
+#: idgui/main.py:296
+msgid "idgui.main.rm.project.dialog"
+msgstr "Remove project?"
+
+#: idgui/main.py:305
+msgid "idgui.main.project.removed"
+msgstr "Project removed: "
+
+#: idgui/main.py:336
+msgid "idgui.main.selected.proyect"
+msgstr "Selected project: "
+
+#: idgui/main.py:372
+msgid "idgui.main.proyect.name.cant.be.empty"
+msgstr "Project name cannot be empty."
+
+#: idgui/main.py:376
+msgid "idgui.main.proyect.name.already.exists"
+msgstr "Project name already exists."
+
+#: idgui/main.py:384
+msgid "idgui.main.name.cant.contain.character"
+msgstr "Project name cannot contain character: "
+
+#: idgui/main.py:389
+msgid "idgui.main.bpel.file.not.selected"
+msgstr "Bpel file not selected."
+
+#: idgui/main.py:391
+msgid "idgui.main.selected.bpel.file.dont.exist"
+msgstr "Selected bpel file doesn't exist."
+
+#: idgui/main.py:398
+msgid "idgui.main.creating.proyect.with.bpel"
+msgstr "Creating project with bpel file: "
+
+#: idgui/main.py:405
+msgid "idgui.main.exception.in.proyect.creation"
+msgstr "Exception captured while project creation."
+
+#: idgui/opciones.py:71 idgui/opciones.py:76 idgui/opciones.py:96
 msgid "msg.help.opt."
 msgstr ""
 
-#: idgui/opciones.py:60
-#, fuzzy
+#: idgui/opciones.py:74
 msgid "idgui.options.no.help.available"
-msgstr "THIS IS A TEEEEEEEST"
+msgstr "No help available."
 
-#: idgui/opciones.py:83
+#: idgui/opciones.py:98
+msgid "idgui.options.successfully.changed"
+msgstr "Option succesfully changed: "
+
+#: idgui/opciones.py:101
 msgid "idgui.options.cant.change.option"
-msgstr ""
+msgstr "Cannot change option: "
 
-#: idgui/proyecto.py:43
+#: idgui/opciones.py:111
+msgid "idgui.options.save.dialog"
+msgstr "Save options"
+
+#: idgui/opciones.py:114
+msgid "idgui.options.saving.options"
+msgstr "Saving options."
+
+#: idgui/opciones.py:131
+msgid "idgui.options.cancel.dialog"
+msgstr "Exit without saving?"
+
+#: idgui/opciones.py:134
+msgid "idgui.options.closing.without.saving"
+msgstr "Exiting without saving."
+
+#: idgui/opciones.py:155
+msgid "idgui.options.default.opts.setted"
+msgstr "Default options setted."
+
+#: idgui/proyecto.py:44
 msgid "idgui.proyect.init.proyect"
-msgstr ""
+msgstr "Initializating project."
 
-#: idgui/proyecto.py:56
+#: idgui/proyecto.py:57
 msgid "idgui.proyect.fatal.exception.at.proyect.creation"
-msgstr ""
+msgstr "Fatal exception captured while creating project."
 
-#: idgui/proyecto.py:90
+#: idgui/proyecto.py:91
 msgid "idgui.proyect.created.succesfully"
-msgstr ""
+msgstr "Project succesfully created."
 
-#: idgui/proyecto.py:190
+#: idgui/proyecto.py:193
 msgid "idgui.proyect.into.proyect"
-msgstr ""
+msgstr "Inside"
 
-#: idgui/proyecto.py:202
+#: idgui/proyecto.py:205
 msgid "idgui.proyect.running.instrumentation"
-msgstr ""
+msgstr "Running instrumentation."
 
-#: idgui/proyecto.py:208 idgui/proyecto.py:209
+#: idgui/proyecto.py:211 idgui/proyecto.py:212
 msgid "idgui.proyect.instrumentation.error"
-msgstr ""
-
-#: idgui/proyecto.py:219
-msgid "idgui.proyect.error.at.dependence.search"
-msgstr ""
+msgstr "Error while running instrumentation."
 
 #: idgui/proyecto.py:222
+msgid "idgui.proyect.error.at.dependence.search"
+msgstr "Error while dependence searching."
+
+#: idgui/proyecto.py:225
 msgid "idgui.proyect.founded.dependences"
-msgstr ""
+msgstr "Found dependences: "
 
-#: idgui/proyecto.py:230
+#: idgui/proyecto.py:233
 msgid "idgui.proyect.saved"
-msgstr ""
+msgstr "Project saved."
 
-#: idgui/proyecto.py:341
+#: idgui/proyecto.py:344
 msgid "idgui.proyect.file.dont.exist.into.proyect"
-msgstr ""
+msgstr "File doesn't exist into project: "
 
-#: idgui/proyecto.py:366
+#: idgui/proyecto.py:369
 msgid "idgui.proyect.marking.file.as.selected"
-msgstr ""
+msgstr "Marking file as selected: "
 
-#: idgui/proyecto.py:377
+#: idgui/proyecto.py:380
 msgid "\t add case: "
-msgstr ""
+msgstr "Adding case: "
 
-#: idgui/proyecto.py:404
+#: idgui/proyecto.py:407
 msgid "idgui.proyect.adding.testcase.file"
-msgstr ""
-
-#: idgui/proyecto.py:418
-msgid "idgui.proyect.error.adding.testcase.file"
-msgstr ""
+msgstr "Adding testcase file: "
 
 #: idgui/proyecto.py:421
-msgid "idgui.proyect.added.testcase.file"
-msgstr ""
+msgid "idgui.proyect.error.adding.testcase.file"
+msgstr "Error while adding testcase file: "
 
-#: idgui/proyecto.py:609
-msgid "idgui.proyect.testcase.not.found.in.treeview"
-msgstr ""
+#: idgui/proyecto.py:424
+msgid "idgui.proyect.added.testcase.file"
+msgstr "Testcase file added: "
 
 #: idgui/proyecto.py:614
+msgid "idgui.proyect.testcase.not.found.in.treeview"
+msgstr "Testcase not found in treeview."
+
+#: idgui/proyecto.py:619
 msgid "idgui.proyect.no.icon.for.this.level"
-msgstr ""
+msgstr "No icon for this level."
 
-#: idgui/proyecto.py:703
+#: idgui/proyecto.py:708
 msgid "idgui.proyect.level.out.of.range"
-msgstr ""
+msgstr "Level out of range."
 
-#: idgui/proyecto.py:719
+#: idgui/proyecto.py:724
 msgid "idgui.proyect.cant.run.tests.if.server.is.offline"
-msgstr ""
+msgstr "Can't run test if ActiveBPEL server is offline."
 
-#: idgui/proyecto.py:720 idgui/proyecto.py:740
+#: idgui/proyecto.py:725 idgui/proyecto.py:745
 msgid "idgui.proyect.run"
-msgstr ""
+msgstr "Run"
 
-#: idgui/proyecto.py:735
+#: idgui/proyecto.py:740
 msgid "idgui.proyect.test.canceled"
-msgstr ""
+msgstr "Test cancelled."
 
-#: idgui/proyecto.py:737
+#: idgui/proyecto.py:742
 msgid "idgui.proyect.test.finished"
-msgstr ""
+msgstr "Tests finished."
 
-#: idgui/proyecto.py:755 idgui/proyecto.py:802
+#: idgui/proyecto.py:760 idgui/proyecto.py:871
 msgid "idgui.proyect.stop"
-msgstr ""
+msgstr "Tests stopped."
+
+#: idgui/proyecto.py:787
+msgid "idgui.project.connection.abpel.server.cheking"
+msgstr "Checking"
+
+#: idgui/proyecto.py:791
+msgid "idgui.project.abpel.running"
+msgstr "Running"
 
 #: idgui/proyecto.py:793
-msgid "idgui.proyect.connection.with.abpel.server"
-msgstr ""
+msgid "idgui.project.abpel.stopped"
+msgstr "Stopped"
+
+#: idgui/proyecto.py:797
+msgid "idgui.project.abpel.server.status"
+msgstr "Status: "
+
+#: idgui/proyecto.py:801 idgui/proyecto.py:862
+msgid "idgui.project.abpel.server.button.stop"
+msgstr "Stop"
+
+#: idgui/proyecto.py:803
+msgid "idgui.project.abpel.server.button.run"
+msgstr "Start"
+
+#: idgui/proyecto.py:814
+msgid "idgui.project.abpel.server.already.running"
+msgstr "ActiveBPEL server is already running."
+
+#: idgui/proyecto.py:818
+msgid "idgui.project.abpel.server.starting.take.while"
+msgstr "Starting ActiveBPEL server... This could take some time."
+
+#: idgui/proyecto.py:825
+msgid "idgui.project.abpel.started.successfully"
+msgstr "ActiveBPEL server succesfully started."
+
+#: idgui/proyecto.py:827
+msgid "idgui.project.abpel.couldnt.start"
+msgstr "Couldn't start ActiveBPEL server."
+
+#: idgui/proyecto.py:836
+msgid "idgui.project.abpel.server.already.stopped"
+msgstr "ActiveBPEL server already stopped."
+
+#: idgui/proyecto.py:840
+msgid "idgui.project.abpel.server.stopping"
+msgstr "Stopping ActiveBPEL server."
+
+#: idgui/proyecto.py:847
+msgid "idgui.project.abpel.stopped.successfully"
+msgstr "ActiveBPEL succesfully stopped."
+
+#: idgui/proyecto.py:849
+msgid "idgui.project.abpel.couldnt.stop"
+msgstr "Couldn't stop ActiveBPEL server."
+
+#: idgui/proyecto.py:1468 idgui/proyecto.py:1484
+msgid "idgui.inv.compare.stop"
+msgstr "Finish"
+
+#: idgui/proyecto.py:1472
+msgid "idgui.inv.compare.start"
+msgstr "Compare"
 
 #: share/ui/main.glade.h:1
 msgid "Edit preferences"
@@ -443,19 +570,31 @@ msgid "Cancel"
 msgstr ""
 
 #: share/ui/opts.glade.h:2
-msgid "Default values"
-msgstr ""
-
-#: share/ui/opts.glade.h:3
 msgid "Opciones"
 msgstr ""
 
-#: share/ui/opts.glade.h:4
+#: share/ui/opts.glade.h:3
 msgid "Options"
+msgstr ""
+
+#: share/ui/opts.glade.h:4
+msgid "Reset Defaults"
 msgstr ""
 
 #: share/ui/opts.glade.h:5 share/ui/proy_config.glade.h:8
 msgid "Save"
+msgstr ""
+
+#: share/ui/proj_context_menu.glade.h:1
+msgid "Close"
+msgstr ""
+
+#: share/ui/proj_context_menu.glade.h:2
+msgid "Export"
+msgstr ""
+
+#: share/ui/proj_context_menu.glade.h:3
+msgid "Remove"
 msgstr ""
 
 #: share/ui/proy.glade.h:1
@@ -483,7 +622,7 @@ msgid "Errors"
 msgstr ""
 
 #: share/ui/proy.glade.h:7
-msgid "Proyect"
+msgid "Project"
 msgstr ""
 
 #: share/ui/proy_anl.glade.h:1
@@ -491,15 +630,14 @@ msgid "\n"
 msgstr ""
 
 #: share/ui/proy_anl.glade.h:3 share/ui/proy_cases.glade.h:1
-#, fuzzy
 msgid "<b>Data</b>"
-msgstr "THIS IS ANOTHER TEST IN Dependencias"
+msgstr ""
 
-#: share/ui/proy_anl.glade.h:4 share/ui/proy_exec.glade.h:1
+#: share/ui/proy_anl.glade.h:4 share/ui/proy_exec.glade.h:2
 msgid "<b>Execution Control</b>"
 msgstr ""
 
-#: share/ui/proy_anl.glade.h:5 share/ui/proy_exec.glade.h:2
+#: share/ui/proy_anl.glade.h:5 share/ui/proy_exec.glade.h:3
 msgid "<b>Log</b>"
 msgstr ""
 
@@ -507,7 +645,8 @@ msgstr ""
 msgid "<b>Selected Traces</b>"
 msgstr ""
 
-#: share/ui/proy_anl.glade.h:7 share/ui/proy_exec.glade.h:3
+#: share/ui/proy_anl.glade.h:7 share/ui/proy_cases.glade.h:3
+#: share/ui/proy_exec.glade.h:4
 msgid "Analize"
 msgstr ""
 
@@ -519,7 +658,7 @@ msgstr ""
 msgid "Simplify"
 msgstr ""
 
-#: share/ui/proy_anl.glade.h:10
+#: share/ui/proy_anl.glade.h:10 share/ui/proy_exec.glade.h:10
 msgid "Time:"
 msgstr ""
 
@@ -527,20 +666,8 @@ msgstr ""
 msgid "Add File"
 msgstr ""
 
-#: share/ui/proy_cases.glade.h:3
-msgid "Cases"
-msgstr ""
-
-#: share/ui/proy_cases.glade.h:4 share/ui/proy_exec.glade.h:5
+#: share/ui/proy_cases.glade.h:4 share/ui/proy_exec.glade.h:6
 msgid "Execute"
-msgstr ""
-
-#: share/ui/proy_cases.glade.h:5
-msgid "File:"
-msgstr ""
-
-#: share/ui/proy_cases.glade.h:6
-msgid "Selected"
 msgstr ""
 
 #: share/ui/proy_config.glade.h:1
@@ -548,14 +675,12 @@ msgid "0"
 msgstr ""
 
 #: share/ui/proy_config.glade.h:2
-#, fuzzy
 msgid "<b>Actions</b>"
-msgstr "THIS IS ANOTHER TEST IN Dependencias"
+msgstr ""
 
 #: share/ui/proy_config.glade.h:3
-#, fuzzy
 msgid "<b>Dependences</b>"
-msgstr "THIS IS ANOTHER TEST IN Dependencias"
+msgstr ""
 
 #: share/ui/proy_config.glade.h:4
 msgid "Broken:"
@@ -573,7 +698,7 @@ msgstr ""
 msgid "Instrument proyect"
 msgstr ""
 
-#: share/ui/proy_config.glade.h:9
+#: share/ui/proy_config.glade.h:9 share/ui/proy_exec.glade.h:8
 msgid "Start"
 msgstr ""
 
@@ -581,39 +706,52 @@ msgstr ""
 msgid "Total:"
 msgstr ""
 
-#: share/ui/proy_exec.glade.h:4
-msgid "Comprobar"
+#: share/ui/proy_exec.glade.h:1
+msgid "<b>ActiveBpel Server</b>"
 msgstr ""
 
-#: share/ui/proy_exec.glade.h:6
-msgid "OK"
+#: share/ui/proy_exec.glade.h:5
+msgid "Check"
 msgstr ""
 
 #: share/ui/proy_exec.glade.h:7
-msgid "Servidor ABpel:"
+msgid "OK"
 msgstr ""
 
-#: share/ui/proy_exec.glade.h:8
-msgid "Tiempo:"
+#: share/ui/proy_exec.glade.h:9
+msgid "State:"
 msgstr ""
 
 #: share/ui/proy_inv.glade.h:1
-msgid ""
-"\n"
-"\n"
+msgid "<b>Comparation</b>"
+msgstr ""
+
+#: share/ui/proy_inv.glade.h:2
+msgid "<b>Invariants</b>"
+msgstr ""
+
+#: share/ui/proy_inv.glade.h:3
+msgid "<b>Invariants</b> By time."
 msgstr ""
 
 #: share/ui/proy_inv.glade.h:4
-#, fuzzy
-msgid "<b>Invariants</b>"
-msgstr "THIS IS ANOTHER TEST IN Dependencias"
-
-#: share/ui/proy_inv.glade.h:5
 msgid "<b>Resume</b>"
 msgstr ""
 
+#: share/ui/proy_inv.glade.h:5
+msgid "Compare"
+msgstr ""
+
 #: share/ui/proy_inv.glade.h:6
-msgid "Elapsed Time"
+msgid "Elapsed Time:"
+msgstr ""
+
+#: share/ui/proy_inv.glade.h:7
+msgid "Invariants:"
+msgstr ""
+
+#: share/ui/proy_inv.glade.h:8
+msgid "Results Available:"
 msgstr ""
 
 #: share/ui/proy_traces.glade.h:1
@@ -625,9 +763,8 @@ msgid "--matrix-flattening"
 msgstr ""
 
 #: share/ui/proy_traces.glade.h:3
-#, fuzzy
 msgid "<b>Options</b>"
-msgstr "THIS IS ANOTHER TEST IN Dependencias"
+msgstr ""
 
 #: share/ui/proy_traces.glade.h:4
 msgid "Flattening Type"
@@ -645,26 +782,33 @@ msgstr ""
 msgid "matrix-flattening"
 msgstr ""
 
+#: share/config.xml:17
+msgid "idg.help.activebpeldaemon"
+msgstr "Path to ActiveBPEL script."
+
 #: share/config.xml:15
 msgid "idg.help.bpelunit"
-msgstr ""
+msgstr "Path to BPELUnit install directory."
 
 #: share/config.xml:9
 msgid "idg.help.home"
-msgstr ""
+msgstr "Home directory."
 
-#: share/config.xml:19
+#: share/config.xml:21
 msgid "idg.help.port"
-msgstr ""
+msgstr "ActiveBPEL server connection port."
 
 #: share/config.xml:11
 msgid "idg.help.share"
-msgstr ""
+msgstr "Shared data folder."
 
-#: share/config.xml:17
+#: share/config.xml:19
 msgid "idg.help.svr"
-msgstr ""
+msgstr "ActiveBPEL server connection url."
 
 #: share/config.xml:13
 msgid "idg.help.takuan"
-msgstr ""
+msgstr "Path to takuan installation directory."
+
+#~ msgid "idg.main.not.installed.locales"
+#~ msgstr "Not installed locales"
