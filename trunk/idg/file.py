@@ -1,11 +1,10 @@
-# File abstractions
+"""@namespace File abstractions"""
 # -*- coding: utf-8 -*-
 
-import os
 import os.path as path
 from xml.dom import minidom as md
 from xml.etree import ElementTree as et
-from exceptions import IOError, NotImplementedError
+#from exceptions import IOError, NotImplementedError
 
 import util.logger
 log = util.logger.getlog('idg.file')
@@ -17,9 +16,6 @@ class File(object):
     This a base class to inherit from.
     """
 
-    ## Associed file descriptor.
-    _file = None
-
     def __init__(self, path_):
         """@brief Initialize File
 
@@ -29,6 +25,7 @@ class File(object):
         """
         self._path = self.abspath(path_)
         self._name = path.basename(self._path)
+        self._file = None
 
     def name(self):
         """@returns The name of the file"""
@@ -49,9 +46,9 @@ class File(object):
         if not self.is_open():
             try:
                 self._file = open(self._path, mode)
-            except IOError:
-                log.error(_("idg.file.cant.open.file.for") + self._path + " " +\
-                          mode)
+            except IOError, ex:
+                log.error(_("idg.file.cant.open.file.for") + self._path + " " +
+                          mode + ":" + str(ex))
 
         return self._file
 
@@ -117,8 +114,8 @@ class File(object):
         @param path_ Path to check.
         @returns True if the file is in the directory. False otherwise.
         """
-        proy = self.abspath(proy)
-        path_ = self.abspath(path_)
+        proy = File.abspath(proy)
+        path_ = File.abspath(path_)
         return path_.startswith(proy)
 
     def external(self, proy):
@@ -129,7 +126,7 @@ class File(object):
         """
         return File.external(proy, self._path)
 
-    def export(self, to):
+    def export(self, to_export):
         """@brief Saves the file to another place
 
         @brief param to Path of the new file.
@@ -150,14 +147,14 @@ class XMLFile(File):
         """@brief Returns the opened doms (md, et) or None"""
         return self._type
 
-    def open(self, type="md"):
+    def open(self, dom_type="md"):
         """Convenience function to fit the File interface
         Opens and returns a dom instance of minidom or etree.
 
         @param type Select the type of dom. Values: md, et
         @returns Opened minidom or ElementTree dom. None in case of error.
         """
-        return self.dom(type)
+        return self.dom(dom_type)
 
     def save(self):
         """@brief Convenience function to fit the File interface
@@ -166,18 +163,18 @@ class XMLFile(File):
         """
         self.serialize()
 
-    def export(self, to):
+    def export(self, export_to):
         """@brief Convenience function to fit the File interface.
 
         @returns True if all goes ok.
         """
-        self.serialize(to)
+        self.serialize(export_to)
 
     def close(self):
         """@brief Resets the open dom without write the changes"""
         self._dom = None
 
-    def dom(self, type="md"):
+    def dom(self, dom_type="md"):
         """@brief Returns an opened dom of the specified type (md or et)
 
         @param type Select the type of dom. Values: md, et
@@ -185,32 +182,33 @@ class XMLFile(File):
         """
         try:
             if self._dom is None:
-                if type == 'md':
+                if dom_type == 'md':
                     self._dom = md.parse(self._path)
-                elif type == 'et':
+                elif dom_type == 'et':
                     self._dom = et.ElementTree()
                     self._dom.parse(self._path)
                 else:
-                    raise ""
+                    raise Exception("Undefined dom type for XMLFile.")
 
-                self._type = type
-        except:
-            log.error(_('idg.file.cannot.parse.file') + type + " " + self._path)
-        finally:
+                self._type = dom_type
+        except IOError:
+            log.error(_('idg.file.cannot.parse.file')\
+                      + dom_type + " " + self._path)
+        else:
             return self._dom
 
-    def serialize(self, path=""):
+    def serialize(self, spath=""):
         """@brief Writes the selected dom, previously opened
 
         @param path Serialize in another file, not in _path.
         @returns True if serialized correctly, None in case of error.
         """
-        path = path if path else self._path
-        check = self._serialize_minidom(path) if self._type == 'md' else\
-                self._serialize_tree(path)
+        spath = spath if spath else self._path
+        check = self._serialize_minidom(spath) if self._type == 'md' else\
+                self._serialize_tree(spath)
 
         if check is None:
-            log.error(_('idg.file.cant.serialize.xml') + type + " " + path)
+            log.error(_('idg.file.cant.serialize.xml') + type + " " + spath)
 
         return check
 
@@ -221,9 +219,9 @@ class XMLFile(File):
         """
         if path.exists(path_) and self._dom is not None:
             self.fix_none_tags()
-            f = open(path_, 'w')
-            f.write(self._dom.toxml(encoding="utf-8"))
-            f.close()
+            mdfile = open(path_, 'w')
+            mdfile.write(self._dom.toxml(encoding="utf-8"))
+            mdfile.close()
             return True
         else:
             return None
@@ -254,22 +252,23 @@ class XMLFile(File):
         """
         elements = [self._dom]
         while elements:
-            e = elements.pop(0)
+            elto = elements.pop(0)
 
-            if e.attributes:
-                for a,v in e.attributes.items():
-                    if v is None:
+            if elto.attributes:
+                for attr, val in elto.attributes.items():
+                    if val is None:
                         #log.debug('None encontrado')
                         #log.debug(e)
                         #log.debug(a)
-                        e.attributes[a] = ""
-            elements.extend(e.childNodes)
+                        elto.attributes[attr] = ""
+            elements.extend(elto.childNodes)
 
     def autodeclare(self):
         """@brief Autodeclare namespaces"""
-        self._autodeclare(self._dom.fistChild)
+        XMLFile._autodeclare(self._dom.fistChild)
 
-    def _autodeclare(self, parent):
+    @staticmethod
+    def _autodeclare(parent):
         """@brief Inline declaration for all namespaces references in the
         document.
 
@@ -280,32 +279,35 @@ class XMLFile(File):
         # We'll use a queue to process the elements in document order
         elms = [parent]
         while elms:
-            e = elms.pop(0)
+            elto = elms.pop(0)
             # Add inline declaration if they need it.
-            if e.namespaceURI:
-                if not e.prefix:
-                    e.previx = 'ns0'   # Avoid empty prefixes
-                e.setAttribute('xmlns:' + e.prefix, e.namespaceURI)
+            if elto.namespaceURI:
+                if not elto.prefix:
+                    elto.previx = 'ns0'   # Avoid empty prefixes
+                elto.setAttribute('xmlns:' + elto.prefix, elto.namespaceURI)
 
             # Queue children
-            elms.extend(e.childNodes)
+            elms.extend(elto.childNodes)
 
         return parent
 
-    def _get_parent(self, e, name):
+    @staticmethod
+    def _get_parent(elto, name):
         """@brief Finds the parent of the element with the given name.
 
         @returns dom of parent element or None if couldn't be founded.
         """
-        while e is not None and e.parentNode is not None:
+        while elto is not None and elto.parentNode is not None:
             # Namespaced elements tag is preceeded by "prefix:"
-            prefix = "" if not e.namespaceURI else e.prefix + ":"
-            if prefix + e.tagName == name: break # We found it!
-            e = e.parentNode # Next parent
+            prefix = "" if not elto.namespaceURI\
+                        else (elto.prefix + ":")
+            if (prefix + elto.tagName) == name:  # We found it!
+                break 
+            elto = elto.parentNode  # Next parent
 
-        return e
+        return elto
 
-    def _set_text(self, e, text):
+    def _set_text(self, elto, text):
         """@brief Sets the child text node of e with text
 
         @param e Element to append a new child text node
@@ -313,11 +315,11 @@ class XMLFile(File):
 
         Note: removes all e childrens, so be careful.
         """
-        while e.hasChildNodes():
-            e.removeChild(e.firstChild)
+        while elto.hasChildNodes():
+            elto.removeChild(elto.firstChild)
 
         text = text if text is not None else ""
-        e.appendChild(self._dom.createTextNode(text))
+        elto.appendChild(self._dom.createTextNode(text))
 
 class ConfigFile(XMLFile):
     """@brief Configuration file.
@@ -334,7 +336,7 @@ class ConfigFile(XMLFile):
         # Open the file with ElementTree
         self.open('et')
 
-    def save(self, dict={}):
+    def save(self, ddict=None):
         """@brief Update the configuration file using the options in
         dictionary
 
@@ -343,16 +345,18 @@ class ConfigFile(XMLFile):
         @returns True if no problem. None if the file couldn't be wroten.
         Overrides File.save
         """
-        root = self._dom.getroot()
-        for id, (val, type) in dict.items():
-            self.set(id, val, type)
+        if ddict is None: 
+            ddict = {}
+
+        for d_id, (val, dom_type) in ddict.items():
+            self.set(d_id, val, dom_type)
 
         return self.serialize()
 
-    def set(self, id, val, type=None):
+    def set(self, oid, val, dom_type=None):
         """@brief Set a option in the file
 
-        @param id Identifier of the option.
+        @param oid Identifier of the option.
         @param val Value of the option.
         @param type The type of the option.
         @returns True if a new option was added. False if an old option was
@@ -361,37 +365,39 @@ class ConfigFile(XMLFile):
         Note: When adding a new option, type is mandatory (value/src).
         """
         root = self._dom.getroot()
-        e = root.find(id)
+        elto = root.find(oid)
 
-        new = e is None
+        new = elto is None
 
         if new:
             # Create new element.
-            e = et.SubElement(root, id)
-            if type is None: return  # New option --> type is mandatory
+            elto = et.SubElement(root, oid)
+            if type is None:  # New option --> type is mandatory
+                return  
 
         # If already exists and no type is given, use the same that already has.
-        elif type is None:
-            type = 'src' if 'src' in e.attrib else 'value'
+        elif dom_type is None:
+            dom_type = 'src' if 'src' in elto.attrib else 'value'
 
-        e.clear()  # Reset old values and attributes.
-        e.set(type, val)
+        elto.clear()  # Reset old values and attributes.
+        elto.set(dom_type, val)
 
         return new
 
-    def get(self, id):
+    def get(self, oid):
         """@brief Get the option from the file.
 
         @returns (value, type), or None if the option isn't in the file.
         """
         root = self._dom.getroot()
-        e = root.find(id)
-        if e is None: return None
+        elto = root.find(oid)
+        if elto is None: 
+            return None
 
-        if e.get('src') is None:
-            return e.get('value'), 'value'
-        elif e.get('value') is not None:
-            return e.get('src'), 'src'
+        if elto.get('src') is None:
+            return elto.get('value'), 'value'
+        elif elto.get('value') is not None:
+            return elto.get('src'), 'src'
         else:
             return None
 
@@ -406,23 +412,23 @@ class ConfigFile(XMLFile):
         Expands absolute paths in src options. DON'T checks paths.
         """
         root = self._dom.getroot()
+        ddict = {}
 
-        dict = {}
-
-        for e in root.getchildren():
-            id = e.tag
-            type = 'src' if 'src' in e.attrib else 'value'
+        for elto in root.getchildren():
+            oid = elto.tag
+            dom_type = 'src' if 'src' in elto.attrib else 'value'
             # Filter by type
-            if ltype and ltype != type: continue
+            if ltype and ltype != dom_type: 
+                continue
 
-            val = e.get(type)
-            if type == 'src':
+            val = elto.get(dom_type)
+            if dom_type == 'src':
                 val = ConfigFile.abspath(val)
 
             if val is not None:
-                dict[id] = [val, type]
+                ddict[oid] = [val, dom_type]
 
-        return dict
+        return ddict
 
 class ANTFile(XMLFile):
     """@brief ANT file.
@@ -441,7 +447,7 @@ class ANTFile(XMLFile):
         # Root element project
         try:
             self._project = self._dom.getElementsByTagName('project')[0]
-        except:
+        except IndexError:
             log.error(_('idg.file.antfile.missing.project.element'))
             self.close()
 
@@ -455,14 +461,14 @@ class ANTFile(XMLFile):
         @returns A string with the value, False if the attribute doesn't exist
         or None if the property doesn't exist.
         """
-        property = self._get_property(name)
+        prop = self._get_property(name)
 
-        if property is None:
+        if prop is None:
             return None
-        elif not property.hasAttribute(attr):
+        elif not prop.hasAttribute(attr):
             return False
         else:
-            return property.getAttribute(attr)
+            return prop.getAttribute(attr)
 
     def set(self, name, attr, val):
         """@brief Set the attribute of the property referenced with name.
@@ -473,13 +479,13 @@ class ANTFile(XMLFile):
         @param val The value to set the property attribute
         @returns True if a new property was created. False otherwise.
         """
-        property = self._get_property(name)
+        prop = self._get_property(name)
         new = False
-        if property is None:
+        if prop is None:
             new = True
-            property = self._create_property(name)
+            prop = self._create_property(name)
 
-        property.setAttribute(attr, val)
+        prop.setAttribute(attr, val)
 
         return new
 
@@ -492,11 +498,11 @@ class ANTFile(XMLFile):
 
         @param name The property name.
         """
-
         try:
-            return [p for p in self._dom.getElementsByTagName('property')\
-                    if p.getAttribute('name') == name][0]
-        except:
+            return [prop for prop
+                    in self._dom.getElementsByTagName('property')\
+                    if prop.getAttribute('name') == name][0]
+        except IndexError:
             return None
 
     def _create_property(self, name):
@@ -505,9 +511,9 @@ class ANTFile(XMLFile):
 
         @param name The property name.
         """
-        property = self._dom.createElement('property')
-        property.setAttribute('name', name)
-        self._project.appendChild(property)
-        return property
+        prop = self._dom.createElement('property')
+        prop.setAttribute('name', name)
+        self._project.appendChild(prop)
+        return prop
 
     # @}
