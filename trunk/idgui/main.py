@@ -11,12 +11,13 @@ pygtk.require("2.0")
 import gtk
 import gobject
 import webkit
+import gettext
 
 import util.logger
 log = util.logger.getlog('idgui.main')
 
-from proyecto import ProyectoUI
-from opciones import OptUI
+from idgui.proyecto import ProyectoUI
+from idgui.opciones import OptUI
 
 class Idgui(object):
     """@brief Objeto principal de la gui."""
@@ -168,6 +169,16 @@ class Idgui(object):
         for child in children:
             child.hide()
 
+        # Crear el proyecto UI
+        try:
+            ## Referencia a la instancia de ProyectoUI abierta en el momento
+            self.proyecto = ProyectoUI(self.idg,self,nombre,bpel)
+        except:
+            log.error("Crear Proyecto %s: %s" % sys.exc_info()[:2])
+            log.error("%s" % traceback.print_exc())
+            self.estado(_("idgui.main.error.loading.project"))
+            self.cargar_portada()
+            return
 
         # Comprobar que el proyecto actualmente cargado, si lo hay, 
         #  no es el mismo que pretendemos cargar.
@@ -178,16 +189,6 @@ class Idgui(object):
             self.proyecto.proyecto_base.reparent(self.proyecto.principal)
             self.proyecto.proyecto_base.show()
             return False
-
-        # Crear el proyecto UI
-        try:
-            ## Referencia a la instancia de ProyectoUI abierta en el momento
-            self.proyecto = ProyectoUI(self.idg,self,nombre,bpel)
-        except:
-            log.error("Crear Proyecto %s: %s" % sys.exc_info()[:2])
-            log.error("%s" % traceback.print_exc())
-            self.estado("Error al cargar el proyecto")
-            self.cargar_portada()
 
     def estado(self,msg,dsc=""):
         """@brief Añadir estado a la barra de estado de la aplicación.
@@ -336,7 +337,7 @@ class Idgui(object):
         log.info(_("idgui.main.selected.proyect") + nombre)
 
         # Si hay otro ya abierto, cerrarlo
-        if self.proyecto is not None :
+        if self.proyecto is not None:
             self.proyecto.cerrar()
 
         # Cargar el proyecto en la gui
