@@ -1,4 +1,4 @@
-# Clase Instrumentadora
+"""Clase Instrumentadora"""
 # -*- coding: utf-8 -*-
 
 import subprocess
@@ -18,7 +18,7 @@ class Instrumentador(Thread):
     ## Expresión regular para comprobar fallos en la instrumentación
     refileexc = re.compile(r"java.io.FileNotFoundException")
 
-    def __init__(self,proy):
+    def __init__(self, proy):
         """@brief Inicializa el Thread
         @param proy Instancia del proyecto para obtener los valores necesarios.
         """
@@ -57,20 +57,22 @@ class Instrumentador(Thread):
         # Intentar la instrumentación
         self.instrumentar()
         # Comprobar que se ha instrumentado correctamente
-        c = self.comprobar()
+        result = self.comprobar()
         # Si ha sido por la falta de un fichero, volvemos a buscar
         # dependencias e intentamos instrumentar de nuevo.
-        if self.cont > 1 : c = False
+        if self.cont > 1: 
+            result = False
 
-        if c is None:
-            bpel = self.proy.bpel_o if path.exists(self.proy.bpel_o) else self.proy.bpel 
+        if result is None:
+            bpel = self.proy.bpel_o if path.exists(self.proy.bpel_o)\
+                                    else self.proy.bpel 
             self.proy.buscar_dependencias(bpel)
             self.instrumentar()
-        elif c is False:
+        elif result is False:
            # raise ProyectoRecuperable(_("No se pudo instrumentar") + out )
-           pass
+            pass
 
         # Establecemos en la clase proyecto si se ha instrumentado bien o no.
-        self.proy.inst = c
+        self.proy.inst = result
         log.debug(self.out)
-        log.info(_("idg.instrum.instrumentation.finished") + str(c))
+        log.info(_("idg.instrum.instrumentation.finished") + str(result))
