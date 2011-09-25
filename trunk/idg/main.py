@@ -103,66 +103,79 @@ class Idg(object):
 
         return self._proylist
 
-    def exportation(self, name, path):
-        """@brief Make a tar (bz2) package with a proyect directory.
+    def exportation(self, name, filepath):
+        """@brief Make a tar (gz) package with a proyect directory.
         @param name Name of proyect.
-        @param path Where the tarfile will be saved.
+        @param filepath Where the tarfile will be saved.
         """
         if name not in self._proylist:
             return False
 
-        # Check that the file doesn't exist and we can write there.
-        tar_path = path.join(path, name + '.proy')
-        if path.exists(tarname) or os.access(ruta, R_OK or W_OK):
-            return False
+        if self.proy is not None and self.proy.nombre == name:
+            self.proy.guardar()
 
         # Compress proyect directory
         try:
-            tar = tarfile.open(tar_path, "w:bz2")
-            tar.add(path.join(self.opt.get('home'), "proy", name))
+            tar = tarfile.open(filepath, "w:gz")
+            tar.add(path.join(self.opt.get('home'), "proy", name), arcname=name)
             tar.close()
-        except TarError:
+        except tarfile.TarError, e:
+            log.error(e)
             return None
 
         return True
 
-    def importation(self, path):
+    def importation(self, filepath):
         """@brief Imports a proyect from an exported package.
-        @param path Path to the package.
+        @param file Path to the package.
         @retval True if everything is ok. False if the proyect cannot be
         imported.
         """
 
         # If path doesn't exist or cannot be accessed
-        if not path.exists(path) or os.access(path ,F_OK or R_OK):
+        if not path.exists(filepath) or not os.access(filepath ,os.F_OK or os.R_OK):
             return False
 
         try:
-            import tarfile
-            tar = tarfile.open(path, "r:bz2")
-        except TarError:
+            tar = tarfile.open(filepath, "r:gz")
+        except tarfile.TarError, e:
+            log.error(e)
             return False
 
+        # Get the name of the root directory in the tarfile
+        member = tar.getmembers()[0]
+
+        # If the first element isn't a directory, wrong format.
+        if not member.isdir():
+            log.error(_("idg.importation.wrong.format" + filepath))
+            return False
+
+        # Check the name of the new proyect and rename if needed
+        nom = member.name
+        i = 1
+        while nom in self._proylist:
+            nom = "%s-%d" % (member.name, i)
+            i += 1
+
+        # Exctract files into a temporary dir
+        extractpath = path.join(self.home, "proy", nom + ".tmp")
         try:
-            # If the first element isn't a directory, wrong format.
-            if not tar[0].isdir():
-                return False
+            tar.extractall(extractpath)
+        except tarfile.TarError, e:
+            log.error(e)
+            return False
 
-            # Proyect name will be extracted from the root directory
-            nom = tar[0].name
-
-            # Check the name of the new proyect and rename if needed
-            i = 1
-            while nom in self._proylist:
-                nom = "%s-%d" % (tar[0].name,i)
-                ++i
-
-            tar.extractall(path.join(self.home,"proy"))
-        except TarError:
+        # Move files from nom.temp/member.name to nom 
+        # and delete nome/member.name
+        try:
+            shutil.move(path.join(extractpath, member.name), 
+                        path.join(self.home, "proy", nom))
+            shutil.rmtree(path.join(extractpath))
+        except shutil.Error, e:
+            log.error(e)
             return False
 
         # Update de proyects list.
-        self.update_proylist()
         return True
 
     def close(self):
@@ -170,3 +183,4 @@ class Idg(object):
 
         if self.proy is not None :
             self.proy.cerrar()
+            self.proy = None
