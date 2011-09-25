@@ -48,12 +48,20 @@ class Idgui(object):
         ### Ventana principal
         self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
                                              "ui/main.glade"))
+        self.builder.add_from_file(path.join(self.idg.opt.get('share'),\
+                                             "ui/proj_context_menu.glade"))
+
         ## Objeto ventana
         self.main_ventana = self.builder.get_object("main_ventana")
         ## Contenedor Principal
         self.principal = self.builder.get_object("principal")
         ## Barra de estado
         self.barra_estado = self.builder.get_object("main_estado")
+        ## Treeview lista proyectos
+        self.lista_treeview =\
+                self.builder.get_object("main_lista_proyectos_vista")
+        ## Popup lista proyectos
+        self.lista_popup = self.builder.get_object("proj_context_menu")
 
         # Cargar portada en principal
 
@@ -65,6 +73,22 @@ class Idgui(object):
         #self.html.load_html_string("<p>HoHoHo</p>", "file:///")
         self.portada = self.builder.get_object("portada")
         self.cargar_portada()
+
+        # Conectar las acciones al menú contextual
+       # self.builder.get_object("menu_action_open_project")\
+       #         .connect_proxy(self.builder.get_object("proj_context_menu_open"))
+
+        self.builder.get_object("menu_action_close_project")\
+                .connect_proxy(self.builder.get_object("proj_context_menu_close"))
+
+        self.builder.get_object("menu_action_export_project")\
+                .connect_proxy(self.builder.get_object("proj_context_menu_export"))
+
+       # self.builder.get_object("menu_action_import_project")\
+       #         .connect_proxy(self.builder.get_object("proj_context_menu_import"))
+
+        self.builder.get_object("menu_action_remove_project")\
+                .connect_proxy(self.builder.get_object("proj_context_menu_rm"))
 
         # Ruta por defecto para abrir los selectores de fichero
         self.last_path = ""
@@ -112,14 +136,23 @@ class Idgui(object):
             @brief Lista los proyectos disponibles en la barra principal.
             @param widget El widget desde donde se llama a esta función.
         """
+        # Recargar proyectos
+        self.idg.update_proylist()
 
         # Limpiar lista actual
         self.modelo_lista_proyectos.clear()
-
-        # Introducir los datos en el ListStore obtenidos de idg
         for p in self.idg.get_proylist():
-            if p not in self.modelo_lista_proyectos:
-                self.modelo_lista_proyectos.append( [p] )
+            self.modelo_lista_proyectos.append([p]) 
+
+    def get_proy_seleccionado(self):
+        """
+        @brief Devuelve el proyecto seleccionado en la lista o None.
+        """
+        if self.lista_treeview.get_selection():
+            model, sel = self.lista_treeview.get_selection().get_selected()
+            return model.get_value(sel,0)
+        else:
+            return None
 
     def cargar_proyecto(self,nombre,bpel=""):
         """ 
@@ -167,6 +200,128 @@ class Idgui(object):
 
     ## @name Callbacks 
     ## @{
+
+    def on_action_open_activate(self, action):
+        """
+        @brief Callback de abrir un proyecto.
+        @param El action desde el cual se llamó.
+        """
+        pass
+
+    def on_action_close_activate(self, action):
+        """
+        @brief Callback de cerrar un proyecto.
+        @param El action desde el cual se llamó.
+        """
+        if self.proyecto is not None:
+            self.proyecto.cerrar()
+            self.proyecto = None
+
+        self.cargar_portada()
+
+    def on_action_import_activate(self, action):
+        """
+        @brief Callback de importar un proyecto.
+        @param El action desde el cual se llamó.
+        """
+        filter = gtk.FileFilter()
+        #filter.add_mime_type("application/x-gzip-compressed-tar")
+        filter.add_pattern("*.idg")
+
+        file_chooser = gtk.FileChooserDialog(\
+                            title=_('idgui.main.select.import.title'),
+                            parent=self.main_ventana,
+                            action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                    gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+        file_chooser.set_default_response(gtk.RESPONSE_OK)
+        file_chooser.add_filter(filter)
+
+        if file_chooser.run() == gtk.RESPONSE_OK:
+            filepath = file_chooser.get_filename()
+
+            if filepath is None: 
+                return False
+
+            cmp = self.idg.importation(filepath)
+
+            if cmp:
+                self.listar_proyectos()
+                self.estado(_('idgui.main.project.imported.successfully'))
+            else:
+                self.estado(_('idgui.main.project.imported.error'))
+
+        file_chooser.destroy()
+
+    def on_action_export_activate(self, action):
+        """
+        @brief Callback de exportar un proyecto.
+        @param El action desde el cual se llamó.
+        """
+        name = self.get_proy_seleccionado()
+        file_chooser = gtk.FileChooserDialog(\
+                            title=_('idgui.main.select.export.title'),
+                            parent=self.main_ventana,
+                            action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                    gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+        file_chooser.set_do_overwrite_confirmation(True)
+        file_chooser.set_current_name(name + ".idg")
+        file_chooser.set_default_response(gtk.RESPONSE_OK)
+
+        if file_chooser.run() == gtk.RESPONSE_OK:
+            filepath = file_chooser.get_filename()
+
+            if filepath is None: 
+                return False
+
+            cmp = self.idg.exportation(name, filepath)
+
+            if cmp:
+                self.estado(_('idgui.main.project.exported.successfully'))
+            else: 
+                self.estado(_('idgui.main.project.exported.error') 
+                                + name + " at " + filepath)
+        file_chooser.destroy()
+
+    def on_action_rm_activate(self, action):
+        """
+        @brief Callback de borrar un proyecto.
+        @param El action desde el cual se llamó.
+        """
+        dialog = gtk.MessageDialog(parent=self.main_ventana,
+                                   type=gtk.MESSAGE_QUESTION,
+                                   buttons=gtk.BUTTONS_OK_CANCEL,
+                                   message_format=
+                                   _('idgui.main.rm.project.dialog'))
+
+        if dialog.run() == gtk.RESPONSE_OK:
+            if self.idg.proy is not None:
+                name = self.idg.proy.nombre
+                self.on_action_close_activate(None)
+                self.idg.proy.borrar()
+                self.idg.proy = None
+                self.listar_proyectos()
+                self.estado(_('idgui.main.project.removed') + name)
+
+        dialog.destroy()
+
+
+    def on_lista_proyectos_release(self, treeview, event):
+        """
+        @brief Callback de hacer click sobre la lista de proyectos.
+        @param treeview El widget treeview con la lista de proyectos.
+        @param event El evento del ratón.
+        """
+        if event.button == 3: # Right click
+            x = int(event.x)
+            y = int(event.y)
+
+            pathinfo = treeview.get_path_at_pos(x, y)
+            if pathinfo is not None:
+                filepath, col, cellx, celly = pathinfo
+                self.lista_popup.popup(None, None, None,
+                                       event.button,event.time)
 
     def on_lista_proyectos_cursor_changed(self, treeview):
         """
@@ -308,14 +463,6 @@ class Idgui(object):
         """@brief Callback de pulsar el cierre de la ventana."""
         self.idg.close()
         gtk.main_quit()
-
-    def on_main_exportar(self, widget):
-        """@brief Callback de pulsar la opción de exportar"""
-        pass
-
-    def on_main_importar(self, widget):
-        """@brief Callback de pulsar la opción de importar"""
-        pass
 
     def on_menu_opciones(self, widget):
         """@brief Callback de seleccionar en el menú ver las opciones."""
