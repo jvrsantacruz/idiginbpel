@@ -108,7 +108,7 @@ class OptUI(object):
                                    type=gtk.MESSAGE_QUESTION,
                                    buttons=gtk.BUTTONS_OK_CANCEL,
                                    message_format=
-                                   _('idgui.options.save.dialog.text'))
+                                   _('idgui.options.save.dialog'))
 
         if dialog.run() == gtk.RESPONSE_OK:
             log.info(_('idgui.options.saving.options'))
@@ -128,7 +128,7 @@ class OptUI(object):
                                    type=gtk.MESSAGE_QUESTION,
                                    buttons=gtk.BUTTONS_OK_CANCEL,
                                    message_format=
-                                   _('idgui.options.cancel.dialog.text'))
+                                   _('idgui.options.cancel.dialog'))
 
         if dialog.run() == gtk.RESPONSE_OK:
             log.info(_('idgui.options.closing.without.saving'))
