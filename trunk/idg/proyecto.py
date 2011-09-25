@@ -1264,6 +1264,13 @@ class Proyecto(object):
         pass
         return self.mod
 
+    def borrar(self):
+        """
+        @brief Borra el proyecto definitivamente.
+        """
+        self.cerrar()
+        shutil.rmtree(self.dir)
+
     def cerrar(self):
         """@brief Cierra el proyecto, realiza comprobaciones y lo guarda. """
         self.cancelar_ejecucion()
