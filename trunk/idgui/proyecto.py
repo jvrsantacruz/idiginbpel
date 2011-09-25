@@ -513,6 +513,8 @@ class ProyectoUI(object):
         self.ejec_log_text = self.gtk.get_object('proy_exec_log_text')
         # Label de estado
         self.ejec_estado_label = self.gtk.get_object('proy_exec_svr-state_label') 
+        ## Boton de arrancar Abpel
+        self.run_abpel_boton = self.gtk.get_object('proy_exec_svr_start_boton')
         ## TreeStore de casos
         self.ejec_tree = self.gtk.get_object('proy_exec_tree')
         ## TreeView de casos
@@ -523,14 +525,14 @@ class ProyectoUI(object):
         ## Boton de analizar desde la pantalla de ejecución
         self.ejec_control_analisis = \
         self.gtk.get_object('proy_exec_control_anl_button')
-        # Label del tiempo de ejecución
+        ## Label del tiempo de ejecución
         self.ejec_control_tiempo_label = \
         self.gtk.get_object('proy_exec_control_time_label')
-        # Barra de progreso
+        ## Barra de progreso
         self.ejec_barra = self.gtk.get_object('proy_exec_control_bar')
 
         # Comprobamos el servidor abpel y ponemos el mensaje correspondiente
-        self.comprobar_servidor_abpel()
+        self.check_server_abpel()
 
         ## Diccionario con los casos listados y sus rutas
         ## de la forma exe_path_cases[fichero:caso] = path
@@ -775,27 +777,91 @@ class ProyectoUI(object):
 
     ## @}
 
-    ## @name Ejecución Callbacks
-    ## @{
-
-    def comprobar_servidor_abpel(self, widget=None):
+    def check_server_abpel(self):
         """@brief Comprueba el servidor abpel y actualiza la gui con el
         resultado.
         @returns True si está activo, False si no lo está.
-        # Label de estado del servidor
-        """
-        status = ""
-        if self.proy.comprobar_abpel() :
-            status = "Online"
-        else:
-            status = "Offline"
+            """
+        self.ejec_estado_label.set_text(
+            _("idgui.project.connection.abpel.server.cheking"))
+
+        is_running = self.proy.check_abpel()
+
+        status = _("idgui.project.abpel.running")\
+                if is_running\
+                else _("idgui.project.abpel.stopped")
 
         # Ponemos el mensaje en el label con el status
         self.ejec_estado_label.set_text(status)
-        self.idgui.estado( _("idgui.proyect.connection.with.abpel.server") + \
+        self.idgui.estado( _("idgui.project.abpel.server.status") +
                           status)
 
-        return status == "Online"
+        self.run_abpel_boton.set_label(
+           _("idgui.project.abpel.server.button.stop") 
+            if is_running\
+            else _("idgui.project.abpel.server.button.run"))
+
+        #log.debug("State is: %s" % str(is_running))
+
+        return is_running
+
+    def start_server_abpel(self):
+        """@brief Inicia el servidor ABpel
+        @returns True si se inició con éxito. False en otro caso.
+        """
+        if self.proy.check_abpel():
+            self.idgui.estado(_("idgui.project.abpel.server.already.running"))
+            return True
+
+        self.ejec_estado_label.set_text(
+            _("idgui.project.abpel.server.starting.take.while"))
+
+        self.proy.start_abpel()
+
+        is_running = self.check_server_abpel()
+
+        if is_running:
+            self.idgui.estado(_("idgui.project.abpel.started.successfully"))
+        else:
+            self.idgui.estado(_("idgui.project.abpel.couldnt.start"))
+
+        return is_running
+
+    def stop_server_abpel(self):
+        """@brief Para el servidor ABpel
+        @returns True si se paró con éxito. False en otro caso.
+        """
+        if not self.proy.check_abpel():
+            self.idgui.estado(_("idgui.project.abpel.server.already.stopped"))
+            return True
+
+        self.ejec_estado_label.set_text(
+            _("idgui.project.abpel.server.stopping"))
+
+        self.proy.stop_abpel()
+
+        is_running = self.check_server_abpel()
+
+        if not is_running:
+            self.idgui.estado(_("idgui.project.abpel.stopped.successfully"))
+        else:
+            self.idgui.estado(_("idgui.project.abpel.couldnt.stop"))
+
+        return is_running
+
+
+    ## @name Ejecución Callbacks
+    ## @{
+
+    def on_proy_exec_svr_check_boton(self, widget):
+        self.check_server_abpel()
+
+    def on_proy_exec_svr_start_boton(self, widget):
+        if self.run_abpel_boton.get_label() ==\
+           _("idgui.project.abpel.server.button.stop"):
+            self.stop_server_abpel()
+        else:
+            self.start_server_abpel()
 
     def on_proy_exec_control_button(self, widget):
         """@brief Callback de pulsar el botón de ejecución en la pantalla de
@@ -809,9 +875,8 @@ class ProyectoUI(object):
     def on_proy_exec_control_anl_button(self, widget):
         """@brief Callback de pulsar el botón de análisis en la pantalla de
         ejecución."""
-        pass
-        #self.actualizar_trazas()
-        #self.analizar()
+        self.actualizar_trazas()
+        self.analizar()
 
     ## @}
 
@@ -1223,18 +1288,272 @@ class ProyectoUI(object):
         self.inv_cont = self.gtk.get_object('proy_inv_container')
         self.inv_cont.reparent(self.gtk.get_object('proy_nb_inv_dummy_box'))
 
-        self.inv_text_buffer = self.gtk.get_object('proy_inv_text_buffer')
+        #self.inv_text_buffer = self.gtk.get_object('proy_inv_text_buffer')
+        self.inv_list = self.gtk.get_object('proy_inv_list')
+        self.inv_list_view = self.gtk.get_object('proy_inv_list_view')
+        #self.inv_list_view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+
+        # Hpane
+        self.inv_hpane = self.gtk.get_object('proy_inv_hpane')
+        self.inv_hpane_size = 0
+
+        # Scroll
+        self.inv_scroll = self.gtk.get_object('proy_inv_scroll')
+        self.inv_viewport = self.gtk.get_object('proy_inv_viewport')
+
+        # Left tree
+        self.inv_left_tree = self.gtk.get_object('proy_inv_left_tree')
+        self.inv_left_view = self.gtk.get_object('proy_inv_left_view')
+
+        # Right tree
+        self.inv_right_tree = self.gtk.get_object('proy_inv_right_tree')
+        self.inv_right_view = self.gtk.get_object('proy_inv_right_view')
+
+        # Compare buttons
+        self.inv_compare_button =\
+                self.gtk.get_object('proy_inv_compare_button')
+        self.inv_compare_label =\
+                self.gtk.get_object('proy_inv_compare_label')
+
+        # Data attributes
         self.inv_data_time = self.gtk.get_object('proy_inv_data_time')
         self.inv_data_ninv = self.gtk.get_object('proy_inv_data_ninv')
+        self.inv_data_nfiles = self.gtk.get_object('proy_inv_data_nfiles')
 
-    def inv_cargar(self):
-        """@brief Carga el último fichero de invariantes en el buffer de invariantes"""
-        inv = self.proy.inv_ultimo()
-        if inv :
-            finv = open(inv, 'r')
-            self.inv_text_buffer.set_text(finv.read())
-            finv.close()
+        # colors
+        self.inv_diff_white = "white"
+        self.inv_diff_red = "red"
+        self.inv_diff_green = "green"
+        self.inv_diff_yellow = "yellow"
+
+        self.inv_load_list()
+        self.inv_file = None
+        self.inv_diff_file = None
+
+    def inv_enter_page(self):
+        """@brief Actions when entering the page"""
+        self.inv_load_list()
+        self.inv_load_lastone()
+        self.inv_compare_button.set_sensitive(len(self.inv_list) != 0)
+
+    def inv_load_lastone(self):
+        """@brief Loads the last invariant available if not already open."""
+        last_path = self.proy.inv_lastone()
+
+        # Load the last invariant.
+        if last_path:
+            self.inv_load(last_path)
+
+    def inv_load(self, path_):
+        """
+        @brief Loads the given inv file on the left tree and sets inv_file.
+        """
+        log.debug("Loading invariant file: " + path_)
+
+        # Close the previous one, if needed
+        if self.inv_file and self.inv_file.path() != path:
+            self.inv_file.close()
+            self.inv_file = None
+
+        if self.inv_file is None:
+            self.inv_file = InvFile(path_)
+
+        self.inv_left_view.set_model(None)
+        self.inv_left_tree.clear()
+
+        white = self.inv_diff_white
+
+        for sequence in self.inv_file.invs.keys():
+            parent = self.inv_left_tree.append(None, [sequence, white])
+            for inv in self.inv_file.invs[sequence]:
+                self.inv_left_tree.append(parent, [" ".join(inv), white])
+
+        self.inv_left_view.set_model(self.inv_left_tree)
+        self.inv_left_view.expand_all()
+        self.inv_left_view.columns_autosize()
+        self.inv_left_view.get_column(0).set_title(InvFile.get_time(\
+                                                      self.inv_file.name()))
+
+        self.inv_hpane.set_position(2147483647)  # Hide right
+        self.inv_data_ninv.set_text(str(self.inv_file.ninvs()))
+
+    def inv_load_fake_sequence(self, tree, name, n=0, color=None):
+        """@brief Inserts an empty fake sequence in the model. Push by front"""
+        color = self.inv_diff_white if color is None else color
+        iter = tree.append(None, [name, color])
+        self.inv_load_fake_invariants(tree, iter, n)
+        return iter
+
+    def inv_load_fake_invariants(self, tree, parent, n, color=None):
+        """@brief Inserts empty fake invariants in the model."""
+        color = self.inv_diff_white if color is None else color
+        for i in xrange(n):
+            tree.append(parent, ["", color])
+
+    def inv_load_diff(self, path_):
+        """@brief Loads two treeviews showing difference of invariants."""
+        # Unplug views and trees
+        self.inv_left_view.set_model(None)
+        self.inv_left_tree.clear()
+
+        self.inv_right_view.set_model(None)
+        self.inv_right_tree.clear()
+
+        self.inv_diff_file = InvFile(path_)
+        for seq, seq_info\
+                in self.inv_file.diff(self.inv_diff_file).iteritems():
+
+            mode = seq_info['mode']
+
+            # Color selection
+            color = self.inv_diff_white
+
+            # Add sequences
+            iter_left = iter_right = None
+
+            # Fake left, new at right
+            if mode == '+':
+                iter_left = self.inv_load_fake_sequence(tree=self.inv_left_tree,
+                                            name=seq)
+            else:
+                iter_left = self.inv_left_tree.append(None, [seq, color])
+
+            # Fake right, old at left
+            if mode == '-':
+                iter_right = self.inv_load_fake_sequence(tree=self.inv_right_tree,
+                                            name=seq)
+            else:
+                iter_right = self.inv_right_tree.append(None, [seq, color])
+
+            # Add invariants as children
+            for inv_info in seq_info['list']:
+                inv_mode = inv_info[0]
+
+                # Color selection
+                if inv_mode == '+':
+                    color = self.inv_diff_green
+                elif inv_mode == '-':
+                    color = self.inv_diff_red
+                elif inv_mode == 'c':
+                    color = self.inv_diff_yellow
+                else:
+                    color = self.inv_diff_white
+
+                # Invariant to show
+                if inv_mode == 'c':
+                    inv_left = " ".join(inv_info[1])
+                    inv_right = " ".join(inv_info[2])
+                elif inv_mode == '+':
+                    inv_left = ""
+                    inv_right = " ".join(inv_info[1])
+                elif inv_mode == '-':
+                    inv_left = " ".join(inv_info[1])
+                    inv_right = ""
+                else:
+                    inv_left = inv_right = " ".join(inv_info[1])
+
+                #if color:
+                #    log.debug("Color: " + color)
+
+                self.inv_left_tree.append(iter_left, [inv_left, color])
+                self.inv_right_tree.append(iter_right, [inv_right, color])
+
+        # Plug views and trees again
+        self.inv_left_view.set_model(self.inv_left_tree)
+        self.inv_left_view.expand_all()
+        self.inv_left_view.columns_autosize()
+        self.inv_left_view.get_column(0).set_title(InvFile.get_time(\
+                                                      self.inv_file.name()))
+
+        self.inv_right_view.set_model(self.inv_right_tree)
+        self.inv_right_view.expand_all()
+        self.inv_right_view.columns_autosize()
+        self.inv_right_view.get_column(0).set_title(InvFile.get_time(\
+                                                      self.inv_diff_file.name()))
+
+    def inv_enter_compare_mode(self):
+        """@brief Changes the ui for compare mode."""
+        if self.inv_file is None:
+            self.warning("No invariant file to compare with.")
+            return None
+
+        self.inv_list_view.get_selection().unselect_all()
+        self.inv_compare_button.set_label(_("idgui.inv.compare.stop"))
+
+    def inv_leave_compare_mode(self):
+        """@brief Changes the ui to leave compare mode."""
+        self.inv_compare_button.set_label(_("idgui.inv.compare.start"))
+        self.inv_hpane.set_position(2147483647)  # Hide right in hpane
+        # self.inv_hpane.set_
+
+        self.inv_load(self.inv_file.path())
+
+        self.inv_diff_file.close()
+        self.inv_diff_file = None
+
+    def inv_get_compare_mode(self):
+        """@brief Checks if the ui is in compare mode."""
+        return self.inv_compare_button.get_label() ==\
+                _('idgui.inv.compare.stop')
+
+    def inv_load_list(self):
+        """@brief Loads the treeview list of available invariants"""
+        self.inv_list_view.set_model(None)
+        self.inv_list.clear()
+
+        list = self.proy.inv_list()
+        list.sort(reverse=True)
+        for inv_path in list:
+            self.inv_list.append([InvFile.get_time(inv_path), inv_path])
+
+        self.inv_data_nfiles.set_text(str(len(self.inv_list)))
+        self.inv_list_view.set_model(self.inv_list)
+
+    ## @}
+
+    ## @name Callbacks Invariantes
+    ## @{
+
+    def on_inv_list_cursor_changed(self, treeview):
+        """@brief Callback for selection/unselection of rows in the list."""
+        model, sel = treeview.get_selection().get_selected()
+        inv_path = model.get_value(sel, 1)
+
+        if self.inv_get_compare_mode():
+            self.inv_load_diff(inv_path)
+            #self.inv_hpane.set_position(-1)  # Automatically resize hpane
+            self.on_inv_hpaned_size_allocate()
         else:
-            log.warning('Se intentó cargar un invariante, pero no hay.')
+            self.inv_load(inv_path)
+
+    def on_inv_compare_button(self, button):
+        """@brief Callback for releasing the compare button."""
+        if self.inv_get_compare_mode():
+            self.inv_leave_compare_mode()
+        else:
+            self.inv_enter_compare_mode()
+
+    def on_inv_hpaned_size_allocate(self, pane=None, alloc=None):
+        """@brief Callback for resizing the hpane with the invariants.
+
+        If compare mode is set, splits shows both treeviews at the same size.
+        Otherwise, hides the right one, showing only the left treeview.
+        """
+        if pane is None:
+            pane = self.inv_hpane
+
+        if alloc is None:
+            alloc = pane.get_allocation()
+
+        # Only if size really changes
+        if self.inv_hpane_size == alloc.width:
+            return
+
+        self.inv_hpane_size = alloc.width
+        compare_on = self.inv_get_compare_mode()
+
+        view_alloc = self.inv_viewport.get_allocation()
+        width = view_alloc.width / 2 if compare_on else view_alloc.width
+        pane.set_position(width)
 
     ## @}
