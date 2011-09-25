@@ -12,11 +12,11 @@ import util.clock
 import util.logger
 log = util.logger.getlog('idgui.proyect')
 
-from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable, \
-ProyectoIrrecuperable
-from instrum import Comprobador
-from ejecucion import Ejecucion
-from analisis import Analisis
+from idg.proyecto import Proyecto, ProyectoError, ProyectoRecuperable
+from idg.invfile import InvFile
+from idgui.instrum import Comprobador
+from idgui.ejecucion import Ejecucion
+from idgui.analisis import Analisis
 
 class ProyectoUI(object):
     """@brief Manejo de la interfaz de usuario del proyecto."""
@@ -118,13 +118,15 @@ class ProyectoUI(object):
     def on_proy_notebook_switch_page(self, notebook, page, pagenum):
         """@brief Actualiza la pestaña de trazas"""
         # Actualizar trazas al entrar en la pestaña de trazas
-        if pagenum == 2 :
+        if pagenum == 2:
             self.load_exe_tree()
-        elif pagenum == 3 :
+        elif pagenum == 3:
             self.actualizar_trazas()
-        elif pagenum == 4 :
+        elif pagenum == 4:
             self.anl_actualizar_info()
             self.anl_seleccionar_trazas()
+        elif pagenum == 5:
+            self.inv_enter_page()
     ## @}
 
     ## @name Config
@@ -167,8 +169,8 @@ class ProyectoUI(object):
         ldep = len(self.proy.deps)
         ldep_miss = len(self.proy.dep_miss)
 
-        log.debug("Dependencias " + str(ldep))
-        log.debug("Dependencias no encontradas " + str(ldep_miss))
+        #log.debug("Dependencias " + str(ldep))
+        #log.debug("Dependencias no encontradas " + str(ldep_miss))
 
         # Mostrar error si hay dependencias rotas
         if len(self.proy.dep_miss) > 0 :
@@ -393,7 +395,7 @@ class ProyectoUI(object):
 
         # Los añadimos al test.bpts general para su ejecución
         self.proy.add_casos(casos)
-        
+
     ## @}
 
     ## @name Callbacks Casos
@@ -409,7 +411,7 @@ class ProyectoUI(object):
         bpts = self.bpts_fichero.get_filename()
         self.last_path = path.dirname(bpts)
 
-        log.debug("Last Path: " + self.last_path)
+        #log.debug("Last Path: " + self.last_path)
         try:
             # Vaciamos primero el test.bpts general para evitar casos repetidos
             self.proy.empty_test()
@@ -478,7 +480,7 @@ class ProyectoUI(object):
             fileiter = parent if parent is not None else it
             self.info_bpts_fichero(model.get_value(fileiter, 0), count)
 
-    def on_proy_cases_exec_anl_button(self, widget):
+    def on_proy_cases_anl_button(self, widget):
         # Pasamos a la página de la ejecución
         self.proyecto_notebook.next_page()
         # Y comenzamos la ejecución
@@ -731,7 +733,7 @@ class ProyectoUI(object):
         log.debug("Terminando ejecución: " + str(kill) )
 
         # Poner el estado en ejecución terminada
-        if kill :
+        if kill:
             self.idgui.estado(_("idgui.proyect.test.canceled"))
         else:
             self.idgui.estado(_("idgui.proyect.test.finished"))
@@ -747,7 +749,7 @@ class ProyectoUI(object):
         self.load_exe_tree()
 
         # Comprobar que el servidor Abpel esté en condiciones
-        if not self.comprobar_servidor_abpel() :
+        if not self.check_server_abpel():
             self.ejec_conexion_error()
             return
 
